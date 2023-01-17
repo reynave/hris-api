@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
-class Personal extends CI_Controller
+class Branch extends CI_Controller
 {
 
     public function __construct()
@@ -21,23 +21,12 @@ class Personal extends CI_Controller
     function index()
     {
         $data = array(
-            "data" => $this->model->sql("select * from personal where presence = 1"),
+            "data" => $this->model->sql("SELECT  * FROM branch WHERE  presence = 1 "),
         );
         echo json_encode($data);
     }
-
-    function detail($id)
-    {
-        $data = array(
-            "item" => $this->model->sql("select * from personal where presence = 1 and id = '$id' "),
-            "personal_religion" =>  $this->model->sql("select * from personal_religion where presence = 1  "),
-            "personal_marital" =>  $this->model->sql("select * from personal_marital where presence = 1  "),
-            "employmentId" =>  $this->model->select("id","employment","personalId = '$id' and presence = 1 and status = 1"),
-            "payrollId" => $this->model->select("id","payroll","personalId = '$id' and presence = 1 and status = 1"),
-        );
-        echo json_encode($data);
-    }
-
+ 
+    
     function fnSave()
     {
         $post =   json_decode(file_get_contents('php://input'), true);
@@ -45,30 +34,14 @@ class Personal extends CI_Controller
             "error" => true,
         );
         if ($post) {
-            $error = true;
-
+            $error = true; 
             $id = $post['id'];
-            $update = array(
-                "permanent" => $post['model']['permanent'],
-                "name" => $post['model']['name'],
-                "phone" => $post['model']['phone'],
-                "email" => $post['model']['email'],
-                "birthPlace" => $post['model']['birthPlace'],
-                "birthDate" =>  $post['model']['birthDate']['year'] . "-" . $post['model']['birthDate']['month'] . "-" . $post['model']['birthDate']['day'],
-                "gender" => $post['model']['gender'],
-                "marital" => $post['model']['marital'],
-                "blood" => $post['model']['blood'],
-                "religion" => $post['model']['religion'],
-                "idType" => $post['model']['idType'],
-                "idNumber" => $post['model']['idNumber'],
-                "expDate" =>  $post['model']['expDate']['year'] . "-" . $post['model']['expDate']['month'] . "-" . $post['model']['expDate']['day'],
-                "postalCode" => $post['model']['postalCode'],
-                "address" => $post['model']['address'],
-
+            $update = array( 
+                "name" => $post['model']['name'],  
                 "inputDate"     => date("Y-m-d H:i:s"),
                 "updateDate"    => date("Y-m-d H:i:s"),
             );
-            $this->db->update('personal', $update, "id='$id'");
+            $this->db->update('organization', $update, "id='$id'");
 
             $data = array(
                 "error" => false,
@@ -83,24 +56,28 @@ class Personal extends CI_Controller
         $post =   json_decode(file_get_contents('php://input'), true);
         $error = true;
         if ($post) {
-            $error = true;
-            $id = $this->model->number('personal');
-            $insert = array(
-                "id" => $id,
-                "name"          => $post['name'],
-                "phone"          => $post['phone'],
-                "email"          => $post['email'],
-                "gender"          => $post['gender'],
-
-                "birthDate" => $post['birthDate']['year'] . "-" . $post['birthDate']['month'] . "-" . $post['birthDate']['day'],
+            $error = true; 
+            $insert = array( 
+                "name"          => $post['name'],  
+                "organizationId" => $post['organizationId'],
                 "inputDate"     => date("Y-m-d H:i:s"),
-                "updateDate"    => date("Y-m-d H:i:s"),
+                "updateDate"    => date("Y-m-d H:i:s"), 
             );
-            $this->db->insert('personal', $insert);
+            $this->db->insert('branch', $insert);
+            $idBranch = $this->model->select("id","branch","1 order by inputDate desc");
+
+            if($post['employmentId'] != ""){
+                $update = array( 
+                    "organizationId" => $post['organizationId'],
+                    "branchId"      =>  $idBranch,   
+                    "updateDate"    => date("Y-m-d H:i:s"), 
+                );
+                $this->db->update('employment', $update,"id = '".$post['employmentId']."' "); 
+            }
+           
 
             $data = array(
-                "id" => $id,
-                "items" =>  $post,
+                "id" =>  $idBranch, 
             );
         }
         echo   json_encode($data);
