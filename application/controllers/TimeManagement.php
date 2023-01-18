@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
-class Personal extends CI_Controller
+class TimeManagement extends CI_Controller
 {
 
     public function __construct()
@@ -21,19 +21,51 @@ class Personal extends CI_Controller
     function index()
     {
         $data = array(
-            "data" => $this->model->sql("select * from personal where presence = 1"),
+            "data" => $this->model->sql("SELECT p.id , p.name , t2.*
+            FROM personal AS p
+            LEFT JOIN  (
+                SELECT tm.personalId, tm.`date`, s.name AS 'shift',
+                s.scheduleIn, s.scheduleOut,
+                 tm.checkIn, tm.checkOut, tm.overTime, tm.id as 'idx'
+                
+                FROM time_management AS tm 
+                LEFT JOIN time_management_shift AS s ON tm.shiftId = s.id
+                
+                WHERE  tm.`date` = CURDATE()
+             ) AS  t2 ON p.id = t2.personalId
+            
+            WHERE p.presence = 1;
+             "),
         );
         echo json_encode($data);
     }
 
-    function detail($id)
+    function today($id)
     {
+
+       
+        $sql = "SELECT * From time_management  WHERE  personalId = '$id' AND DATE = CURDATE() ";
+        if(!$this->model->sql($sql)){
+            $insert = array(
+                "personalId" => $id,
+                "date" => date("Y-m-d"),
+                "shiftId" => "W",
+                "inputDate" => date("Y-m-d H:i:s"),
+            );
+            $this->db->insert("time_management", $insert);
+        }
+
         $data = array(
-            "item" => $this->model->sql("select * from personal where presence = 1 and id = '$id' "),
-            "personal_religion" =>  $this->model->sql("select * from personal_religion where presence = 1  "),
-            "personal_marital" =>  $this->model->sql("select * from personal_marital where presence = 1  "),
-            "employmentId" =>  $this->model->select("id","employment","personalId = '$id' and presence = 1 and status = 1"),
-            "payrollId" => $this->model->select("id","payroll","personalId = '$id' and presence = 1 and status = 1"),
+            "personal" =>$this->model->sql("SELECT p.id , p.name from personal p WHERE p.presence = 1 and p.id = '$id' ")[0],
+            "item" => $this->model->sql($sql )[0],
+            "timeManagementShift" =>  $this->model->sql("SELECT id, name,
+                 DATE_FORMAT(`scheduleIn`, '%H:%i') AS `scheduleIn`,
+                 DATE_FORMAT(`scheduleOut`, '%H:%i') AS `scheduleOut`
+                 
+            from time_management_shift "), 
+            "offtime" =>  $this->model->sql("SELECT id, name FROM  offtime  where presence = 1  order by name asc "), 
+       
+            
         );
         echo json_encode($data);
     }
@@ -46,29 +78,29 @@ class Personal extends CI_Controller
         );
         if ($post) {
             $error = true;
-
+            if(isset($post['model']['branch'])){
+                $insert = array(
+                    "organizationId" =>  $post['model']['organizationId'],
+                    "name" => $post['model']['branch'],
+                    "inputDate"    => date("Y-m-d H:i:s"),
+                    "updateDate"    => date("Y-m-d H:i:s"),
+                ); 
+                $this->db->insert('branch', $insert);
+                $idBranch = $this->model->select("id", "branch", "1 order by inputDate desc");
+            }
             $id = $post['id'];
-            $update = array(
-                "permanent" => $post['model']['permanent'],
-                "name" => $post['model']['name'],
-                "phone" => $post['model']['phone'],
-                "email" => $post['model']['email'],
-                "birthPlace" => $post['model']['birthPlace'],
-                "birthDate" =>  $post['model']['birthDate']['year'] . "-" . $post['model']['birthDate']['month'] . "-" . $post['model']['birthDate']['day'],
-                "gender" => $post['model']['gender'],
-                "marital" => $post['model']['marital'],
-                "blood" => $post['model']['blood'],
-                "religion" => $post['model']['religion'],
-                "idType" => $post['model']['idType'],
-                "idNumber" => $post['model']['idNumber'],
-                "expDate" =>  $post['model']['expDate']['year'] . "-" . $post['model']['expDate']['month'] . "-" . $post['model']['expDate']['day'],
-                "postalCode" => $post['model']['postalCode'],
-                "address" => $post['model']['address'],
-
-                "inputDate"     => date("Y-m-d H:i:s"),
+            $update = array( 
+                "dateJoinStart" =>  $post['model']['dateJoinStart']['year'] . "-" . $post['model']['dateJoinStart']['month'] . "-" . $post['model']['dateJoinStart']['day'],
+                "dateJoinEnd" =>  $post['model']['dateJoinEnd']['year'] . "-" . $post['model']['dateJoinEnd']['month'] . "-" . $post['model']['dateJoinEnd']['day'],
+                "jobLevelId" => $post['model']['jobLevelId'], 
+                "jobPositionId" => $post['model']['jobPositionId'], 
+                "branchId" => isset($post['model']['branch']) ?  $idBranch : $post['model']['branchId'], 
+                "approvalLineId" => $post['model']['approvalLineId'], 
+                "employmentStatusId" => $post['model']['employmentStatusId'],  
+                "organizationId" => $post['model']['organizationId'],   
                 "updateDate"    => date("Y-m-d H:i:s"),
             );
-            $this->db->update('personal', $update, "id='$id'");
+            $this->db->update('employment', $update, "id='$id'");
 
             $data = array(
                 "error" => false,
@@ -135,7 +167,6 @@ class Personal extends CI_Controller
             "error" => true,
         );
         if ($post) {
-            
             $error = true;
             if($post['value'] == 'employment'){
                 $personalId = $post['personalId'];

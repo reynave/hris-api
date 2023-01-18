@@ -64,14 +64,34 @@ class Payroll extends CI_Controller
             public : string,  */
             $id = $post['id'];
             $update = array(
-                "taxableDate" => $post['model']['taxableDate']['year'] . "-" . $post['model']['taxableDate']['month'] . "-" . $post['model']['taxableDate']['day'],
+                "taxableDate" => !isset($post['model']['taxableDate']) ? '' :  $post['model']['taxableDate']['year'] . "-" . $post['model']['taxableDate']['month'] . "-" . $post['model']['taxableDate']['day'],
+                "bpjsTkDate" => !isset($post['model']['bpjsTkDate']) ? '' : $post['model']['bpjsTkDate']['year'] . "-" . $post['model']['bpjsTkDate']['month'] . "-" . $post['model']['bpjsTkDate']['day'],
+                "JaminanPensiunDate" => !isset($post['model']['JaminanPensiunDate']) ? '' :  $post['model']['JaminanPensiunDate']['year'] . "-" . $post['model']['JaminanPensiunDate']['month'] . "-" . $post['model']['JaminanPensiunDate']['day'],
+               
+                
                 "salary" => $post['model']['salary'], 
                 "salaryType" => $post['model']['salaryType'],
                 "bankName" => $post['model']['bankName'],
                 "bankAccountNumber" => $post['model']['bankAccountNumber'],
                 "bankAccountHolderName" => $post['model']['bankAccountHolderName'],
                 "hourlyRate" => $post['model']['hourlyRate'],
-                "tunjangan" => $post['model']['tunjangan'],   
+                "tunjangan" => $post['model']['tunjangan'],
+                
+
+                "taxNpwp" => $post['model']['taxNpwp'],
+                "taxMethod" => $post['model']['taxMethod'],
+                "taxHolderName" => $post['model']['taxHolderName'],
+                "taxPtkpStatus" => $post['model']['taxPtkpStatus'],
+                "taxSalary" => $post['model']['taxSalary'],
+                "EmploymentTaxStatus" => $post['model']['EmploymentTaxStatus'],
+                "taxPktpAccountHolder" => $post['model']['taxPktpAccountHolder'],
+                "bpsjTkNo" => $post['model']['bpsjTkNo'],
+                "bpsjKesehatanNo" => $post['model']['bpsjKesehatanNo'],
+                "JhtCost" => $post['model']['JhtCost'],
+                "JaminanPensiunCost" => $post['model']['JaminanPensiunCost'],
+                "bpjsKesehatanFamily" => $post['model']['bpjsKesehatanFamily'],
+                
+
                 "updateDate" => date("Y-m-d H:i:s"),
             );
             $this->db->update('payroll', $update, "id='$id'");
