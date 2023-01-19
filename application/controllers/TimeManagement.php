@@ -31,7 +31,7 @@ class TimeManagement extends CI_Controller
                 FROM time_management AS tm 
                 LEFT JOIN time_management_shift AS s ON tm.shiftId = s.id
                 
-                WHERE  tm.`date` = CURDATE()
+                WHERE  tm.`date` = CURDATE() and tm.presence = 1
              ) AS  t2 ON p.id = t2.personalId
             
             WHERE p.presence = 1;
@@ -42,9 +42,8 @@ class TimeManagement extends CI_Controller
 
     function today($id)
     {
-
-       
-        $sql = "SELECT * From time_management  WHERE  personalId = '$id' AND DATE = CURDATE() ";
+ 
+        $sql = "SELECT * From time_management  WHERE presence = 1 and  personalId = '$id' AND DATE = CURDATE() ";
         if(!$this->model->sql($sql)){
             $insert = array(
                 "personalId" => $id,
@@ -68,47 +67,7 @@ class TimeManagement extends CI_Controller
             
         );
         echo json_encode($data);
-    }
-
-    function fnSave()
-    {
-        $post =   json_decode(file_get_contents('php://input'), true);
-        $data = array(
-            "error" => true,
-        );
-        if ($post) {
-            $error = true;
-            if(isset($post['model']['branch'])){
-                $insert = array(
-                    "organizationId" =>  $post['model']['organizationId'],
-                    "name" => $post['model']['branch'],
-                    "inputDate"    => date("Y-m-d H:i:s"),
-                    "updateDate"    => date("Y-m-d H:i:s"),
-                ); 
-                $this->db->insert('branch', $insert);
-                $idBranch = $this->model->select("id", "branch", "1 order by inputDate desc");
-            }
-            $id = $post['id'];
-            $update = array( 
-                "dateJoinStart" =>  $post['model']['dateJoinStart']['year'] . "-" . $post['model']['dateJoinStart']['month'] . "-" . $post['model']['dateJoinStart']['day'],
-                "dateJoinEnd" =>  $post['model']['dateJoinEnd']['year'] . "-" . $post['model']['dateJoinEnd']['month'] . "-" . $post['model']['dateJoinEnd']['day'],
-                "jobLevelId" => $post['model']['jobLevelId'], 
-                "jobPositionId" => $post['model']['jobPositionId'], 
-                "branchId" => isset($post['model']['branch']) ?  $idBranch : $post['model']['branchId'], 
-                "approvalLineId" => $post['model']['approvalLineId'], 
-                "employmentStatusId" => $post['model']['employmentStatusId'],  
-                "organizationId" => $post['model']['organizationId'],   
-                "updateDate"    => date("Y-m-d H:i:s"),
-            );
-            $this->db->update('employment', $update, "id='$id'");
-
-            $data = array(
-                "error" => false,
-            );
-        }
-        echo   json_encode($data);
-    }
-
+    } 
 
     function insert()
     {
@@ -143,17 +102,13 @@ class TimeManagement extends CI_Controller
         $post =   json_decode(file_get_contents('php://input'), true);
         $error = true;
         if ($post) {
-            $error = true;
-
+            $error = true; 
             $id = $post['id'];
             $update = array(
-                "presence" => 0,
-                "status" => 0,
-                "inputDate"     => date("Y-m-d H:i:s"),
+                "presence" => 0,  
                 "updateDate"    => date("Y-m-d H:i:s"),
             );
-            $this->db->update('personal', $update, "id='$id'");
-
+            $this->db->update('time_management', $update, "id='$id'"); 
             $data = array(
                 "error" => false,
             );
@@ -161,41 +116,27 @@ class TimeManagement extends CI_Controller
         echo   json_encode($data);
     }
 
-    function fnCreateOtherForm(){
+    function fnUpdate()
+    {
         $post =   json_decode(file_get_contents('php://input'), true);
-        $data = array(
-            "error" => true,
-        );
+        $error = true;
         if ($post) {
-            $error = true;
-            if($post['value'] == 'employment'){
-                $personalId = $post['personalId'];
-                $id = $this->model->number('employment');
-                $insert = array( 
-                    "id" => $id,
-                    "personalId" => $personalId,
-                    "inputDate"     => date("Y-m-d H:i:s"), 
-                );
-                $this->db->insert('employment', $insert);
-    
-            }
-            if($post['value'] == 'payroll'){
-                $personalId = $post['personalId'];
-                $id = $this->model->number('payroll');
-                $insert = array( 
-                    "id" => $id,
-                    "personalId" => $personalId,
-                    "inputDate"     => date("Y-m-d H:i:s"), 
-                );
-                $this->db->insert('payroll', $insert);
-    
-            }
-           
+            $error = true; 
+            $id = $post['id'];
+            $update = array( 
+                 "checkIn"  => $post['item']['checkIn'],
+                 "checkOut" => $post['item']['checkOut'],
+                 "overTime" => $post['item']['overTime'],
+                 "offTimeId" => $post['item']['offTimeId'],
+                "updateDate"    => date("Y-m-d H:i:s"),
+            );
+            $this->db->update('time_management', $update, "id='$id'"); 
             $data = array(
-                "id" => $id ,
                 "error" => false,
             );
         }
         echo   json_encode($data);
     }
+
+ 
 }
