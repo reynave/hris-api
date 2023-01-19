@@ -24,14 +24,15 @@ CREATE TABLE IF NOT EXISTS `auto_number` (
   `runningNumber` int(9) NOT NULL DEFAULT 1,
   `updateDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table hris.auto_number: ~4 rows (approximately)
+-- Dumping data for table hris.auto_number: ~5 rows (approximately)
 INSERT INTO `auto_number` (`id`, `name`, `prefix`, `digit`, `runningNumber`, `updateDate`) VALUES
 	(1, 'personal', 'P', 6, 7, '0000-00-00 00:00:00'),
 	(2, 'employment', 'E', 6, 23, '0000-00-00 00:00:00'),
 	(3, 'payroll', 'PYL', 6, 12, '0000-00-00 00:00:00'),
-	(4, 'reimbursement', 'REM', 6, 23, '0000-00-00 00:00:00');
+	(4, 'reimbursement', 'REM', 6, 23, '0000-00-00 00:00:00'),
+	(5, 'loan', 'LN', 6, 17, '0000-00-00 00:00:00');
 
 -- Dumping structure for table hris.branch
 DROP TABLE IF EXISTS `branch`;
@@ -140,14 +141,57 @@ INSERT INTO `employment_status` (`id`, `name`) VALUES
 -- Dumping structure for table hris.loan
 DROP TABLE IF EXISTS `loan`;
 CREATE TABLE IF NOT EXISTS `loan` (
-  `id` int(9) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+  `id` varchar(50) NOT NULL DEFAULT '',
+  `personalId` varchar(50) NOT NULL DEFAULT '',
+  `amount` double NOT NULL DEFAULT 0,
+  `installment` int(10) NOT NULL DEFAULT 0,
+  `description` varchar(250) NOT NULL DEFAULT '',
+  `effectiveDate` date DEFAULT NULL,
+  `presence` int(2) NOT NULL DEFAULT 1,
+  `status` int(3) NOT NULL DEFAULT 1,
+  `inputDate` datetime DEFAULT NULL,
+  `updateDate` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table hris.loan: ~0 rows (approximately)
-INSERT INTO `loan` (`id`, `name`) VALUES
-	(1, 'Personal Load');
+INSERT INTO `loan` (`id`, `personalId`, `amount`, `installment`, `description`, `effectiveDate`, `presence`, `status`, `inputDate`, `updateDate`) VALUES
+	('LN000017', 'P000004', 100000000, 12, '', '2023-01-19', 1, 1, '2023-01-19 14:52:08', NULL);
+
+-- Dumping structure for table hris.loan_detail
+DROP TABLE IF EXISTS `loan_detail`;
+CREATE TABLE IF NOT EXISTS `loan_detail` (
+  `id` int(9) NOT NULL AUTO_INCREMENT,
+  `loanId` varchar(50) NOT NULL,
+  `installment` int(3) NOT NULL DEFAULT 1,
+  `paymentDate` date DEFAULT NULL,
+  `paymentAmount` double NOT NULL DEFAULT 0,
+  `paidDate` date DEFAULT NULL,
+  `paidAmount` double NOT NULL DEFAULT 0,
+  `balance` double NOT NULL DEFAULT 0,
+  `status` int(3) NOT NULL DEFAULT 1,
+  `presence` int(2) NOT NULL DEFAULT 1,
+  `inputDate` datetime DEFAULT NULL,
+  `inputBy` varchar(50) NOT NULL DEFAULT '',
+  `updateDate` datetime DEFAULT NULL,
+  `updateBy` varchar(50) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=121 DEFAULT CHARSET=utf8mb4;
+
+-- Dumping data for table hris.loan_detail: ~0 rows (approximately)
+INSERT INTO `loan_detail` (`id`, `loanId`, `installment`, `paymentDate`, `paymentAmount`, `paidDate`, `paidAmount`, `balance`, `status`, `presence`, `inputDate`, `inputBy`, `updateDate`, `updateBy`) VALUES
+	(109, 'LN000017', 1, '2023-02-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
+	(110, 'LN000017', 2, '2023-03-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
+	(111, 'LN000017', 3, '2023-04-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
+	(112, 'LN000017', 4, '2023-05-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
+	(113, 'LN000017', 5, '2023-06-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
+	(114, 'LN000017', 6, '2023-07-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
+	(115, 'LN000017', 7, '2023-08-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
+	(116, 'LN000017', 8, '2023-09-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
+	(117, 'LN000017', 9, '2023-10-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
+	(118, 'LN000017', 10, '2023-11-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
+	(119, 'LN000017', 11, '2023-12-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
+	(120, 'LN000017', 12, '2024-01-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, '');
 
 -- Dumping structure for table hris.offtime
 DROP TABLE IF EXISTS `offtime`;
@@ -397,7 +441,7 @@ CREATE TABLE IF NOT EXISTS `time_management` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table hris.time_management: ~13 rows (approximately)
+-- Dumping data for table hris.time_management: ~16 rows (approximately)
 INSERT INTO `time_management` (`id`, `personalId`, `date`, `shiftId`, `checkIn`, `checkOut`, `overTime`, `offTimeId`, `presence`, `inputDate`, `updateDate`) VALUES
 	(1, 'P000003', '2023-01-18', 'W', '00:00:00', '00:00:00', '00:00:00', 0, 1, '2023-01-01 00:00:00', '2023-01-01 00:00:00'),
 	(2, 'P000003', '2023-01-17', 'W', '00:00:00', '00:00:00', '00:00:00', 0, 1, '2023-01-01 00:00:00', '2023-01-01 00:00:00'),
