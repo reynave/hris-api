@@ -60,7 +60,7 @@ class TimeManagement extends CI_Controller
             $insert = array(
                 "personalId" => $id,
                 "date" => date("Y-m-d"),
-                "shiftId" => "W",
+                "shiftId" =>$this->model->select("timeManagementShiftId","employment","personalId = '$id' "),
                 "inputDate" => date("Y-m-d H:i:s"),
             );
             $this->db->insert("time_management", $insert);
@@ -161,10 +161,11 @@ class TimeManagement extends CI_Controller
             LINES TERMINATED BY '\r\n' 
             (`idx`,`code`,`dateIn`,`timeScan`,`checkIn`)");
         if ($bulk == 1) {
-            $this->db->query("INSERT INTO time_management(personalId,DATE, checkIn,importData)
+            $this->db->query("INSERT INTO time_management(personalId,DATE, checkIn,importData, inputDate)
                 SELECT p.id AS 'personalId',
                     CONCAT(SUBSTRING(a.dateIn,7,4),'-',SUBSTRING(a.dateIn,4,2),'-',SUBSTRING(a.dateIn,1,2)) AS 'date',
-                    a.timeScan, '1' AS 'importData'
+                    a.timeScan, '1' AS 'importData',
+                    CONCAT(CURDATE(),' ',CURTIME() ) as inputDate
                     FROM attendance AS a
                     JOIN personal AS p ON a.idx = p.idx
                     WHERE a.checkIn = 'I' AND a.timeScan !=  ''
@@ -182,18 +183,25 @@ class TimeManagement extends CI_Controller
                     WHERE a.checkIn = 'o' AND a.timeScan != ''
                 ) AS a
                 SET 
-                    tm.checkOut = a.timeScan
+                    tm.checkOut = a.timeScan,
+                    tm.updateDate = CONCAT(CURDATE(),' ',CURTIME() )
                 WHERE tm.date = a.date AND tm.personalId = a.personalId
            ");
+
+            echo 'DONE';
         }
         ;
     }
 
     function reports()
     {
+        $beginMinusOneDay = $this->input->get('startDate');
 
-        $begin = new DateTime($this->input->get('startDate'));
-        $end = new DateTime($this->input->get('endDate'));
+        $endAddOneDay = date('Y-m-d H:i:s', strtotime($this->input->get('endDate') . ' +1 day'));
+
+
+        $begin = new DateTime($beginMinusOneDay);
+        $end = new DateTime($endAddOneDay);
 
         $interval = DateInterval::createFromDateString('1 day');
         $period = new DatePeriod($begin, $interval, $end);
@@ -223,11 +231,11 @@ class TimeManagement extends CI_Controller
             'overtime' => array(
                 "minutes" => 0,
                 "hours" => 0,
-            ), 
+            ),
             'working' => array(
                 "minutes" => 0,
                 "hours" => 0,
-            ), 
+            ),
         );
         foreach ($period as $dt) {
             $isLate = false;
@@ -259,81 +267,85 @@ class TimeManagement extends CI_Controller
                 "day" => $dt->format("D"),
                 "date" => $dt->format("Y-m-d"),
                 "hour" => '',
-                "job" =>  "Holiday" ,
+                "job" => "",
                 "checkIn" => '',
                 "checkOut" => '',
-                "late" => '',  
-                "lateInt" => '', 
+                "late" => '',
+                "lateInt" => '',
                 "quickly" => '',
                 "overtime" => '',
                 "workingHour" => '',
                 "note" => "",
                 "off" => $offDay,
             );
-            if ($offDay == 1) { 
-                $isLate = strtotime($checkIn) > strtotime($scheduleIn) ? true : false;
-                $isQuickly = strtotime($checkOut) < strtotime($scheduleOut) ? true : false;
-                $isOvertime = strtotime($checkOut) > strtotime($scheduleOut) ? true : false;
 
-                $temp["hour"] = substr($scheduleIn, 0, -3) . "-" . substr($scheduleOut, 0, -3);
-                $temp["job"] = "Work";
-                $temp["checkIn"] = substr($checkIn, 0, -3);
-                $temp["checkOut"] = substr($checkOut, 0, -3);
-
-                $temp["late"] = $isLate ? $intervalIn->h . "h" . $intervalIn->i . "m" : '';    
-                $temp["quickly"] = $isQuickly ? $intervalOut->h . "h" . $intervalOut->i . "m" : '';  
-                $temp["overtime"] = $isOvertime ? $intervalOut->h . "h" . $intervalOut->i . "m" : '';
-
-                $time81 = new DateTime($checkOut);
-                $time82 = new DateTime($checkIn);
-                $workingHours = $time81->diff($time82);
-
-
-                $temp["workingHour"] = $workingHours->h . "h" . $workingHours->i . "m" ;
-                $temp["off"] = $offDay; 
-
-                if($isLate == true){
-                    $summary['late']['minutes'] += $intervalIn->i;
-                    $summary['late']['hours'] += $intervalIn->h;
-                }
-
-                if($isQuickly == true){
-                    $summary['quickly']['minutes'] += $intervalOut->i;
-                    $summary['quickly']['hours'] += $intervalOut->h;
-                }
-
-                if($isOvertime == true){
-                    $summary['overtime']['minutes'] += $intervalOut->i;
-                    $summary['overtime']['hours'] += $intervalOut->h;
-                }
+            $time81 = new DateTime($checkOut);
+            $time82 = new DateTime($checkIn);
+            $workingHours = $time81->diff($time82);
+            $temp["workingHour"] = $workingHours->h . "h" . $workingHours->i . "m";
+            $temp["job"] = $offDay == 1 ? "Work" : 'Holiday';
+            if ((int) ($workingHours->h . $workingHours->i) > 0  ) {
               
+                if ($offDay == 1) {
+                    $isLate = strtotime($checkIn) > strtotime($scheduleIn) ? true : false;
+                    $isQuickly = strtotime($checkOut) < strtotime($scheduleOut) ? true : false;
+                    $isOvertime = strtotime($checkOut) > strtotime($scheduleOut) ? true : false;
+
+                    $temp["hour"] = substr($scheduleIn, 0, -3) . "-" . substr($scheduleOut, 0, -3);
+                  
+                    $temp["checkIn"] = substr($checkIn, 0, -3);
+                    $temp["checkOut"] = substr($checkOut, 0, -3);
+
+                    $temp["late"] = $isLate ? $intervalIn->h . "h" . $intervalIn->i . "m" : '';
+                    $temp["quickly"] = $isQuickly ? $intervalOut->h . "h" . $intervalOut->i . "m" : '';
+                    $temp["overtime"] = $isOvertime ? $intervalOut->h . "h" . $intervalOut->i . "m" : '';
+
+                    $temp["off"] = $offDay;
+
+                    if ($isLate == true) {
+                        $summary['late']['minutes'] += $intervalIn->i;
+                        $summary['late']['hours'] += $intervalIn->h;
+                    }
+
+                    if ($isQuickly == true) {
+                        $summary['quickly']['minutes'] += $intervalOut->i;
+                        $summary['quickly']['hours'] += $intervalOut->h;
+                    }
+
+                    if ($isOvertime == true) {
+                        $summary['overtime']['minutes'] += $intervalOut->i;
+                        $summary['overtime']['hours'] += $intervalOut->h;
+                    }
+
                     $summary['working']['minutes'] += $workingHours->i;
                     $summary['working']['hours'] += $workingHours->h;
-                 
 
-            }  else{
-                $temp['job'] = "Holiday";
-            }
 
-    
-
+                }  
+            } 
             array_push($items, $temp);
 
         }
-      
- 
 
-        $data = array( 
+
+
+        $data = array(
             "summary" => array(
-                "late" =>   date('H:i', mktime($summary['late']['hours'],$summary['late']['minutes'])),
-                "quickly" =>   date('H:i', mktime($summary['quickly']['hours'],$summary['quickly']['minutes'])),
-                "overtime" =>   date('H:i', mktime($summary['overtime']['hours'],$summary['overtime']['minutes'])),
-               "working" =>   ((int)($summary['working']['hours']+ (int) date('H', mktime(0,$summary['working']['minutes']))) ).'h'. date('H', mktime(0,$summary['working']['minutes'])).'m',
-            //   "h" => (int) date('H', mktime(0,$summary['working']['minutes'])),
+                //"late" => date('H:i', mktime($summary['late']['hours'], $summary['late']['minutes'])),
+                "late" => ((int) ($summary['late']['hours'] + (int) date('H', mktime(0, $summary['late']['minutes'])))) . 'h' . date('i', mktime(0, $summary['late']['minutes'])) . 'm',
+
+                //"quickly" => date('H:i', mktime($summary['quickly']['hours'], $summary['quickly']['minutes'])),
+                "quickly" => ((int) ($summary['quickly']['hours'] + (int) date('H', mktime(0, $summary['quickly']['minutes'])))) . 'h' . date('i', mktime(0, $summary['quickly']['minutes'])) . 'm',
+
+                //"overtime" => date('H:i', mktime($summary['overtime']['hours'], $summary['overtime']['minutes'])),
+                "overtime" => ((int) ($summary['overtime']['hours'] + (int) date('H', mktime(0, $summary['overtime']['minutes'])))) . 'h' . date('i', mktime(0, $summary['overtime']['minutes'])) . 'm',
+
+                "working" => ((int) ($summary['working']['hours'] + (int) date('H', mktime(0, $summary['working']['minutes'])))) . 'h' . date('i', mktime(0, $summary['working']['minutes'])) . 'm',
+                //   "h" => (int) date('H', mktime(0,$summary['working']['minutes'])),
             ),
             "employee" => $employee,
             "items" => $items,
-           
+
         );
 
         echo json_encode($data);
