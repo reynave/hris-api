@@ -200,17 +200,39 @@ class TimeManagement extends CI_Controller
         $personalId = $this->input->get('id');
         $shiftId = $this->model->select("shiftId", "time_management", "personalId = '$personalId'");
         $items = [];
+
+        $jobPosId = $this->model->select("jobPositionId", "employment", "personalId = '" . $this->input->get('id') . "'");
+        $employee = array(
+            "personalId" => $this->input->get('id'),
+            "idx" => $this->model->select("idx", "personal", "id = '" . $this->input->get('id') . "'"),
+            "name" => $this->model->select("name", "personal", "id = '" . $this->input->get('id') . "'"),
+            "jobPositionId" => $this->model->select("name", "employment_jobposition", "id = '" . $jobPosId . "'"),
+            "dateJoinStart" => $this->model->select("dateJoinStart", "employment", "personalId = '" . $this->input->get('id') . "'"),
+
+        );
+
         $summary = array(
             'late' => array(
                 "minutes" => 0,
                 "hours" => 0,
             ),
-            'totalquickly' => 0,
-            'totalOverTime' => 0,
-            'totalHour' => 0,
+            'quickly' => array(
+                "minutes" => 0,
+                "hours" => 0,
+            ),
+            'overtime' => array(
+                "minutes" => 0,
+                "hours" => 0,
+            ), 
+            'working' => array(
+                "minutes" => 0,
+                "hours" => 0,
+            ), 
         );
         foreach ($period as $dt) {
             $isLate = false;
+            $isQuickly = false;
+            $isOvertime = false;
             $where = "personalId = '" . $this->input->get('id') . "' AND 
             `date` = '" . $dt->format("Y-m-d") . "' ORDER BY id DESC limit 1";
 
@@ -240,8 +262,7 @@ class TimeManagement extends CI_Controller
                 "job" =>  "Holiday" ,
                 "checkIn" => '',
                 "checkOut" => '',
-                "late" => '', 
-                "scheduleInInt" => '',
+                "late" => '',  
                 "lateInt" => '', 
                 "quickly" => '',
                 "overtime" => '',
@@ -251,26 +272,45 @@ class TimeManagement extends CI_Controller
             );
             if ($offDay == 1) { 
                 $isLate = strtotime($checkIn) > strtotime($scheduleIn) ? true : false;
-                $temp["day"] = $dt->format("D");
-                $temp["date"] = $dt->format("Y-m-d");
+                $isQuickly = strtotime($checkOut) < strtotime($scheduleOut) ? true : false;
+                $isOvertime = strtotime($checkOut) > strtotime($scheduleOut) ? true : false;
+
                 $temp["hour"] = substr($scheduleIn, 0, -3) . "-" . substr($scheduleOut, 0, -3);
                 $temp["job"] = "Work";
                 $temp["checkIn"] = substr($checkIn, 0, -3);
                 $temp["checkOut"] = substr($checkOut, 0, -3);
-                $temp["late"] = $isLate ? $intervalIn->h . "h" . $intervalIn->i . "m" : ''; 
 
-                $temp["scheduleInInt"] = strtotime($scheduleIn);
-                $temp["lateInt"] = strtotime($checkIn);
-                $temp["quickly"] = strtotime($checkOut) < strtotime($scheduleOut) ? $intervalOut->h . "h" . $intervalOut->i . "m" : '';
-                $temp["overtime"] = strtotime($checkOut) > strtotime($scheduleOut) ? $intervalOut->h . "h" . $intervalOut->i . "m" : '';
-                $temp["workingHour"] = $quickly;
+                $temp["late"] = $isLate ? $intervalIn->h . "h" . $intervalIn->i . "m" : '';    
+                $temp["quickly"] = $isQuickly ? $intervalOut->h . "h" . $intervalOut->i . "m" : '';  
+                $temp["overtime"] = $isOvertime ? $intervalOut->h . "h" . $intervalOut->i . "m" : '';
+
+                $time81 = new DateTime($checkOut);
+                $time82 = new DateTime($checkIn);
+                $workingHours = $time81->diff($time82);
+
+
+                $temp["workingHour"] = $workingHours->h . "h" . $workingHours->i . "m" ;
                 $temp["off"] = $offDay; 
 
                 if($isLate == true){
                     $summary['late']['minutes'] += $intervalIn->i;
                     $summary['late']['hours'] += $intervalIn->h;
                 }
-                
+
+                if($isQuickly == true){
+                    $summary['quickly']['minutes'] += $intervalOut->i;
+                    $summary['quickly']['hours'] += $intervalOut->h;
+                }
+
+                if($isOvertime == true){
+                    $summary['overtime']['minutes'] += $intervalOut->i;
+                    $summary['overtime']['hours'] += $intervalOut->h;
+                }
+              
+                    $summary['working']['minutes'] += $workingHours->i;
+                    $summary['working']['hours'] += $workingHours->h;
+                 
+
             }  else{
                 $temp['job'] = "Holiday";
             }
@@ -280,20 +320,16 @@ class TimeManagement extends CI_Controller
             array_push($items, $temp);
 
         }
-        $jobPosId = $this->model->select("jobPositionId", "employment", "personalId = '" . $this->input->get('id') . "'");
-        $employee = array(
-            "personalId" => $this->input->get('id'),
-            "idx" => $this->model->select("idx", "personal", "id = '" . $this->input->get('id') . "'"),
-            "name" => $this->model->select("name", "personal", "id = '" . $this->input->get('id') . "'"),
-            "jobPositionId" => $this->model->select("name", "employment_jobposition", "id = '" . $jobPosId . "'"),
-            "dateJoinStart" => $this->model->select("dateJoinStart", "employment", "personalId = '" . $this->input->get('id') . "'"),
-
-        );
+      
  
 
         $data = array( 
             "summary" => array(
                 "late" =>   date('H:i', mktime($summary['late']['hours'],$summary['late']['minutes'])),
+                "quickly" =>   date('H:i', mktime($summary['quickly']['hours'],$summary['quickly']['minutes'])),
+                "overtime" =>   date('H:i', mktime($summary['overtime']['hours'],$summary['overtime']['minutes'])),
+               "working" =>   ((int)($summary['working']['hours']+ (int) date('H', mktime(0,$summary['working']['minutes']))) ).'h'. date('H', mktime(0,$summary['working']['minutes'])).'m',
+            //   "h" => (int) date('H', mktime(0,$summary['working']['minutes'])),
             ),
             "employee" => $employee,
             "items" => $items,
