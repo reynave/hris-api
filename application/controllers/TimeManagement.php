@@ -60,7 +60,7 @@ class TimeManagement extends CI_Controller
             $insert = array(
                 "personalId" => $id,
                 "date" => date("Y-m-d"),
-                "shiftId" =>$this->model->select("timeManagementShiftId","employment","personalId = '$id' "),
+                "shiftId" => $this->model->select("timeManagementShiftId", "employment", "personalId = '$id' "),
                 "inputDate" => date("Y-m-d H:i:s"),
             );
             $this->db->insert("time_management", $insert);
@@ -253,21 +253,13 @@ class TimeManagement extends CI_Controller
             $offDay = $this->model->select($dt->format("D"), "time_management_shift", "id='$shiftId'");
 
 
-            $time1 = new DateTime($scheduleIn);
-            $time2 = new DateTime($checkIn);
-            $intervalIn = $time1->diff($time2);
-
-            $time11 = new DateTime($scheduleOut);
-            $time22 = new DateTime($checkOut);
-            $intervalOut = $time11->diff($time22);
-
-            $quickly = (int) ($intervalOut->h . $intervalOut->i);
+          
 
             $temp = array(
                 "day" => $dt->format("D"),
                 "date" => $dt->format("Y-m-d"),
                 "hour" => '',
-                "job" => "",
+                "job" =>  $offDay == 1 ? "Work" : 'Holiday',
                 "checkIn" => '',
                 "checkOut" => '',
                 "late" => '',
@@ -278,53 +270,64 @@ class TimeManagement extends CI_Controller
                 "note" => "",
                 "off" => $offDay,
             );
+            if ($checkIn != "") {
+                $time1 = new DateTime($scheduleIn);
+                $time2 = new DateTime($checkIn);
+                $intervalIn = $time1->diff($time2);
+    
+                $time11 = new DateTime($scheduleOut);
+                $time22 = new DateTime($checkOut);
+                $intervalOut = $time11->diff($time22);
+    
+                $quickly = (int) ($intervalOut->h . $intervalOut->i);
 
-            $time81 = new DateTime($checkOut);
-            $time82 = new DateTime($checkIn);
-            $workingHours = $time81->diff($time82);
-            $temp["workingHour"] = $workingHours->h . "h" . $workingHours->i . "m";
-            $temp["job"] = $offDay == 1 ? "Work" : 'Holiday';
-            if ((int) ($workingHours->h . $workingHours->i) > 0  ) {
-              
-                if ($offDay == 1) {
-                    $isLate = strtotime($checkIn) > strtotime($scheduleIn) ? true : false;
-                    $isQuickly = strtotime($checkOut) < strtotime($scheduleOut) ? true : false;
-                    $isOvertime = strtotime($checkOut) > strtotime($scheduleOut) ? true : false;
+                $time81 = new DateTime($checkOut);
+                $time82 = new DateTime($checkIn);
+                $workingHours = $time81->diff($time82);
+                $temp["workingHour"] = $workingHours->h . "h" . $workingHours->i . "m";
+                $temp["job"] = $offDay == 1 ? "Work" : 'Holiday';
+                if ((int) ($workingHours->h . $workingHours->i) > 0) {
 
-                    $temp["hour"] = substr($scheduleIn, 0, -3) . "-" . substr($scheduleOut, 0, -3);
-                  
-                    $temp["checkIn"] = substr($checkIn, 0, -3);
-                    $temp["checkOut"] = substr($checkOut, 0, -3);
+                    if ($offDay == 1) {
+                        $isLate = strtotime($checkIn) > strtotime($scheduleIn) ? true : false;
+                        $isQuickly = strtotime($checkOut) < strtotime($scheduleOut) ? true : false;
+                        $isOvertime = strtotime($checkOut) > strtotime($scheduleOut) ? true : false;
 
-                    $temp["late"] = $isLate ? $intervalIn->h . "h" . $intervalIn->i . "m" : '';
-                    $temp["quickly"] = $isQuickly ? $intervalOut->h . "h" . $intervalOut->i . "m" : '';
-                    $temp["overtime"] = $isOvertime ? $intervalOut->h . "h" . $intervalOut->i . "m" : '';
+                        $temp["hour"] = substr($scheduleIn, 0, -3) . "-" . substr($scheduleOut, 0, -3);
 
-                    $temp["off"] = $offDay;
+                        $temp["checkIn"] = substr($checkIn, 0, -3);
+                        $temp["checkOut"] = substr($checkOut, 0, -3);
 
-                    if ($isLate == true) {
-                        $summary['late']['minutes'] += $intervalIn->i;
-                        $summary['late']['hours'] += $intervalIn->h;
+                        $temp["late"] = $isLate ? $intervalIn->h . "h" . $intervalIn->i . "m" : '';
+                        $temp["quickly"] = $isQuickly ? $intervalOut->h . "h" . $intervalOut->i . "m" : '';
+                        $temp["overtime"] = $isOvertime ? $intervalOut->h . "h" . $intervalOut->i . "m" : '';
+
+                        $temp["off"] = $offDay;
+
+                        if ($isLate == true) {
+                            $summary['late']['minutes'] += $intervalIn->i;
+                            $summary['late']['hours'] += $intervalIn->h;
+                        }
+
+                        if ($isQuickly == true) {
+                            $summary['quickly']['minutes'] += $intervalOut->i;
+                            $summary['quickly']['hours'] += $intervalOut->h;
+                        }
+
+                        if ($isOvertime == true) {
+                            $summary['overtime']['minutes'] += $intervalOut->i;
+                            $summary['overtime']['hours'] += $intervalOut->h;
+                        }
+
+                        $summary['working']['minutes'] += $workingHours->i;
+                        $summary['working']['hours'] += $workingHours->h;
+
+
                     }
-
-                    if ($isQuickly == true) {
-                        $summary['quickly']['minutes'] += $intervalOut->i;
-                        $summary['quickly']['hours'] += $intervalOut->h;
-                    }
-
-                    if ($isOvertime == true) {
-                        $summary['overtime']['minutes'] += $intervalOut->i;
-                        $summary['overtime']['hours'] += $intervalOut->h;
-                    }
-
-                    $summary['working']['minutes'] += $workingHours->i;
-                    $summary['working']['hours'] += $workingHours->h;
-
-
-                }  
-            } 
+                }
+               
+            }
             array_push($items, $temp);
-
         }
 
 
