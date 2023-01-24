@@ -153,15 +153,21 @@ class TimeManagement extends CI_Controller
 
     function attendanceInsert()
     {
-        global $file_attendance;
-        $bulk = $this->db->query(" LOAD DATA LOCAL INFILE  
-            '$file_attendance/Attendance3.txt'
+        $post = json_decode(file_get_contents('php://input'), true);
+        $data = array(
+            "error" => true,
+        );
+        if ($post) {
+            global $file_attendance;
+            $fileName = $post['item']['fileName'];
+            $bulk = $this->db->query(" LOAD DATA LOCAL INFILE  
+            '$file_attendance/$fileName'
             INTO TABLE attendance  
             FIELDS TERMINATED BY ';'  
             LINES TERMINATED BY '\r\n' 
             (`idx`,`code`,`dateIn`,`timeScan`,`checkIn`)");
-        if ($bulk == 1) {
-            $this->db->query("INSERT INTO time_management(personalId,DATE, checkIn,importData, inputDate)
+            if ($bulk == 1) {
+                $this->db->query("INSERT INTO time_management(personalId,DATE, checkIn,importData, inputDate)
                 SELECT p.id AS 'personalId',
                     CONCAT(SUBSTRING(a.dateIn,7,4),'-',SUBSTRING(a.dateIn,4,2),'-',SUBSTRING(a.dateIn,1,2)) AS 'date',
                     a.timeScan, '1' AS 'importData',
@@ -170,27 +176,40 @@ class TimeManagement extends CI_Controller
                     JOIN personal AS p ON a.idx = p.idx
                     WHERE a.checkIn = 'I' AND a.timeScan !=  ''
                     ORDER BY a.dateIn ASC 
-           ");
+                 ");
 
-            $this->db->query(" UPDATE time_management AS tm, (
-                    SELECT p.id AS 'personalId',
-                    a.idx,
-                    CONCAT(SUBSTRING(a.dateIn,7,4),'-',SUBSTRING(a.dateIn,4,2),'-',SUBSTRING(a.dateIn,1,2))  AS 'date',
-                    a.timeScan,
-                    a.checkIn
-                    FROM attendance AS a
-                    JOIN personal AS p ON a.idx = p.idx
-                    WHERE a.checkIn = 'o' AND a.timeScan != ''
-                ) AS a
-                SET 
-                    tm.checkOut = a.timeScan,
-                    tm.updateDate = CONCAT(CURDATE(),' ',CURTIME() )
-                WHERE tm.date = a.date AND tm.personalId = a.personalId
-           ");
+                $this->db->query(" UPDATE time_management AS tm, (
+                        SELECT p.id AS 'personalId',
+                        a.idx,
+                        CONCAT(SUBSTRING(a.dateIn,7,4),'-',SUBSTRING(a.dateIn,4,2),'-',SUBSTRING(a.dateIn,1,2))  AS 'date',
+                        a.timeScan,
+                        a.checkIn
+                        FROM attendance AS a
+                        JOIN personal AS p ON a.idx = p.idx
+                        WHERE a.checkIn = 'o' AND a.timeScan != ''
+                    ) AS a
+                    SET 
+                        tm.checkOut = a.timeScan,
+                        tm.updateDate = CONCAT(CURDATE(),' ',CURTIME() )
+                    WHERE tm.date = a.date AND tm.personalId = a.personalId
+                ");
+ 
+                $update = array( 
+                    "status" => 1,
+                    "presence" => 1,
+                    "note" => "Sync Success",
+                    "updateDate" => date("Y-m-d H:i:s"), 
+                );
+                $this->db->update("attendance_log", $update,"id = ".$post['id']);
 
-            echo 'DONE';
+                $this->db->query("TRUNCATE TABLE attendance");
+
+                $data = array(
+                    "error" => false,
+                    "status" => "done",
+                );
+            }
         }
-        ;
     }
 
     function reports()
@@ -253,13 +272,13 @@ class TimeManagement extends CI_Controller
             $offDay = $this->model->select($dt->format("D"), "time_management_shift", "id='$shiftId'");
 
 
-          
+
 
             $temp = array(
                 "day" => $dt->format("D"),
                 "date" => $dt->format("Y-m-d"),
                 "hour" => '',
-                "job" =>  $offDay == 1 ? "Work" : 'Holiday',
+                "job" => $offDay == 1 ? "Work" : 'Holiday',
                 "checkIn" => '',
                 "checkOut" => '',
                 "late" => '',
@@ -274,11 +293,11 @@ class TimeManagement extends CI_Controller
                 $time1 = new DateTime($scheduleIn);
                 $time2 = new DateTime($checkIn);
                 $intervalIn = $time1->diff($time2);
-    
+
                 $time11 = new DateTime($scheduleOut);
                 $time22 = new DateTime($checkOut);
                 $intervalOut = $time11->diff($time22);
-    
+
                 $quickly = (int) ($intervalOut->h . $intervalOut->i);
 
                 $time81 = new DateTime($checkOut);
@@ -325,7 +344,7 @@ class TimeManagement extends CI_Controller
 
                     }
                 }
-               
+
             }
             array_push($items, $temp);
         }
@@ -356,4 +375,15 @@ class TimeManagement extends CI_Controller
 
     }
 
+    function logs()
+    {
+        $data = array(
+            "items" => $this->model->sql("SELECT * from attendance_log where presence = 1 order by inputDate Desc limit 30"),
+        );
+        echo json_encode($data);
+    }
+
+    function location(){
+        echo __FILE__;
+    }
 }

@@ -18,20 +18,25 @@ class Upload extends CI_Controller
 
     function index()
     {
-         return false;
+        
+         return true;
+
     }  
-    function accountImg(){
+    
+    function uploadItem()
+    { 
         $data = array(
-            "error" => true, 
+            "error" => true,
         );
-        if($this->input->post('token') ) {
+
+        // mysql harus : SET GLOBAL local_infile=1;
+
+        if ($this->input->post('token') == '123') {
             $this->load->helper('url', 'form');
-            $config['upload_path']          = './uploads/configuration/';
-            $config['allowed_types']        = 'gif|jpg|png|jpeg';
-            $config['max_size']             = 2000;
-            $config['max_width']            = 5024;
-            $config['max_height']           = 3768;
-            $new_name = time().$_FILES["thumbnail"]['name'];
+            $config['upload_path']          = './uploads/attendance';
+            $config['allowed_types']        = 'txt';
+            $config['max_size']             = 10000;
+            $new_name = time() . $_FILES["item"]['name'];
             $config['file_name'] = $new_name;
             $data = array(
                 "error" => false,
@@ -40,146 +45,31 @@ class Upload extends CI_Controller
                 "post" => $this->input->post(),
             );
             $this->load->library('upload', $config);
-           
-            if (!$this->upload->do_upload('thumbnail')) { 
+
+            if (!$this->upload->do_upload('item')) {
                 $data['error'] =  $this->upload->display_errors();
-            }
-            else {  
-                $data['upload_data'] =  $this->upload->data(); 
-                $update = array(
-                    "name" => "Logo",
-                    "value"=> $this->upload->data()['file_name'],
-                    "updateDate" => time(),
-                    "updateBy" => $this->model->userId(),
+            } else {
+                $data['upload_data'] =  $this->upload->data();
+                $insert = array(
+                    "fileSize" => $this->upload->data()['file_size'],
+                    "fileName" => $this->upload->data()['file_name'], 
+                    "status" => 0,
+                    "presence" => 1,
+                    "note" => "Upload Success",
+                    "inputDate" => date("Y-m-d H:i:s"), 
                 );
-                $this->db->update("cso1_account", $update,"id=14" );
-
-            } 
-
+                $this->db->insert("attendance_log", $insert);
+                $id = $this->model->select("id", "attendance_log", "1 order by inputDate DESC limit 1");
+                $error = false;
+                $data = array(
+                    "error"     => $error,
+                    "id"        => $id,
+                    "insert"    => $insert,
+                );
+            }
         }
-     
+
         echo json_encode($data);
     }
-
-    function configurationImg(){
-        $data = array(
-            "error" => true, 
-        );
-        if($this->input->post('token') ) {
-            $this->load->helper('url', 'form');
-            $config['upload_path']          = './uploads/configuration/';
-            $config['allowed_types']        = 'gif|jpg|png|jpeg';
-            $config['max_size']             = 2000;
-            $config['max_width']            = 5024;
-            $config['max_height']           = 3768;
-            $new_name = time().$_FILES["thumbnail"]['name'];
-            $config['file_name'] = $new_name;
-            $data = array(
-                "error" => false,
-                "upload_data" => [],
-                "token" => apache_request_headers(),
-                "post" => $this->input->post(),
-            );
-            $this->load->library('upload', $config);
-           
-            if (!$this->upload->do_upload('thumbnail')) { 
-                $data['error'] =  $this->upload->display_errors();
-            }
-            else {  
-                $data['upload_data'] =  $this->upload->data(); 
-                $update = array(
-                    "name" => "configurationImages",
-                    "value"=> $this->upload->data()['file_name'],
-                    "updateDate" => time(),
-                    "updateBy" => $this->model->userId(),
-                );
-                $this->db->update("cso1_account", $update,"id=1010" );
-
-            } 
-
-        }
-     
-        echo json_encode($data);
-    }
-
-    function uploadImages(){
-        $data = array(
-            "error" => true, 
-        );
-        if($this->input->post('token') ) {
-            $this->load->helper('url', 'form');
-            $config['upload_path']          = './uploads/account/';
-            $config['allowed_types']        = 'gif|jpg|png|jpeg';
-            $config['max_size']             = 2000;
-            $config['max_width']            = 5024;
-            $config['max_height']           = 3768;
-            $new_name = time().$_FILES["thumbnail"]['name'];
-            $config['file_name'] = $new_name;
-            $data = array(
-                "error" => false,
-                "upload_data" => [],
-                "token" => apache_request_headers(),
-                "post" => $this->input->post(),
-            );
-            $this->load->library('upload', $config);
-           
-            if (!$this->upload->do_upload('thumbnail')) { 
-                $data['error'] =  $this->upload->display_errors();
-            }
-            else {  
-                $data['upload_data'] =  $this->upload->data(); 
-                $update = array(
-                    "name" => "Logo Images SCO Terminal",
-                    "value"=> $this->upload->data()['file_name'],
-                    "updateDate" => time(),
-                    "updateBy" => $this->model->userId(),
-                );
-                $this->db->update("cso1_account", $update,"id=14" );
-
-            } 
-
-        }
-     
-        echo json_encode($data);
-    }
-
-    function uploadItems(){
-        $data = array(
-            "error" => true, 
-        );
-        if( $this->input->post('token') ) {
-            $this->load->helper('url', 'form');
-            $config['upload_path']          = './uploads/items/';
-            $config['allowed_types']        = 'gif|jpg|png|jpeg';
-            $config['max_size']             = 2000;
-            $config['max_width']            = 5024;
-            $config['max_height']           = 3768;
-            $new_name = time().$_FILES["thumbnail"]['name'];
-            $config['file_name'] = $new_name;
-            $data = array(
-                "error" => false,
-                "upload_data" => [],
-                "token" => apache_request_headers(),
-                "post" => $this->input->post(),
-            );
-            $this->load->library('upload', $config);
-           
-            if (!$this->upload->do_upload('thumbnail')) { 
-                $data['error'] =  $this->upload->display_errors();
-            }
-            else {  
-                $data['upload_data'] =  $this->upload->data(); 
-                $update = array( 
-                    "images"=> base_url()."uploads/items/".$this->upload->data()['file_name'],
-                    "updateDate" => time(),
-                    "updateBy" => $this->model->userId(),
-                );
-                $this->db->update("cso1_item", $update,"id='".$this->input->post('id')."' " );
-
-            } 
-
-        }
-     
-        echo json_encode($data);
-    }
+ 
 }
