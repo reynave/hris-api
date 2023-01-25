@@ -31,9 +31,10 @@ class Payroll extends CI_Controller
         echo json_encode($data);
     }
 
-    function detail($id)
+    function detail($personalId)
     {
         $branch = [];
+        $id = $this->model->select("id", "payroll", "personalId = '$personalId'");
         $item = $this->model->sql("SELECT e.*, 
             p.name AS 'personal'
             from payroll AS e

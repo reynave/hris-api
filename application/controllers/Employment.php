@@ -37,14 +37,16 @@ class Employment extends CI_Controller
         echo json_encode($data);
     }
 
-    function detail($id)
+    function detail($personalId)
     {
         $branch = [];
+        $id = $this->model->select("id", "employment", "personalId = '$personalId'");
         $item = $this->model->sql("SELECT e.*, p.name from employment AS e
         JOIN personal AS p ON p.id = e.personalId
         WHERE e.presence = 1 and  e.id = '$id' ");
 
         $data = array(
+            "id" => $id,
             "item" => $item,
             "employmentStatus" =>  $this->model->sql("SELECT * from employment_status"), 
             "approvedLine" =>  $this->model->sql("SELECT id, name from personal where presence = 1 order by name ASC  "),
@@ -90,6 +92,7 @@ class Employment extends CI_Controller
             $this->db->update('employment', $update, "id='$id'");
 
             $data = array(
+                "update" => $update,
                 "error" => false,
             );
         }

@@ -137,9 +137,8 @@ class TimeManagement extends CI_Controller
             $id = $post['id'];
             $update = array(
                 "checkIn" => $post['item']['checkIn'],
-                "checkOut" => $post['item']['checkOut'],
-                "overTime" => $post['item']['overTime'],
-                "offTimeId" => $post['item']['offTimeId'],
+                "checkOut" => $post['item']['checkOut'], 
+                "shiftId" =>  $post['item']['shiftId'], 
                 "updateDate" => date("Y-m-d H:i:s"),
             );
             $this->db->update('time_management', $update, "id='$id'");
@@ -271,8 +270,7 @@ class TimeManagement extends CI_Controller
 
             $offDay = $this->model->select($dt->format("D"), "time_management_shift", "id='$shiftId'");
 
-
-
+ 
 
             $temp = array(
                 "day" => $dt->format("D"),
@@ -288,6 +286,8 @@ class TimeManagement extends CI_Controller
                 "workingHour" => '',
                 "note" => "",
                 "off" => $offDay,
+                "shiftId" =>  $this->model->select("shiftId", "time_management", $where),
+                "id" => $this->model->select("id", "time_management", $where),
             );
             if ($checkIn != "") {
                 $time1 = new DateTime($scheduleIn);
@@ -368,6 +368,12 @@ class TimeManagement extends CI_Controller
             "employee" => $employee,
             "items" => $items,
 
+            "timeManagementShift" => $this->model->sql("SELECT id, name,
+                 DATE_FORMAT(`scheduleIn`, '%H:%i') AS `scheduleIn`,
+                 DATE_FORMAT(`scheduleOut`, '%H:%i') AS `scheduleOut`
+                 
+            from time_management_shift "),
+            "offtime" => $this->model->sql("SELECT id, name FROM  offtime  where presence = 1  order by name asc "),
         );
 
         echo json_encode($data);

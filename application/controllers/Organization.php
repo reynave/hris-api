@@ -68,4 +68,11 @@ class Organization extends CI_Controller
             echo json_encode($data);
         }
     }
+
+    function branch($id){
+        $data = array(
+            "data" => $this->model->sql("select * from branch where organizationId = $id and presence = 1 "),
+        );
+        echo json_encode($data);
+    }
 }
