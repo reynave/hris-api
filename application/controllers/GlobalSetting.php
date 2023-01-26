@@ -5,14 +5,12 @@ class GlobalSetting extends CI_Controller
 
     public function __construct()
     {
-        parent::__construct();  
-        $this->openAPI = $this->db->openAPI;
+        parent::__construct();
         header('Access-Control-Allow-Origin: *');
         header("Access-Control-Allow-Headers: key, token,  Content-Type");
         header('Access-Control-Allow-Methods: GET, POST, PUT');
         header('Content-Type: application/json');
-        // error_reporting(E_ALL);  
-        if (!$this->model->header($this->openAPI)) {
+        if (!$this->model->header($this->db->openAPI)) {
             echo $this->model->error("Error auth");
             exit;
         }
@@ -21,100 +19,146 @@ class GlobalSetting extends CI_Controller
 
     function index()
     {
-        $data = array( 
-            "greeting" => $this->model->sql("SELECT * FROM cso1_greeting where  presence = 1 order by publishDate"),
-            "account" => array( 
-                "value1" => $this->model->select("value","cso1_account","id=1001"),
-                "value2" => $this->model->select("value","cso1_account","id=1002"),
-                "value3" => $this->model->select("value","cso1_account","id=1003"),
-                "value4" => $this->model->select("value","cso1_account","id=1004"),
-                "value5" => $this->model->select("value","cso1_account","id=1005"),
-                "value6" => $this->model->select("value","cso1_account","id=1006"),
-                "value7" => $this->model->select("value","cso1_account","id=1007"),
-                "value8" => $this->model->select("value","cso1_account","id=1008"),
-                "value9" => $this->model->select("value","cso1_account","id=1009"), 
-                "img"  =>  $this->model->select("value","cso1_account","id=1010"), 
-                
-            ),
-            
-        ); 
+        $data = array(
+            "employment_joblevel" => $this->model->sql("SELECT * FROM employment_joblevel where  presence = 1 order by id ASC "),
+            "employment_jobposition" => $this->model->sql("SELECT * FROM employment_jobposition where  presence = 1 order by id ASC "),
+            "offtime" => $this->model->sql("SELECT * FROM offtime where  presence = 1 order by id ASC "),
+            "reimbursement_name" => $this->model->sql("SELECT * FROM reimbursement_name where  presence = 1 order by id ASC "),
+            "time_management_shift" => $this->model->sql("SELECT * FROM time_management_shift where  presence = 1 order by idAuto ASC "),
 
-        echo json_encode($data); 
-    } 
-
-    function fnUpdateAccount(){
-        $post =   json_decode(file_get_contents('php://input'), true);
-        $error = true;
-        if ($post) {
-            $error = true;
-            $update = array(
-                "name" => $post['name'],
-                "value" => $post['value'],
-                "updateDate" => time(),
-                "updateBy" => $this->model->userId(),
-            );
-            $this->db->update('cso1_account', $update,"id=".(1000+$post['id'])); 
-
-            $data = array(
-                "items" =>  $post,
-            );
-        }
-        echo   json_encode($data);
+        );
+        echo json_encode($data);
     }
 
-    function fnInsertGreeting()
+
+    function fnSave_employment_joblevel()
     {
-        $post =   json_decode(file_get_contents('php://input'), true);
-        $error = true;
+        $post = json_decode(file_get_contents('php://input'), true);
+        $data = array(
+            "error" => true,
+        );
         if ($post) {
-            $error = true;
-            $insert = array(   
-                "presence" => 1,
-                "inputDate" => time(),
-                "inputBy" => $this->model->userId(),
-                "updateDate" => time(),
-                "updateBy" => $this->model->userId(),
-            );
-            $this->db->insert('cso1_greeting', $insert);
+            foreach ($post as $row) {
+                $update = array(
+                    "name" => $row['name'],
+                );
+                $this->db->update("employment_joblevel", $update, " id='" . $row['id'] . "' ");
+            }
 
             $data = array(
-                "items" =>  $post,
+                "error" => false,
             );
         }
-        echo   json_encode($data);
+
+        echo json_encode($data);
+    }
+    function fnSave_reimbursement_name()
+    {
+        $post = json_decode(file_get_contents('php://input'), true);
+        $data = array(
+            "error" => true,
+        );
+        if ($post) {
+            foreach ($post as $row) {
+                $update = array(
+                    "name" => $row['name'],
+                );
+                $this->db->update("reimbursement_name", $update, " id='" . $row['id'] . "' ");
+            }
+
+            $data = array(
+                "error" => false,
+            );
+        }
+
+        echo json_encode($data);
+    }
+    function fnSave_employment_jobposition()
+    {
+        $post = json_decode(file_get_contents('php://input'), true);
+        $data = array(
+            "error" => true,
+        );
+        if ($post) {
+            foreach ($post as $row) {
+                $update = array(
+                    "name" => $row['name'],
+                    "_masterData" => $row['_masterData'],
+                    "_timeManagement" => $row['_timeManagement'],
+                    "_reimbursement" => $row['_reimbursement'],
+                    "_loan" => $row['_loan'],
+                    "_payroll" => $row['_payroll'],
+                );
+                $this->db->update("employment_jobposition", $update, " id='" . $row['id'] . "' ");
+            }
+
+            $data = array(
+                "error" => false,
+            );
+        }
+
+        echo json_encode($data);
     }
 
-    function deleteGreeting(){
-        $post =   json_decode(file_get_contents('php://input'), true);
-        $error = true;
+
+    function fnSave_time_management_shift()
+    {
+        $post = json_decode(file_get_contents('php://input'), true);
+        $data = array(
+            "error" => true,
+        );
         if ($post) {
-            $error = true;
+            foreach ($post as $row) {
+                if($this->model->select("id","time_management_shift"," idAuto='" . $row['idAuto'] . "' ") == "" ){
+                    $update = array(
+                        "id" => $row['id'],  
+                    );
+                    $this->db->update("time_management_shift", $update, " idAuto='" . $row['idAuto'] . "' ");
+                }
+
+                $update = array( 
+                    "name" => $row['name'],  
+                    "scheduleIn" => $row['scheduleIn'],
+                    "scheduleOut" => $row['scheduleOut'],
+                    "Sun" => $row['Sun'],
+                    "Mon" => $row['Mon'],
+                    "Tue" => $row['Tue'],
+                    "Wed" => $row['Wed'],
+                    "Thu" => $row['Thu'],
+                    "Fri" => $row['Fri'],
+                    "Sat" => $row['Sat'], 
+                );
+                $this->db->update("time_management_shift", $update, " idAuto='" . $row['idAuto'] . "' ");
+            }
+
+            $data = array(
+                "error" => false,
+            );
+        }
+
+        echo json_encode($data);
+    }
+
+    function fnDelete()
+    {
+        $post = json_decode(file_get_contents('php://input'), true);
+        if ($post) {
             $update = array(
                 "presence" => 0,
-                "updateDate" => time(),
-                "updateBy" => $this->model->userId(),
             );
-            $this->db->update('cso1_greeting', $update,"id=".$post['id']); 
-       
+            $this->db->update($post['table'], $update, " id='" . $post['item']['id'] . "' ");
+
         }
-        echo   json_encode($post);
     }
 
-    function updateGreeting(){
-        $post =   json_decode(file_get_contents('php://input'), true);
-        $error = true;
+    function fnInsert()
+    {
+        $post = json_decode(file_get_contents('php://input'), true);
         if ($post) {
-            $error = true;
-            $update = array(
-                "status" => $post['status'],
-                "message" => $post['message'], 
-                "publishDate" => $post['publishDate'],  
-                "updateDate" => time(),
-                "updateBy" => $this->model->userId(),
+            $insert = array(
+                "presence" => 1,
             );
-            $this->db->update('cso1_greeting', $update,"id=".$post['id']);  
+            $this->db->insert($post['table'], $insert);
         }
-        echo   json_encode($post);
     }
- 
 }

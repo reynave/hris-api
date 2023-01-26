@@ -5,16 +5,15 @@ class TimeManagement extends CI_Controller
 
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct(); 
         header('Access-Control-Allow-Origin: *');
         header("Access-Control-Allow-Headers: key, token,  Content-Type");
         header('Access-Control-Allow-Methods: GET, POST, PUT');
         header('Content-Type: application/json');
-        // error_reporting(E_ALL);  
-        /* if (!$this->model->header($this->openAPI)) {
-        echo $this->model->error("Error auth");
-        exit;
-        }*/
+        if (!$this->model->header($this->db->openAPI)) {
+            echo $this->model->error("Error auth");
+            exit;
+        }
     }
 
 
@@ -137,8 +136,8 @@ class TimeManagement extends CI_Controller
             $id = $post['id'];
             $update = array(
                 "checkIn" => $post['item']['checkIn'],
-                "checkOut" => $post['item']['checkOut'], 
-                "shiftId" =>  $post['item']['shiftId'], 
+                "checkOut" => $post['item']['checkOut'],
+                "shiftId" => $post['item']['shiftId'],
                 "updateDate" => date("Y-m-d H:i:s"),
             );
             $this->db->update('time_management', $update, "id='$id'");
@@ -192,14 +191,14 @@ class TimeManagement extends CI_Controller
                         tm.updateDate = CONCAT(CURDATE(),' ',CURTIME() )
                     WHERE tm.date = a.date AND tm.personalId = a.personalId
                 ");
- 
-                $update = array( 
+
+                $update = array(
                     "status" => 1,
                     "presence" => 1,
                     "note" => "Sync Success",
-                    "updateDate" => date("Y-m-d H:i:s"), 
+                    "updateDate" => date("Y-m-d H:i:s"),
                 );
-                $this->db->update("attendance_log", $update,"id = ".$post['id']);
+                $this->db->update("attendance_log", $update, "id = " . $post['id']);
 
                 $this->db->query("TRUNCATE TABLE attendance");
 
@@ -270,7 +269,7 @@ class TimeManagement extends CI_Controller
 
             $offDay = $this->model->select($dt->format("D"), "time_management_shift", "id='$shiftId'");
 
- 
+
 
             $temp = array(
                 "day" => $dt->format("D"),
@@ -286,7 +285,7 @@ class TimeManagement extends CI_Controller
                 "workingHour" => '',
                 "note" => "",
                 "off" => $offDay,
-                "shiftId" =>  $this->model->select("shiftId", "time_management", $where),
+                "shiftId" => $this->model->select("shiftId", "time_management", $where),
                 "id" => $this->model->select("id", "time_management", $where),
             );
             if ($checkIn != "") {
@@ -389,7 +388,8 @@ class TimeManagement extends CI_Controller
         echo json_encode($data);
     }
 
-    function location(){
+    function location()
+    {
         echo __FILE__;
     }
 }

@@ -10,11 +10,10 @@ class Branch extends CI_Controller
         header("Access-Control-Allow-Headers: key, token,  Content-Type");
         header('Access-Control-Allow-Methods: GET, POST, PUT');
         header('Content-Type: application/json');
-        // error_reporting(E_ALL);  
-        /* if (!$this->model->header($this->openAPI)) {
-             echo $this->model->error("Error auth");
+        if (!$this->model->header($this->db->openAPI)) {
+            echo $this->model->error("Error auth");
             exit;
-        }*/
+        }
     }
 
 
