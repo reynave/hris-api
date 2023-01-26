@@ -72,7 +72,7 @@ class TimeManagement extends CI_Controller
                  DATE_FORMAT(`scheduleIn`, '%H:%i') AS `scheduleIn`,
                  DATE_FORMAT(`scheduleOut`, '%H:%i') AS `scheduleOut`
                  
-            from time_management_shift "),
+            from time_management_shift where presence = 1 "),
             "offtime" => $this->model->sql("SELECT id, name FROM  offtime  where presence = 1  order by name asc "),
 
 
@@ -260,7 +260,7 @@ class TimeManagement extends CI_Controller
             $isOvertime = false;
             $where = "personalId = '" . $this->input->get('id') . "' AND 
             `date` = '" . $dt->format("Y-m-d") . "' ORDER BY id DESC limit 1";
-
+            $shiftId = $this->model->select("shiftId", "time_management", $where);
             $scheduleIn = $this->model->select("scheduleIn", "time_management_shift", "id='$shiftId'");
             $scheduleOut = $this->model->select("scheduleOut", "time_management_shift", "id='$shiftId'");
 
@@ -269,7 +269,7 @@ class TimeManagement extends CI_Controller
 
             $offDay = $this->model->select($dt->format("D"), "time_management_shift", "id='$shiftId'");
 
-
+          
 
             $temp = array(
                 "day" => $dt->format("D"),
@@ -303,7 +303,7 @@ class TimeManagement extends CI_Controller
                 $time82 = new DateTime($checkIn);
                 $workingHours = $time81->diff($time82);
                 $temp["workingHour"] = $workingHours->h . "h" . $workingHours->i . "m";
-                $temp["job"] = $offDay == 1 ? "Work" : 'Holiday';
+                $temp["job"] = $offDay == 1 ? $this->model->select("name", "time_management_shift", "id = '$shiftId' ") : 'Holiday';
                 if ((int) ($workingHours->h . $workingHours->i) > 0) {
 
                     if ($offDay == 1) {
@@ -371,7 +371,7 @@ class TimeManagement extends CI_Controller
                  DATE_FORMAT(`scheduleIn`, '%H:%i') AS `scheduleIn`,
                  DATE_FORMAT(`scheduleOut`, '%H:%i') AS `scheduleOut`
                  
-            from time_management_shift "),
+            from time_management_shift where presence = 1"),
             "offtime" => $this->model->sql("SELECT id, name FROM  offtime  where presence = 1  order by name asc "),
         );
 
