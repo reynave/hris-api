@@ -156,6 +156,7 @@ class TimeManagement extends CI_Controller
             "error" => true,
         );
         if ($post) {
+            $this->db->query("SET GLOBAL local_infile=1;");
             global $file_attendance;
             $fileName = $post['item']['fileName'];
             $bulk = $this->db->query(" LOAD DATA LOCAL INFILE  
