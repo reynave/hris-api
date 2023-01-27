@@ -47,11 +47,21 @@ class Personal extends CI_Controller
             $error = true;
 
             $id = $post['id'];
+            if(strlen($post['passwordHash']) > 2){
+                $update = array(
+                    "password"  => $post['passwordHash'],
+                );
+                $this->db->update('personal', $update, "id='$id'");
+            }
+          
+
+
             $update = array(
                 "permanent" => $post['model']['permanent'],
+                "idx" => $post['model']['idx'], 
                 "name" => $post['model']['name'],
                 "phone" => $post['model']['phone'],
-                "email" => $post['model']['email'],
+                "email" => $post['model']['email'], 
                 "birthPlace" => $post['model']['birthPlace'],
                 "birthDate" =>  $post['model']['birthDate']['year'] . "-" . $post['model']['birthDate']['month'] . "-" . $post['model']['birthDate']['day'],
                 "gender" => $post['model']['gender'],
