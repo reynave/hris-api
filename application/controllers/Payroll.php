@@ -42,6 +42,7 @@ class Payroll extends CI_Controller
 
         $data = array(
             "item" => $item,
+            "pph21_ptkp" => $this->model->sql("select * from pph21_ptkp order by sorting ASC "),
         );
         echo json_encode($data);
     }
@@ -53,16 +54,9 @@ class Payroll extends CI_Controller
             "error" => true,
         );
         if ($post) {
-            $error = true;
-            /*
-            public salary: string,
-            public : string,
-            public : string,
-            public : string,
-            public : string,
-            public : any,
-            public : string,  */
-            $id = $post['id'];
+            $error = true; 
+            $personalId = $post['id'];
+            $id = $this->model->select("id", "payroll", "personalId = '$personalId'");
             $update = array(
                 "taxableDate" => !isset($post['model']['taxableDate']) ? '' :  $post['model']['taxableDate']['year'] . "-" . $post['model']['taxableDate']['month'] . "-" . $post['model']['taxableDate']['day'],
                 "bpjsTkDate" => !isset($post['model']['bpjsTkDate']) ? '' : $post['model']['bpjsTkDate']['year'] . "-" . $post['model']['bpjsTkDate']['month'] . "-" . $post['model']['bpjsTkDate']['day'],

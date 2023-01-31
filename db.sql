@@ -74,8 +74,8 @@ DROP TABLE IF EXISTS `bpjs_setting`;
 CREATE TABLE IF NOT EXISTS `bpjs_setting` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `label` varchar(50) NOT NULL,
-  `company` int(10) NOT NULL,
-  `employee` int(10) NOT NULL,
+  `company` float NOT NULL DEFAULT 0,
+  `employee` float NOT NULL DEFAULT 0,
   `presence` int(10) NOT NULL DEFAULT 1,
   `updateDate` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   PRIMARY KEY (`id`) USING BTREE
@@ -83,12 +83,12 @@ CREATE TABLE IF NOT EXISTS `bpjs_setting` (
 
 -- Dumping data for table hris.bpjs_setting: ~6 rows (approximately)
 INSERT INTO `bpjs_setting` (`id`, `label`, `company`, `employee`, `presence`, `updateDate`) VALUES
-	(100, 'JHT (Jaminan Hari Tua)', 1, 9, 1, '2023-01-30 09:57:56'),
-	(110, 'JKK (Jaminan Kecelakaan Kerja)', 2, 8, 1, '2023-01-30 09:57:56'),
-	(111, 'JKM (Jaminan Kematian)', 3, 7, 1, '2023-01-30 09:57:56'),
-	(112, 'JP (Jaminan Pensiun)', 5, 5, 1, '2023-01-30 09:57:56'),
-	(113, 'JKP (Jaminan Kehilangan Pekerjaan)', 5, 4, 1, '2023-01-30 09:57:56'),
-	(200, 'BPJS Kesehaatan', 12, 32, 1, '2023-01-30 09:57:56');
+	(100, 'JHT (Jaminan Hari Tua)', 2, 2, 1, '2023-01-31 10:06:56'),
+	(110, 'JKK (Jaminan Kecelakaan Kerja)', 0.24, 0.24, 1, '2023-01-31 10:06:56'),
+	(111, 'JKM (Jaminan Kematian)', 0.3, 0.3, 1, '2023-01-31 10:06:56'),
+	(112, 'JP (Jaminan Pensiun)', 1, 1, 1, '2023-01-31 10:06:56'),
+	(113, 'JKP (Jaminan Kehilangan Pekerjaan)', 0, 0, 1, '2023-01-31 10:06:56'),
+	(200, 'BPJS Kesehaatan', 4, 4, 1, '2023-01-31 10:06:56');
 
 -- Dumping structure for table hris.branch
 DROP TABLE IF EXISTS `branch`;
@@ -347,7 +347,7 @@ CREATE TABLE IF NOT EXISTS `payroll` (
 
 -- Dumping data for table hris.payroll: ~1 rows (approximately)
 INSERT INTO `payroll` (`id`, `personalId`, `salary`, `salaryType`, `bankName`, `bankAccountNumber`, `bankAccountHolderName`, `hourlyRate`, `tunjangan`, `taxNpwp`, `taxMethod`, `taxableDate`, `taxHolderName`, `taxPtkpStatus`, `taxSalary`, `EmploymentTaxStatus`, `taxPktpAccountHolder`, `bpsjTkNo`, `bpsjKesehatanNo`, `JhtCost`, `JaminanPensiunCost`, `bpjsTkDate`, `bpjsKesehatanFamily`, `JaminanPensiunDate`, `status`, `presence`, `updateDate`, `inputDate`) VALUES
-	('PYL000014', 'P000003', 0, '', '', '', '', 0, 0, '', '', '2020-01-01', '', '', 0, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-01-01 00:00:00', '2023-01-25 11:15:20'),
+	('PYL000014', 'P000003', 10000000, 'M', 'Paypal', '09999777774', 'maria sarapova Bank', 0, 1000000, 'NPWP00001111', '', '2020-01-01', '', 'TK/0', 0, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-01-31 10:20:01', '2023-01-25 11:15:20'),
 	('PYL000015', 'P000010', 0, '', '', '', '', 0, 0, '', '', '2020-01-01', '', '', 0, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-01-01 00:00:00', '2023-01-25 11:45:16'),
 	('PYL000016', '1', 0, '', '', '', '', 0, 0, '', '', '2020-01-01', '', '', 0, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-01-01 00:00:00', '2023-01-26 08:54:28');
 
@@ -384,7 +384,7 @@ INSERT INTO `personal` (`id`, `idx`, `name`, `phone`, `email`, `password`, `birt
 	('1', '11223344', 'admin', '007', 'hris@admin.com', '25f9e794323b453885f5181f1b624d0b', '', '', '0', 0, '', 0, 1, '', '2023-01-01', 1, '', '', 1, 1, '2023-01-16 13:32:39', '2023-01-16 13:32:39'),
 	('800', '20190001', 'asd', '', '', '', '', '', '0', 0, '', 0, 1, '', '2023-01-01', 1, '', '', 0, 0, '2023-01-16 13:32:58', '2023-01-16 13:32:58'),
 	('P000002', '20189900', 'asd', '', '', '', '', '', '0', 0, '', 0, 1, '', '2023-01-01', 1, '', '', 0, 0, '2023-01-16 13:43:32', '2023-01-16 13:43:32'),
-	('P000003', '20050082', 'maria', '234234324', 'admin@abac.org', '25d55ad283aa400af464c76d713c07ad', 'gagagagagag', '1990-1-27', 'M', 4, 'A', 3, 2, '88854454520000454', '2023-03-17', 1, '535345', '245234523 2 43 2345 2345', 1, 1, '2023-01-27 15:17:53', '2023-01-27 15:17:53'),
+	('P000003', '20050082', 'maria', '234234324', 'admin@abac.org', '25d55ad283aa400af464c76d713c07ad', 'gagagagagag', '1990-1-27', 'M', 4, 'A', 3, 2, '88854454520000454', '2023-03-17', 1, '535345', '245234523 2 43 2345 2345', 1, 1, '2023-01-31 08:37:25', '2023-01-31 08:37:25'),
 	('P000004', '20120542', 'AkanShari', '', '', '', '', '1990-1-19', '0', 0, '', 0, 1, '', '2023-01-01', 1, '', '', 1, 1, '2023-01-16 13:14:47', '2023-01-16 13:14:47'),
 	('P000005', '20130588', 'Sayako', '1234234', 'admin@admin.com', '', '', '1990-1-1', 'M', 0, '', 0, 1, '', '2023-01-01', 1, '', '', 1, 1, '2023-01-17 10:41:04', '2023-01-17 10:41:04'),
 	('P000006', '20130607', 'Kitaro', '43234234', 'rey_nave@yahoo.com', '', '', '1990-1-1', 'M', 0, '', 0, 1, '', '2023-01-01', 1, '', '', 1, 1, '2023-01-16 13:17:41', '2023-01-16 13:17:41'),
@@ -458,7 +458,7 @@ CREATE TABLE IF NOT EXISTS `personal_marital` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table hris.personal_marital: ~3 rows (approximately)
+-- Dumping data for table hris.personal_marital: ~4 rows (approximately)
 INSERT INTO `personal_marital` (`id`, `name`, `other`, `presence`) VALUES
 	(1, 'Single', 0, 1),
 	(2, 'married', 0, 1),
@@ -487,25 +487,30 @@ INSERT INTO `personal_religion` (`id`, `name`, `other`, `presence`) VALUES
 -- Dumping structure for table hris.pph21_ptkp
 DROP TABLE IF EXISTS `pph21_ptkp`;
 CREATE TABLE IF NOT EXISTS `pph21_ptkp` (
-  `id` int(6) NOT NULL AUTO_INCREMENT,
+  `id` varchar(9) NOT NULL,
+  `sorting` int(2) NOT NULL DEFAULT 0,
   `jumlahAnak` int(2) NOT NULL DEFAULT 0,
-  `PTKPTidakKawinLabel` varchar(50) NOT NULL,
-  `PTKPTidakKawin` double NOT NULL,
-  `PTKPKawinLabel` varchar(50) NOT NULL,
-  `PTKPKawin` double NOT NULL,
-  `PTKPGabunganSuamiIstriLabel` varchar(50) NOT NULL,
-  `PTKPGabunganSuamiIstri` double NOT NULL,
+  `label` varchar(50) NOT NULL,
+  `amount` double NOT NULL DEFAULT 0,
   `presence` int(1) NOT NULL DEFAULT 1,
   `updateDate` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table hris.pph21_ptkp: ~4 rows (approximately)
-INSERT INTO `pph21_ptkp` (`id`, `jumlahAnak`, `PTKPTidakKawinLabel`, `PTKPTidakKawin`, `PTKPKawinLabel`, `PTKPKawin`, `PTKPGabunganSuamiIstriLabel`, `PTKPGabunganSuamiIstri`, `presence`, `updateDate`) VALUES
-	(1, 0, 'TK/0', 54000000, 'K/0', 58500000, 'K/I/0a', 112500000, 1, '2023-01-30 09:03:15'),
-	(2, 1, 'TK/1', 58500000, 'K/1', 63000000, 'K/I/1b', 117000000, 1, '2023-01-30 09:03:15'),
-	(3, 2, 'TK/2', 63000000, 'K/2', 67500000, 'K/I/2c', 121500000, 1, '2023-01-30 09:03:15'),
-	(4, 3, 'TK/3', 67500000, 'K/3', 72000000, 'K/I/3d', 126500000, 1, '2023-01-30 09:03:15');
+-- Dumping data for table hris.pph21_ptkp: ~11 rows (approximately)
+INSERT INTO `pph21_ptkp` (`id`, `sorting`, `jumlahAnak`, `label`, `amount`, `presence`, `updateDate`) VALUES
+	('K/0', 1, 0, 'PTKP Kawin ', 58500000, 1, '2023-01-31 08:02:09'),
+	('K/1', 2, 1, 'PTKP Kawin ', 63000000, 1, '2023-01-31 08:02:09'),
+	('K/2', 3, 2, 'PTKP Kawin ', 67500000, 1, '2023-01-31 08:02:09'),
+	('K/3', 4, 3, 'PTKP Kawin ', 72000000, 1, '2023-01-31 08:02:09'),
+	('K/I/0', 21, 0, 'PTKP Gabungan Suami-Istri', 112500000, 1, '2023-01-31 08:02:09'),
+	('K/I/1', 22, 1, 'PTKP Gabungan Suami-Istri', 117000000, 1, '2023-01-31 08:02:09'),
+	('K/I/2', 23, 2, 'PTKP Gabungan Suami-Istri', 121500000, 1, '2023-01-31 08:02:09'),
+	('K/I/3', 24, 3, 'PTKP Gabungan Suami-Istri', 126500000, 1, '2023-01-31 08:02:09'),
+	('TK/0', 11, 0, 'PTKP Tidak Kawin ', 54000000, 1, '2023-01-31 08:02:09'),
+	('TK/1', 12, 1, 'PTKP Tidak Kawin ', 58500000, 1, '2023-01-31 08:02:09'),
+	('TK/2', 13, 2, 'PTKP Tidak Kawin ', 63000000, 1, '2023-01-31 08:02:09'),
+	('TK/3', 14, 3, 'PTKP Tidak Kawin ', 67500000, 1, '2023-01-31 08:02:09');
 
 -- Dumping structure for table hris.pph21_tarif_pajak
 DROP TABLE IF EXISTS `pph21_tarif_pajak`;
@@ -514,19 +519,19 @@ CREATE TABLE IF NOT EXISTS `pph21_tarif_pajak` (
   `note` varchar(250) NOT NULL DEFAULT '',
   `minAmount` double NOT NULL DEFAULT 0,
   `maxAmount` double NOT NULL DEFAULT 0,
-  `TaxPercent` float NOT NULL DEFAULT 0,
+  `taxPercent` float NOT NULL DEFAULT 0,
   `presence` int(1) NOT NULL DEFAULT 1,
   `updateDate` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table hris.pph21_tarif_pajak: ~4 rows (approximately)
-INSERT INTO `pph21_tarif_pajak` (`id`, `note`, `minAmount`, `maxAmount`, `TaxPercent`, `presence`, `updateDate`) VALUES
-	(1, '', 0, 60000000, 5, 1, '2023-01-30 09:03:15'),
-	(2, '', 60000001, 250000000, 15, 1, '2023-01-30 09:03:15'),
-	(3, '', 25000001, 500000000, 25, 1, '2023-01-30 09:03:15'),
-	(4, '', 500000001, 5000000000, 30, 1, '2023-01-30 09:03:15'),
-	(5, '', 5000000001, 99999999999, 35, 1, '2023-01-30 09:03:15');
+-- Dumping data for table hris.pph21_tarif_pajak: ~5 rows (approximately)
+INSERT INTO `pph21_tarif_pajak` (`id`, `note`, `minAmount`, `maxAmount`, `taxPercent`, `presence`, `updateDate`) VALUES
+	(1, '', 0, 60000000, 5, 1, '2023-01-31 08:02:09'),
+	(2, '', 60000001, 250000000, 15, 1, '2023-01-31 08:02:09'),
+	(3, '', 25000001, 500000000, 25, 1, '2023-01-31 08:02:09'),
+	(4, '', 500000001, 5000000000, 30, 1, '2023-01-31 08:02:09'),
+	(5, '', 5000000001, 99999999999, 35, 1, '2023-01-31 08:02:09');
 
 -- Dumping structure for table hris.reimbursement
 DROP TABLE IF EXISTS `reimbursement`;
