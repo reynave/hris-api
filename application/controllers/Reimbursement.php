@@ -11,8 +11,8 @@ class Reimbursement extends CI_Controller
         header('Access-Control-Allow-Methods: GET, POST, PUT');
         header('Content-Type: application/json');
         if (!$this->model->header($this->db->openAPI)) {
-            echo $this->model->error("Error auth");
-            exit;
+        //    echo $this->model->error("Error auth");
+        //    exit;
         }
     }
 
@@ -20,15 +20,33 @@ class Reimbursement extends CI_Controller
     function index()
     {
         $data = array(
+            "personalId" => $this->model->userId(),
             "data" =>$this->model->sql("SELECT r.*, p.name , n.name  AS 'reimbursement',
             CONCAT('Rp ', FORMAT(r.requestAmount, 0)) AS 'price'
             from reimbursement as r
             JOIN personal AS p ON p.id = r.personalId
             JOIN reimbursement_name AS n ON n.id = r.reimbursementNameId
-            where r.presence = 1 and r.approvedBy = '' "),
+            where r.presence = 1 and r.approved = 0 and r.personalId =  '".$this->model->userId()."' "),
         );
         echo json_encode($data);
     }
+
+    function approvedLineList()
+    {
+        $personalId = $this->model->userId(); 
+        $data = array(
+            "personalId" => $personalId, 
+            "data" =>$this->model->sql("SELECT r.*, p.name , n.name  AS 'reimbursement',
+            CONCAT('Rp ', FORMAT(r.requestAmount, 0)) AS 'price', e.approvalLineId
+            from reimbursement as r
+            JOIN personal AS p ON p.id = r.personalId
+            LEFT JOIN employment AS e ON e.personalId = p.id
+            JOIN reimbursement_name AS n ON n.id = r.reimbursementNameId
+            WHERE r.presence = 1 And r.approved = 0 AND e.approvalLineId = '".$this->model->userId()."' "),
+        );
+        echo json_encode($data);
+    }
+
     function history()
     {
         $data = array(
@@ -37,16 +55,15 @@ class Reimbursement extends CI_Controller
             from reimbursement as r
             JOIN personal AS p ON p.id = r.personalId
             JOIN reimbursement_name AS n ON n.id = r.reimbursementNameId
-            where r.presence = 1 and r.approvedBy != '' "),
+            where r.presence = 1   and r.personalId =  '".$this->model->userId()."' "),
         );
         echo json_encode($data);
     }
-
-
+ 
     function add()
     {
         $data = array(
-            "personal" => $this->model->sql("SELECT id, name from personal where presence = 1 order by name ASC"), 
+            "personal" => $this->model->sql("SELECT id, name from personal where presence = 1 and id = '".$this->model->userId()."' order by name ASC"), 
             "reimbursementName" => $this->model->sql("SELECT id, name from reimbursement_name where presence = 1 order by name ASC"),  
             "today" => array(
                 "year" => (int)date("Y"),
@@ -74,13 +91,22 @@ class Reimbursement extends CI_Controller
                 "paidAmount" => $post['model']['paidAmount'],  
                 "requestDate" => $post['model']['requestDate']['year']."-".$post['model']['requestDate']['month']."-".$post['model']['requestDate']['day'],  
                 
-                "updateDate"    => date("Y-m-d H:i:s"),
-                "approvedDate" => $post['approved'] == true ? date("Y-m-d H:i:s") : null,
-                "approvedBy" => 'P0004',
+                "updateDate"    => date("Y-m-d H:i:s"), 
                 
             );
             $this->db->update('reimbursement', $update, "id='$id'");
 
+
+            if($post['model']['approved']  > 0){
+                $update = array(
+                    "approved" => $post['model']['approved'],
+                    "approvedDate" => date("Y-m-d H:i:s"),
+                    "approvedBy" => $this->model->userId(),
+                    
+                );
+                $this->db->update('reimbursement', $update, "id='$id'"); 
+            }
+          
             $data = array(
                 "error" => false,
             );

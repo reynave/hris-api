@@ -25,12 +25,33 @@ class GlobalSetting extends CI_Controller
             "offtime" => $this->model->sql("SELECT * FROM offtime where  presence = 1 order by id ASC "),
             "reimbursement_name" => $this->model->sql("SELECT * FROM reimbursement_name where  presence = 1 order by id ASC "),
             "time_management_shift" => $this->model->sql("SELECT * FROM time_management_shift where  presence = 1 order by idAuto ASC "),
+            "global_setting_jabatan" => $this->model->sql("SELECT * FROM global_setting where  id >= 100 or id <= 199 order by id ASC "),
 
         );
         echo json_encode($data);
     }
 
+    function fnSave_global_setting_jabatan()
+    {
+        $post = json_decode(file_get_contents('php://input'), true);
+        $data = array(
+            "error" => true,
+        );
+        if ($post) {
+            foreach ($post as $row) {
+                $update = array(
+                    "value" => $row['value'],
+                );
+                $this->db->update("global_setting", $update, " id='" . $row['id'] . "' ");
+            }
 
+            $data = array(
+                "error" => false,
+            );
+        }
+
+        echo json_encode($data);
+    }
     function fnSave_employment_joblevel()
     {
         $post = json_decode(file_get_contents('php://input'), true);
@@ -109,15 +130,15 @@ class GlobalSetting extends CI_Controller
         );
         if ($post) {
             foreach ($post as $row) {
-                if($this->model->select("id","time_management_shift"," idAuto='" . $row['idAuto'] . "' ") == "" ){
+                if ($this->model->select("id", "time_management_shift", " idAuto='" . $row['idAuto'] . "' ") == "") {
                     $update = array(
-                        "id" => $row['id'],  
+                        "id" => $row['id'],
                     );
                     $this->db->update("time_management_shift", $update, " idAuto='" . $row['idAuto'] . "' ");
                 }
 
-                $update = array( 
-                    "name" => $row['name'],  
+                $update = array(
+                    "name" => $row['name'],
                     "scheduleIn" => $row['scheduleIn'],
                     "scheduleOut" => $row['scheduleOut'],
                     "Sun" => $row['Sun'],
@@ -126,7 +147,7 @@ class GlobalSetting extends CI_Controller
                     "Wed" => $row['Wed'],
                     "Thu" => $row['Thu'],
                     "Fri" => $row['Fri'],
-                    "Sat" => $row['Sat'], 
+                    "Sat" => $row['Sat'],
                 );
                 $this->db->update("time_management_shift", $update, " idAuto='" . $row['idAuto'] . "' ");
             }

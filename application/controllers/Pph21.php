@@ -57,36 +57,57 @@ class Pph21 extends CI_Controller
         echo json_encode($data);
     }
 
+    function employee_thead()
+    {
+        $data = array(
+            'companyBPSJ' => $this->model->select("company", "bpjs_setting", "id=200"),
+            'companyJKK' => $this->model->select("company", "bpjs_setting", "id=110"),
+            'companyJKM' => $this->model->select("company", "bpjs_setting", "id=111"),
 
+            'employeeBPSJ' => $this->model->select("employee", "bpjs_setting", "id=200"),
+            'employeeJHT' => $this->model->select("employee", "bpjs_setting", "id=100"),
+            'employeeJP' => $this->model->select("employee", "bpjs_setting", "id=112"),
+            
+        );
+        $data = array( 
+            "data" => $data,
+        );
+        echo json_encode($data);
+    }
     function employee(){
         $companyBPSJ = $this->model->select("company", "bpjs_setting", "id=200");
         $companyJKK = $this->model->select("company", "bpjs_setting", "id=110");
         $companyJKM = $this->model->select("company", "bpjs_setting", "id=111");
-        $companyJHT = $this->model->select("company", "bpjs_setting", "id=100");
-        $companyJP = $this->model->select("company", "bpjs_setting", "id=112");
+ 
+         
+        $employeeBPSJ = $this->model->select("employee", "bpjs_setting", "id=200");
+        $employeeJHT = $this->model->select("employee", "bpjs_setting", "id=100");
+        $employeeJP = $this->model->select("employee", "bpjs_setting", "id=112");
 
-        $employee = $this->model->sql("SELECT p.id, p.name, r.salary, r.tunjangan, r.taxPtkpStatus,
-        ((r.salary+ r.tunjangan) * ($companyBPSJ/100))  AS 'bpjs',
-        ((r.salary+ r.tunjangan) * ($companyJKK/100))  AS 'jkk',
-        ((r.salary+ r.tunjangan) * ($companyJKM/100))  AS 'jkm',
-        ((r.salary+ r.tunjangan) + 
-        ((r.salary+ r.tunjangan) * ($companyBPSJ/100)) +  
-        ((r.salary+ r.tunjangan) * ($companyJKK/100)) +  
-        ((r.salary+ r.tunjangan) * ($companyJKM/100)) )AS 'bruto'  
+
+        $sqlEmployee = "SELECT p.id, p.name, r.taxSalary,  r.tunjangan, r.taxPtkpStatus, 
+        ((r.taxSalary+ r.tunjangan) * ($companyBPSJ/100))  AS 'bpjs',
+        ((r.taxSalary+ r.tunjangan) * ($companyJKK/100))  AS 'jkk',
+        ((r.taxSalary+ r.tunjangan) * ($companyJKM/100))  AS 'jkm',
+        ((r.taxSalary+ r.tunjangan) + 
+        ((r.taxSalary+ r.tunjangan) * ($employeeBPSJ/100)) +  
+        ((r.taxSalary+ r.tunjangan) * ($companyJKK/100)) +  
+        ((r.taxSalary+ r.tunjangan) * ($companyJKM/100)) )AS 'bruto'  
         FROM payroll AS r 
         JOIN personal AS p ON p.id = r.personalId
-        WHERE r.presence = 1");
+        WHERE r.presence = 1 order by p.name ASC;";
+        $employee = $this->model->sql($sqlEmployee);
 
         $bpjsKes = 1;
         $data = [];
-        $jabatanPercent = 0.05;
-        $jabatanAmount = 500000;
+        $jabatanPercent = $this->model->select("value","global_setting","id=100");
+        $jabatanAmount = $this->model->select("value","global_setting","id=101");
         foreach( $employee as $row){
             $temp = array(
                 "byJabatan" => ($row['bruto'] *  $jabatanPercent) >  $jabatanAmount  ?  $jabatanAmount : ($row['bruto'] *  $jabatanPercent),
                 "bpjsKes" => $row['bruto'] * ($bpjsKes/100), 
-                "jht" => $row['bruto'] * ($companyJHT/100), 
-                "jp" => $row['bruto'] * ($companyJP/100), 
+                "jht" => $row['bruto'] * ($employeeJHT/100), 
+                "jp" => $row['bruto'] * ($employeeJP/100), 
                 "netto" => 0,  
                 "ptkpAmount" => (int)$this->model->select("amount","pph21_ptkp","id='".$row['taxPtkpStatus']."'"),
                 "pkp" => 0,
@@ -96,7 +117,7 @@ class Pph21 extends CI_Controller
             );
 
             $temp['netto'] = $row['bruto'] - ($temp['byJabatan'] + $temp['bpjsKes'] + $temp['jht'] + $temp['jp']);
-            $temp['pkp'] = ($temp['netto'] * 12) + $row['salary'] - $temp['ptkpAmount'];
+            $temp['pkp'] = ($temp['netto'] * 12) + $row['taxSalary'] - $temp['ptkpAmount'];
 
             $temp['taxPercent'] =  (float)$this->model->select("taxPercent","pph21_tarif_pajak","maxAmount >= ".$temp['pkp']."
             ORDER BY taxPercent ASC LIMIT 1");
@@ -108,8 +129,20 @@ class Pph21 extends CI_Controller
             array_push($data, array_merge($row, $temp));
         }
 
+        $thead = array(
+            'companyBPSJ' => $this->model->select("company", "bpjs_setting", "id=200"),
+            'companyJKK' => $this->model->select("company", "bpjs_setting", "id=110"),
+            'companyJKM' => $this->model->select("company", "bpjs_setting", "id=111"),
+
+            'employeeBPSJ' => $this->model->select("employee", "bpjs_setting", "id=200"),
+            'employeeJHT' => $this->model->select("employee", "bpjs_setting", "id=100"),
+            'employeeJP' => $this->model->select("employee", "bpjs_setting", "id=112"),
+            
+        );
+
         $data = array(
-            ///"error" => false,
+            "error" => false,
+            "thead" => $thead,
             "data" => $data,
         );
         echo json_encode($data);
