@@ -46,16 +46,7 @@ class Personal extends CI_Controller
         if ($post) {
             $error = true;
 
-            $id = $post['id'];
-            if(strlen($post['passwordHash']) > 2){
-                $update = array(
-                    "password"  => $post['passwordHash'],
-                );
-                $this->db->update('personal', $update, "id='$id'");
-            }
-          
-
-
+            $id = $post['id']; 
             $update = array(
                 "permanent" => $post['model']['permanent'],
                 "idx" => $post['model']['idx'], 
@@ -75,6 +66,28 @@ class Personal extends CI_Controller
                 "address" => $post['model']['address'],
 
                 "inputDate"     => date("Y-m-d H:i:s"),
+                "updateDate"    => date("Y-m-d H:i:s"),
+            );
+            $this->db->update('personal', $update, "id='$id'");
+
+            $data = array(
+                "error" => false,
+            );
+        }
+        echo   json_encode($data);
+    }
+
+    function updatePassword()
+    {
+        $post =   json_decode(file_get_contents('php://input'), true);
+        $data = array(
+            "error" => true,
+        );
+        if ($post) {
+            $error = true; 
+            $id = $post['id']; 
+            $update = array(
+                "password" => $post['passwordHash'],
                 "updateDate"    => date("Y-m-d H:i:s"),
             );
             $this->db->update('personal', $update, "id='$id'");

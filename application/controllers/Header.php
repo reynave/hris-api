@@ -26,15 +26,12 @@ class Header extends CI_Controller
 
         $id = $this->model->select("personalId", "personal_access", "token = '$token'");
         $jobPositionId = $this->model->select("jobPositionId", "employment", "personalId = '$id'");
-       
-
-
-
+        
         $data = array( 
             "jobPositionId" => $jobPositionId,
-            "module" => $this->model->sql("select * from employment_jobposition where id = ".$jobPositionId)[0],
-            "id" => $this->model->select("personalId","personal_access","token = '$token'"),
-          //  "header" =>$header,
+            "module"        => $this->model->sql("select * from employment_jobposition where id = ".$jobPositionId)[0],
+            "id"            => $this->model->select("personalId","personal_access","token = '$token'"),
+            "user"    =>$id ?  $this->model->sql("SELECT id, name, email from personal where presence = 1 and status = 1 and id = '".$this->model->userId()."'")[0]: [],
             "token" => $token,
             "error" => false,
         );

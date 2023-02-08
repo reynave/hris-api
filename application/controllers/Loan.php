@@ -41,11 +41,11 @@ class Loan extends CI_Controller
         JOIN personal AS p ON p.id = l.personalId 
         JOIN employment AS e ON e.personalId =l.personalId
         LEFT JOIN personal AS a ON a.id = e.approvalLineId
-        WHERE l.presence = 1 AND l.STATUS = 1 and l.approved = 0 ";
+        WHERE l.presence = 1 AND l.STATUS = 1 and l.approved = 0  and e.approvalLineId = '".$this->model->userId()."' ";
 
         $data = array(
             "q"=> $q,
-            "data" => $this->model->sql($q ),
+            "data" => $this->model->sql($q),
 
         );
         echo json_encode($data);
@@ -78,9 +78,7 @@ class Loan extends CI_Controller
         foreach($this->model->sql($q) as $row){
             $temp = array(
                 "paidInstallment" => $this->model->select("count(id)","loan_detail","loanId= '".$row['id']."' and presence = 1 and paidAmount > 0  ")
-            );
-
-            
+            ); 
             array_push($items,array_merge($temp, $row));
         }
 
