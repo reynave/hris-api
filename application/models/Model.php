@@ -197,7 +197,7 @@ class Model extends CI_Model
         return $this->model->personalId();
     }
 
-    function number($name = "")
+    function number($name = "",$prefixLabel = "")
     {
         if ($name) {
             $number = $this->model->select('runningNumber', 'auto_number', "name = '" . $name . "'") + 1;
@@ -213,7 +213,7 @@ class Model extends CI_Model
 
             $new_number = str_pad($number, $this->model->select('digit', 'auto_number', "name = '" . $name . "'"), "0", STR_PAD_LEFT);
 
-            return $prefix . $new_number;
+            return $prefix.$prefixLabel . $new_number;
         }
     }
 

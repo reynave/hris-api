@@ -1,7 +1,7 @@
 -- --------------------------------------------------------
--- Host:                         127.0.0.1
--- Server version:               10.4.24-MariaDB - mariadb.org binary distribution
--- Server OS:                    Win64
+-- Host:                         128.199.94.89
+-- Server version:               8.0.32-0ubuntu0.22.10.2 - (Ubuntu)
+-- Server OS:                    Linux
 -- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
@@ -17,30 +17,30 @@
 -- Dumping structure for table hris.attendance
 DROP TABLE IF EXISTS `attendance`;
 CREATE TABLE IF NOT EXISTS `attendance` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `idx` varchar(50) DEFAULT NULL,
   `code` varchar(50) DEFAULT NULL,
   `dateIn` varchar(50) DEFAULT NULL,
   `timeScan` varchar(50) DEFAULT NULL,
   `checkIn` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table hris.attendance: ~0 rows (approximately)
 
 -- Dumping structure for table hris.attendance_log
 DROP TABLE IF EXISTS `attendance_log`;
 CREATE TABLE IF NOT EXISTS `attendance_log` (
-  `id` int(9) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `fileSize` double NOT NULL,
   `fileName` varchar(250) NOT NULL,
   `note` varchar(250) NOT NULL,
-  `status` int(2) NOT NULL DEFAULT 1,
-  `presence` int(1) NOT NULL DEFAULT 1,
+  `status` int NOT NULL DEFAULT '1',
+  `presence` int NOT NULL DEFAULT '1',
   `inputDate` datetime DEFAULT NULL,
   `updateDate` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table hris.attendance_log: ~4 rows (approximately)
 INSERT INTO `attendance_log` (`id`, `fileSize`, `fileName`, `note`, `status`, `presence`, `inputDate`, `updateDate`) VALUES
@@ -52,59 +52,62 @@ INSERT INTO `attendance_log` (`id`, `fileSize`, `fileName`, `note`, `status`, `p
 -- Dumping structure for table hris.auto_number
 DROP TABLE IF EXISTS `auto_number`;
 CREATE TABLE IF NOT EXISTS `auto_number` (
-  `id` int(9) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL DEFAULT '',
   `prefix` varchar(50) NOT NULL DEFAULT '',
-  `digit` int(2) NOT NULL DEFAULT 1,
-  `runningNumber` int(9) NOT NULL DEFAULT 1,
+  `digit` int NOT NULL DEFAULT '1',
+  `runningNumber` int NOT NULL DEFAULT '1',
   `updateDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.auto_number: ~5 rows (approximately)
+-- Dumping data for table hris.auto_number: ~8 rows (approximately)
 INSERT INTO `auto_number` (`id`, `name`, `prefix`, `digit`, `runningNumber`, `updateDate`) VALUES
 	(1, 'personal', 'P', 6, 10, '0000-00-00 00:00:00'),
-	(2, 'employment', 'E', 6, 34, '0000-00-00 00:00:00'),
-	(3, 'payroll', 'PYL', 6, 16, '0000-00-00 00:00:00'),
-	(4, 'reimbursement', 'REM', 6, 24, '0000-00-00 00:00:00'),
-	(5, 'loan', 'LN', 6, 17, '0000-00-00 00:00:00');
+	(2, 'employment', 'E', 6, 35, '0000-00-00 00:00:00'),
+	(3, 'payroll', 'PYL', 6, 17, '0000-00-00 00:00:00'),
+	(4, 'reimbursement', 'REM', 6, 32, '0000-00-00 00:00:00'),
+	(5, 'loan', 'LN', 6, 25, '0000-00-00 00:00:00'),
+	(6, 'salery', 'S', 6, 3, '0000-00-00 00:00:00'),
+	(7, 'maintenance', 'M', 6, 3, '0000-00-00 00:00:00'),
+	(8, 'mlog', 'MS', 6, 5, '0000-00-00 00:00:00');
 
 -- Dumping structure for table hris.bpjs_setting
 DROP TABLE IF EXISTS `bpjs_setting`;
 CREATE TABLE IF NOT EXISTS `bpjs_setting` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `label` varchar(50) NOT NULL,
-  `company` float NOT NULL DEFAULT 0,
-  `employee` float NOT NULL DEFAULT 0,
-  `presence` int(10) NOT NULL DEFAULT 1,
+  `company` float NOT NULL DEFAULT '0',
+  `employee` float NOT NULL DEFAULT '0',
+  `presence` int NOT NULL DEFAULT '1',
   `updateDate` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=201 DEFAULT CHARSET=latin1;
 
 -- Dumping data for table hris.bpjs_setting: ~6 rows (approximately)
 INSERT INTO `bpjs_setting` (`id`, `label`, `company`, `employee`, `presence`, `updateDate`) VALUES
-	(100, 'JHT (Jaminan Hari Tua)', 2, 2, 1, '2023-01-31 10:06:56'),
-	(110, 'JKK (Jaminan Kecelakaan Kerja)', 0.24, 0.24, 1, '2023-01-31 10:06:56'),
-	(111, 'JKM (Jaminan Kematian)', 0.3, 0.3, 1, '2023-01-31 10:06:56'),
-	(112, 'JP (Jaminan Pensiun)', 1, 1, 1, '2023-01-31 10:06:56'),
-	(113, 'JKP (Jaminan Kehilangan Pekerjaan)', 0, 0, 1, '2023-01-31 10:06:56'),
-	(200, 'BPJS Kesehaatan', 4, 4, 1, '2023-01-31 10:06:56');
+	(100, 'JHT (Jaminan Hari Tua)', 3.7, 2, 1, '2023-02-03 06:39:02'),
+	(110, 'JKK (Jaminan Kecelakaan Kerja)', 0.24, 0, 1, '2023-02-03 06:39:02'),
+	(111, 'JKM (Jaminan Kematian)', 0.3, 0, 1, '2023-02-03 06:39:02'),
+	(112, 'JP (Jaminan Pensiun)', 2, 1, 1, '2023-02-03 06:39:02'),
+	(113, 'JKP (Jaminan Kehilangan Pekerjaan)', 0, 0, 1, '2023-02-03 06:39:02'),
+	(200, 'BPJS Kesehaatan', 4, 1, 1, '2023-02-03 06:39:02');
 
 -- Dumping structure for table hris.branch
 DROP TABLE IF EXISTS `branch`;
 CREATE TABLE IF NOT EXISTS `branch` (
-  `id` int(3) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `organizationId` varchar(50) NOT NULL,
   `name` varchar(50) NOT NULL,
-  `presence` int(1) DEFAULT 1,
+  `presence` int DEFAULT '1',
   `inputDate` datetime DEFAULT NULL,
   `updateDate` datetime DEFAULT NULL,
   `inputBy` varchar(50) DEFAULT NULL,
   `updateBy` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.branch: ~11 rows (approximately)
+-- Dumping data for table hris.branch: ~14 rows (approximately)
 INSERT INTO `branch` (`id`, `organizationId`, `name`, `presence`, `inputDate`, `updateDate`, `inputBy`, `updateBy`) VALUES
 	(1, '1', 'Kelapa gading', 1, NULL, NULL, NULL, NULL),
 	(2, '1', 'Mangga Dua', 1, NULL, NULL, NULL, NULL),
@@ -126,40 +129,41 @@ DROP TABLE IF EXISTS `employment`;
 CREATE TABLE IF NOT EXISTS `employment` (
   `id` varchar(9) NOT NULL,
   `personalId` varchar(10) NOT NULL,
-  `employmentStatusId` int(3) NOT NULL DEFAULT 0,
+  `approvalLineId` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `employmentStatusId` int NOT NULL DEFAULT '0',
   `timeManagementShiftId` varchar(3) NOT NULL,
   `dateJoinStart` date NOT NULL,
   `dateJoinEnd` date NOT NULL DEFAULT '2030-01-01',
-  `jobPositionId` int(3) NOT NULL,
-  `jobLevelId` int(3) NOT NULL,
-  `branchId` int(3) NOT NULL,
-  `approvalLineId` varchar(50) NOT NULL DEFAULT '',
-  `organizationId` int(3) NOT NULL,
-  `presence` int(2) NOT NULL DEFAULT 1,
-  `status` int(2) NOT NULL DEFAULT 1,
+  `jobPositionId` int NOT NULL,
+  `jobLevelId` int NOT NULL,
+  `branchId` int NOT NULL,
+  `organizationId` int NOT NULL,
+  `presence` int NOT NULL DEFAULT '1',
+  `status` int NOT NULL DEFAULT '1',
   `inputDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
   `updateDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `personalId` (`personalId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.employment: ~4 rows (approximately)
-INSERT INTO `employment` (`id`, `personalId`, `employmentStatusId`, `timeManagementShiftId`, `dateJoinStart`, `dateJoinEnd`, `jobPositionId`, `jobLevelId`, `branchId`, `approvalLineId`, `organizationId`, `presence`, `status`, `inputDate`, `updateDate`) VALUES
-	('E000031', '1', 1, '', '0000-00-00', '2030-01-01', 1, 0, 0, '', 0, 1, 1, '2023-01-25 10:50:22', '2023-01-01 00:00:00'),
-	('E000032', 'P000003', 1, '', '2023-01-01', '2030-01-01', 6, 4, 4, 'P000004', 2, 1, 1, '2023-01-25 11:13:08', '2023-01-25 11:28:26'),
-	('E000033', 'P000004', 2, '', '0000-00-00', '2030-01-01', 8, 4, 14, 'P000004', 880, 1, 1, '2023-01-25 11:28:32', '2023-01-25 11:31:22'),
-	('E000034', 'P000010', 0, '', '0000-00-00', '2030-01-01', 0, 0, 0, '', 0, 1, 1, '2023-01-25 11:45:14', '2023-01-01 00:00:00');
+-- Dumping data for table hris.employment: ~5 rows (approximately)
+INSERT INTO `employment` (`id`, `personalId`, `approvalLineId`, `employmentStatusId`, `timeManagementShiftId`, `dateJoinStart`, `dateJoinEnd`, `jobPositionId`, `jobLevelId`, `branchId`, `organizationId`, `presence`, `status`, `inputDate`, `updateDate`) VALUES
+	('E000031', '1', '1', 1, '', '0000-00-00', '2030-01-01', 1, 0, 0, 0, 1, 1, '2023-01-25 10:50:22', '2023-01-01 00:00:00'),
+	('E000032', 'P000003', '1', 2, '', '2023-01-01', '2030-01-01', 6, 6, 4, 2, 1, 1, '2023-01-25 11:13:08', '2023-02-06 10:44:52'),
+	('E000033', 'P000004', '1', 2, '', '0000-00-00', '2030-01-01', 8, 4, 14, 880, 1, 1, '2023-01-25 11:28:32', '2023-01-25 11:31:22'),
+	('E000034', 'P000010', '1', 0, '', '0000-00-00', '2030-01-01', 0, 0, 0, 0, 1, 1, '2023-01-25 11:45:14', '2023-01-01 00:00:00'),
+	('E000035', 'P000005', '1', 3, '', '0000-00-00', '2030-01-01', 1, 5, 5, 2, 1, 1, '2023-02-08 07:52:50', '2023-02-08 07:54:35');
 
 -- Dumping structure for table hris.employment_joblevel
 DROP TABLE IF EXISTS `employment_joblevel`;
 CREATE TABLE IF NOT EXISTS `employment_joblevel` (
-  `id` int(3) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
-  `presence` int(1) NOT NULL DEFAULT 1,
+  `presence` int NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.employment_joblevel: ~8 rows (approximately)
+-- Dumping data for table hris.employment_joblevel: ~9 rows (approximately)
 INSERT INTO `employment_joblevel` (`id`, `name`, `presence`) VALUES
 	(4, 'CEO', 1),
 	(5, 'Manager', 1),
@@ -174,35 +178,35 @@ INSERT INTO `employment_joblevel` (`id`, `name`, `presence`) VALUES
 -- Dumping structure for table hris.employment_jobposition
 DROP TABLE IF EXISTS `employment_jobposition`;
 CREATE TABLE IF NOT EXISTS `employment_jobposition` (
-  `id` int(3) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
-  `_masterData` int(1) NOT NULL DEFAULT 0,
-  `_timeManagement` int(1) NOT NULL DEFAULT 0,
-  `_reimbursement` int(1) NOT NULL DEFAULT 0,
-  `_loan` int(1) NOT NULL DEFAULT 0,
-  `_payroll` int(1) NOT NULL DEFAULT 0,
-  `presence` int(1) NOT NULL DEFAULT 1,
+  `_masterData` int NOT NULL DEFAULT '0',
+  `_timeManagement` int NOT NULL DEFAULT '0',
+  `_reimbursement` int NOT NULL DEFAULT '0',
+  `_loan` int NOT NULL DEFAULT '0',
+  `_payroll` int NOT NULL DEFAULT '0',
+  `_maintenance` int NOT NULL DEFAULT '0',
+  `presence` int NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.employment_jobposition: ~8 rows (approximately)
-INSERT INTO `employment_jobposition` (`id`, `name`, `_masterData`, `_timeManagement`, `_reimbursement`, `_loan`, `_payroll`, `presence`) VALUES
-	(1, 'Administrator', 1, 1, 1, 1, 1, 1),
-	(5, 'Manager', 1, 0, 0, 0, 0, 1),
-	(6, 'Staft', 0, 1, 0, 0, 0, 1),
-	(7, 'General Manager', 0, 0, 1, 0, 0, 1),
-	(8, 'IT Staft', 0, 1, 0, 1, 0, 1),
-	(9, 'Office Boy', 1, 0, 0, 0, 1, 1),
-	(10, '', 0, 0, 0, 0, 0, 0),
-	(11, 'haha', 1, 0, 0, 1, 0, 0);
+-- Dumping data for table hris.employment_jobposition: ~7 rows (approximately)
+INSERT INTO `employment_jobposition` (`id`, `name`, `_masterData`, `_timeManagement`, `_reimbursement`, `_loan`, `_payroll`, `_maintenance`, `presence`) VALUES
+	(1, 'Administrator', 1, 1, 1, 1, 1, 1, 1),
+	(5, 'Manager', 0, 0, 0, 0, 0, 1, 1),
+	(6, 'Staft', 0, 0, 0, 0, 0, 1, 1),
+	(7, 'General Manager', 0, 0, 0, 0, 0, 1, 1),
+	(8, 'IT Staft', 0, 0, 0, 0, 0, 1, 1),
+	(9, 'Office Boy', 0, 0, 0, 0, 0, 1, 1),
+	(11, 'haha', 1, 0, 0, 1, 0, 1, 0);
 
 -- Dumping structure for table hris.employment_status
 DROP TABLE IF EXISTS `employment_status`;
 CREATE TABLE IF NOT EXISTS `employment_status` (
-  `id` int(3) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table hris.employment_status: ~3 rows (approximately)
 INSERT INTO `employment_status` (`id`, `name`) VALUES
@@ -210,73 +214,225 @@ INSERT INTO `employment_status` (`id`, `name`) VALUES
 	(2, 'Contract'),
 	(3, 'Permanent');
 
+-- Dumping structure for table hris.global_setting
+DROP TABLE IF EXISTS `global_setting`;
+CREATE TABLE IF NOT EXISTS `global_setting` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(250) DEFAULT NULL,
+  `value` varchar(250) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=113 DEFAULT CHARSET=latin1;
+
+-- Dumping data for table hris.global_setting: ~5 rows (approximately)
+INSERT INTO `global_setting` (`id`, `name`, `value`) VALUES
+	(51, 'periodDateStart', '25'),
+	(52, 'periodDateEnd', '25'),
+	(100, 'jabatanPercent', '0.05'),
+	(101, 'jabatanMaxAmount', '500000'),
+	(112, 'min UMP for BPJS', '4800000');
+
 -- Dumping structure for table hris.loan
 DROP TABLE IF EXISTS `loan`;
 CREATE TABLE IF NOT EXISTS `loan` (
   `id` varchar(50) NOT NULL DEFAULT '',
   `personalId` varchar(50) NOT NULL DEFAULT '',
-  `amount` double NOT NULL DEFAULT 0,
-  `installment` int(10) NOT NULL DEFAULT 0,
+  `amount` double NOT NULL DEFAULT '0',
+  `installment` int NOT NULL DEFAULT '0',
   `description` varchar(250) NOT NULL DEFAULT '',
   `effectiveDate` date DEFAULT NULL,
-  `presence` int(2) NOT NULL DEFAULT 1,
-  `status` int(3) NOT NULL DEFAULT 1,
+  `approved` int DEFAULT '0',
+  `approvedBy` varchar(50) DEFAULT NULL,
+  `approvedDate` datetime DEFAULT NULL,
+  `presence` int NOT NULL DEFAULT '1',
+  `status` int NOT NULL DEFAULT '1',
   `inputDate` datetime DEFAULT NULL,
   `updateDate` datetime DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.loan: ~1 rows (approximately)
-INSERT INTO `loan` (`id`, `personalId`, `amount`, `installment`, `description`, `effectiveDate`, `presence`, `status`, `inputDate`, `updateDate`) VALUES
-	('LN000017', 'P000004', 100000000, 12, '', '2023-01-19', 1, 1, '2023-01-19 14:52:08', NULL);
+-- Dumping data for table hris.loan: ~8 rows (approximately)
+INSERT INTO `loan` (`id`, `personalId`, `amount`, `installment`, `description`, `effectiveDate`, `approved`, `approvedBy`, `approvedDate`, `presence`, `status`, `inputDate`, `updateDate`) VALUES
+	('LN000017', 'P000004', 100000000, 12, '', '2023-01-19', 0, NULL, NULL, 0, 1, '2023-01-19 14:52:08', '2023-02-07 10:43:31'),
+	('LN000018', 'P000003', 180000000, 12, 'DP beli rumah', '2023-02-09', 0, NULL, NULL, 0, 1, '2023-02-07 08:39:17', '2023-02-07 09:25:23'),
+	('LN000019', 'P000003', 444000020, 12, 'Description 213', '2023-02-07', 1, 'P000003', '2023-02-07 10:56:15', 1, 1, '2023-02-07 09:23:58', '2023-02-07 10:56:15'),
+	('LN000020', 'P000003', 180000000, 7, 'DP beli rumah', '2023-02-09', 0, NULL, NULL, 1, 1, '2023-02-07 09:20:09', NULL),
+	('LN000021', 'P000003', 180000000, 5, 'DP beli rumah', '2023-02-09', 1, 'P000003', '2023-02-07 11:05:37', 1, 1, '2023-02-07 09:13:54', '2023-02-07 11:05:37'),
+	('LN000022', 'P000003', 180000000, 3, 'DP beli rumah', '2023-02-09', 0, NULL, NULL, 0, 1, '2023-02-07 09:13:59', '2023-02-07 09:25:29'),
+	('LN000023', 'P000003', 80000000, 6, 'PD mobile', '2023-02-07', 1, 'P000003', '2023-02-07 10:56:32', 1, 1, '2023-02-07 09:53:57', '2023-02-07 10:56:32'),
+	('LN000025', 'P000003', 177700000, 12, '', '2023-02-08', 0, NULL, NULL, 1, 1, '2023-02-08 05:43:18', NULL);
 
 -- Dumping structure for table hris.loan_detail
 DROP TABLE IF EXISTS `loan_detail`;
 CREATE TABLE IF NOT EXISTS `loan_detail` (
-  `id` int(9) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `loanId` varchar(50) NOT NULL,
-  `installment` int(3) NOT NULL DEFAULT 1,
+  `employmentId` varchar(50) NOT NULL,
+  `personalId` varchar(50) NOT NULL,
+  `installment` int NOT NULL DEFAULT '1',
   `paymentDate` date DEFAULT NULL,
-  `paymentAmount` double NOT NULL DEFAULT 0,
+  `paymentAmount` double NOT NULL DEFAULT '0',
   `paidDate` date DEFAULT NULL,
-  `paidAmount` double NOT NULL DEFAULT 0,
-  `balance` double NOT NULL DEFAULT 0,
-  `status` int(3) NOT NULL DEFAULT 1,
-  `presence` int(2) NOT NULL DEFAULT 1,
+  `paidAmount` double NOT NULL DEFAULT '0',
+  `balance` double NOT NULL DEFAULT '0',
+  `status` int NOT NULL DEFAULT '1',
+  `presence` int NOT NULL DEFAULT '1',
   `inputDate` datetime DEFAULT NULL,
   `inputBy` varchar(50) NOT NULL DEFAULT '',
   `updateDate` datetime DEFAULT NULL,
   `updateBy` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=121 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=156 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.loan_detail: ~12 rows (approximately)
-INSERT INTO `loan_detail` (`id`, `loanId`, `installment`, `paymentDate`, `paymentAmount`, `paidDate`, `paidAmount`, `balance`, `status`, `presence`, `inputDate`, `inputBy`, `updateDate`, `updateBy`) VALUES
-	(109, 'LN000017', 1, '2023-02-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
-	(110, 'LN000017', 2, '2023-03-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
-	(111, 'LN000017', 3, '2023-04-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
-	(112, 'LN000017', 4, '2023-05-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
-	(113, 'LN000017', 5, '2023-06-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
-	(114, 'LN000017', 6, '2023-07-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
-	(115, 'LN000017', 7, '2023-08-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
-	(116, 'LN000017', 8, '2023-09-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
-	(117, 'LN000017', 9, '2023-10-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
-	(118, 'LN000017', 10, '2023-11-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
-	(119, 'LN000017', 11, '2023-12-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, ''),
-	(120, 'LN000017', 12, '2024-01-19', 8333334, NULL, 0, 8333334, 1, 1, '2023-01-19 14:52:08', '', NULL, '');
+-- Dumping data for table hris.loan_detail: ~23 rows (approximately)
+INSERT INTO `loan_detail` (`id`, `loanId`, `employmentId`, `personalId`, `installment`, `paymentDate`, `paymentAmount`, `paidDate`, `paidAmount`, `balance`, `status`, `presence`, `inputDate`, `inputBy`, `updateDate`, `updateBy`) VALUES
+	(133, 'LN000019', 'LN000018', 'P000003', 1, '2023-03-07', 37000002, NULL, 0, 37000002, 1, 1, '2023-02-07 10:56:16', '', NULL, ''),
+	(134, 'LN000019', 'LN000018', 'P000003', 2, '2023-04-07', 37000002, NULL, 0, 37000002, 1, 1, '2023-02-07 10:56:16', '', NULL, ''),
+	(135, 'LN000019', 'LN000018', 'P000003', 3, '2023-05-07', 37000002, NULL, 0, 37000002, 1, 1, '2023-02-07 10:56:16', '', NULL, ''),
+	(136, 'LN000019', 'LN000018', 'P000003', 4, '2023-06-07', 37000002, NULL, 0, 37000002, 1, 1, '2023-02-07 10:56:16', '', NULL, ''),
+	(137, 'LN000019', 'LN000018', 'P000003', 5, '2023-07-07', 37000002, NULL, 0, 37000002, 1, 1, '2023-02-07 10:56:16', '', NULL, ''),
+	(138, 'LN000019', 'LN000018', 'P000003', 6, '2023-08-07', 37000002, NULL, 0, 37000002, 1, 1, '2023-02-07 10:56:16', '', NULL, ''),
+	(139, 'LN000019', 'LN000018', 'P000003', 7, '2023-09-07', 37000002, NULL, 0, 37000002, 1, 1, '2023-02-07 10:56:16', '', NULL, ''),
+	(140, 'LN000019', 'LN000018', 'P000003', 8, '2023-10-07', 37000002, NULL, 0, 37000002, 1, 1, '2023-02-07 10:56:16', '', NULL, ''),
+	(141, 'LN000019', 'LN000018', 'P000003', 9, '2023-11-07', 37000002, NULL, 0, 37000002, 1, 1, '2023-02-07 10:56:16', '', NULL, ''),
+	(142, 'LN000019', 'LN000018', 'P000003', 10, '2023-12-07', 37000002, NULL, 0, 37000002, 1, 1, '2023-02-07 10:56:16', '', NULL, ''),
+	(143, 'LN000019', 'LN000018', 'P000003', 11, '2024-01-07', 37000002, NULL, 0, 37000002, 1, 1, '2023-02-07 10:56:16', '', NULL, ''),
+	(144, 'LN000019', 'LN000018', 'P000003', 12, '2024-02-07', 37000002, NULL, 0, 37000002, 1, 1, '2023-02-07 10:56:16', '', NULL, ''),
+	(145, 'LN000023', 'LN000018', 'P000003', 1, '2023-03-07', 13333334, NULL, 0, 13333334, 1, 1, '2023-02-07 10:56:32', '', NULL, ''),
+	(146, 'LN000023', 'LN000018', 'P000003', 2, '2023-04-07', 13333334, NULL, 0, 13333334, 1, 1, '2023-02-07 10:56:32', '', NULL, ''),
+	(147, 'LN000023', 'LN000018', 'P000003', 3, '2023-05-07', 13333334, NULL, 0, 13333334, 1, 1, '2023-02-07 10:56:32', '', NULL, ''),
+	(148, 'LN000023', 'LN000018', 'P000003', 4, '2023-06-07', 13333334, NULL, 0, 13333334, 1, 1, '2023-02-07 10:56:32', '', NULL, ''),
+	(149, 'LN000023', 'LN000018', 'P000003', 5, '2023-07-07', 13333334, NULL, 0, 13333334, 1, 1, '2023-02-07 10:56:32', '', NULL, ''),
+	(150, 'LN000023', 'LN000018', 'P000003', 6, '2023-08-07', 13333334, NULL, 0, 13333334, 1, 1, '2023-02-07 10:56:32', '', NULL, ''),
+	(151, 'LN000021', 'LN000018', 'P000003', 1, '2023-03-09', 36000000, NULL, 0, 36000000, 1, 1, '2023-02-07 11:05:37', '', NULL, ''),
+	(152, 'LN000021', 'LN000018', 'P000003', 2, '2023-04-09', 36000000, NULL, 0, 36000000, 1, 1, '2023-02-07 11:05:37', '', NULL, ''),
+	(153, 'LN000021', 'LN000018', 'P000003', 3, '2023-05-09', 36000000, NULL, 0, 36000000, 1, 1, '2023-02-07 11:05:37', '', NULL, ''),
+	(154, 'LN000021', 'LN000018', 'P000003', 4, '2023-06-09', 36000000, NULL, 0, 36000000, 1, 1, '2023-02-07 11:05:37', '', NULL, ''),
+	(155, 'LN000021', 'LN000018', 'P000003', 5, '2023-07-09', 36000000, NULL, 0, 36000000, 1, 1, '2023-02-07 11:05:37', '', NULL, '');
+
+-- Dumping structure for table hris.maintenance
+DROP TABLE IF EXISTS `maintenance`;
+CREATE TABLE IF NOT EXISTS `maintenance` (
+  `id` varchar(50) NOT NULL DEFAULT '',
+  `equipmentId` int DEFAULT NULL,
+  `description` text,
+  `categoryId` int DEFAULT NULL,
+  `purchaseDate` date DEFAULT '2000-01-01',
+  `supplier` varchar(250) DEFAULT NULL,
+  `warantyUntil` date DEFAULT NULL,
+  `location` text CHARACTER SET latin1 COLLATE latin1_swedish_ci,
+  `schedule` int NOT NULL DEFAULT '3',
+  `lastDate` date DEFAULT '2020-01-01',
+  `presence` int NOT NULL DEFAULT '1',
+  `status` int NOT NULL DEFAULT '1',
+  `inputDate` datetime DEFAULT '2020-01-01 00:00:00',
+  `inputBy` varchar(50) DEFAULT NULL,
+  `updateDate` datetime DEFAULT '2020-01-01 00:00:00',
+  `updateBy` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Dumping data for table hris.maintenance: ~2 rows (approximately)
+INSERT INTO `maintenance` (`id`, `equipmentId`, `description`, `categoryId`, `purchaseDate`, `supplier`, `warantyUntil`, `location`, `schedule`, `lastDate`, `presence`, `status`, `inputDate`, `inputBy`, `updateDate`, `updateBy`) VALUES
+	('M2023000002', 1, 'Description', 1, '2023-02-24', 'Supplier', '2023-02-17', 'Location', 2, '2020-01-01', 1, 1, '2023-02-13 09:02:48', 'P000005', '2020-01-01 00:00:00', NULL),
+	('M2023000003', 1, '33232', 1, '2013-02-01', '1111', '2025-02-08', 'bacc', 21, '2020-01-01', 1, 1, '2023-02-13 09:59:35', 'P000005', '2023-02-13 12:46:21', 'P000005');
+
+-- Dumping structure for table hris.maintenance_category
+DROP TABLE IF EXISTS `maintenance_category`;
+CREATE TABLE IF NOT EXISTS `maintenance_category` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(250) DEFAULT NULL,
+  `presence` int DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+-- Dumping data for table hris.maintenance_category: ~3 rows (approximately)
+INSERT INTO `maintenance_category` (`id`, `name`, `presence`) VALUES
+	(1, 'A', 1),
+	(2, 'B', 1),
+	(3, 'C', 1);
+
+-- Dumping structure for table hris.maintenance_equipment
+DROP TABLE IF EXISTS `maintenance_equipment`;
+CREATE TABLE IF NOT EXISTS `maintenance_equipment` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(250) NOT NULL DEFAULT '',
+  `presence` int NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+
+-- Dumping data for table hris.maintenance_equipment: ~4 rows (approximately)
+INSERT INTO `maintenance_equipment` (`id`, `name`, `presence`) VALUES
+	(1, 'AC', 1),
+	(2, 'Mobil 1', 1),
+	(3, 'Mobil 2', 1),
+	(4, 'Server', 1);
+
+-- Dumping structure for table hris.maintenance_images
+DROP TABLE IF EXISTS `maintenance_images`;
+CREATE TABLE IF NOT EXISTS `maintenance_images` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `maintenanceId` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT '',
+  `name` varchar(250) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `url` varchar(250) DEFAULT NULL,
+  `presence` int DEFAULT '1',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+
+-- Dumping data for table hris.maintenance_images: ~1 rows (approximately)
+INSERT INTO `maintenance_images` (`id`, `maintenanceId`, `name`, `url`, `presence`) VALUES
+	(4, 'M2023000002', 'test', 'https://dummyimage.com/600x400/000/fff', 1);
+
+-- Dumping structure for table hris.maintenance_schedule
+DROP TABLE IF EXISTS `maintenance_schedule`;
+CREATE TABLE IF NOT EXISTS `maintenance_schedule` (
+  `id` varchar(50) NOT NULL DEFAULT '',
+  `maintenanceId` varchar(50) NOT NULL,
+  `scheduleDate` date NOT NULL DEFAULT '2023-01-01',
+  `maintenanceDate` date NOT NULL DEFAULT '2023-01-01',
+  `supplier` varchar(250) NOT NULL DEFAULT '',
+  `cost` double NOT NULL DEFAULT '0',
+  `note` text NOT NULL,
+  `status` int NOT NULL DEFAULT '1',
+  `presence` int NOT NULL DEFAULT '1',
+  `inputDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
+  `updateDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
+  `inputBy` varchar(50) NOT NULL DEFAULT '',
+  `updateBy` varchar(50) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Dumping data for table hris.maintenance_schedule: ~4 rows (approximately)
+INSERT INTO `maintenance_schedule` (`id`, `maintenanceId`, `scheduleDate`, `maintenanceDate`, `supplier`, `cost`, `note`, `status`, `presence`, `inputDate`, `updateDate`, `inputBy`, `updateBy`) VALUES
+	('MS202313000002', 'M2023000003', '2023-02-24', '2023-01-01', '', 5555510, '123213123', 1, 0, '2023-02-13 12:11:23', '2023-02-13 12:45:45', 'P000005', ''),
+	('MS202313000003', 'M2023000003', '2023-02-26', '2023-01-01', '', 57770, '123123', 1, 0, '2023-02-13 12:11:58', '2023-02-13 12:46:14', 'P000005', ''),
+	('MS2313000004', 'M2023000003', '2023-02-26', '2023-01-01', '', 10000, 'Note 123', 100, 1, '2023-02-13 12:13:19', '2023-02-13 13:18:17', 'P000005', ''),
+	('MS2313000005', 'M2023000003', '2023-02-18', '2023-01-01', 'supplier', 245510, 'sdsfsdfsdf', 1, 1, '2023-02-13 12:17:51', '2023-01-01 00:00:00', 'P000005', '');
+
+-- Dumping structure for table hris.maintenance_status
+DROP TABLE IF EXISTS `maintenance_status`;
+CREATE TABLE IF NOT EXISTS `maintenance_status` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=latin1;
+
+-- Dumping data for table hris.maintenance_status: ~2 rows (approximately)
+INSERT INTO `maintenance_status` (`id`, `name`) VALUES
+	(1, 'Schedule'),
+	(100, 'Done');
 
 -- Dumping structure for table hris.offtime
 DROP TABLE IF EXISTS `offtime`;
 CREATE TABLE IF NOT EXISTS `offtime` (
-  `id` int(3) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
-  `presence` int(1) DEFAULT 1,
+  `presence` int DEFAULT '1',
   `inputDate` datetime DEFAULT NULL,
   `updateDate` datetime DEFAULT NULL,
   `inputBy` varchar(50) DEFAULT NULL,
   `updateBy` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=888 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=888 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table hris.offtime: ~2 rows (approximately)
 INSERT INTO `offtime` (`id`, `name`, `presence`, `inputDate`, `updateDate`, `inputBy`, `updateBy`) VALUES
@@ -286,17 +442,17 @@ INSERT INTO `offtime` (`id`, `name`, `presence`, `inputDate`, `updateDate`, `inp
 -- Dumping structure for table hris.organization
 DROP TABLE IF EXISTS `organization`;
 CREATE TABLE IF NOT EXISTS `organization` (
-  `id` int(3) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
-  `presence` int(1) DEFAULT 1,
+  `presence` int DEFAULT '1',
   `inputDate` datetime DEFAULT NULL,
   `updateDate` datetime DEFAULT NULL,
   `inputBy` varchar(50) DEFAULT NULL,
   `updateBy` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=886 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=886 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.organization: ~9 rows (approximately)
+-- Dumping data for table hris.organization: ~11 rows (approximately)
 INSERT INTO `organization` (`id`, `name`, `presence`, `inputDate`, `updateDate`, `inputBy`, `updateBy`) VALUES
 	(1, 'PT Astra TBK', 1, NULL, NULL, NULL, NULL),
 	(2, 'PT Panasonic', 1, NULL, NULL, NULL, NULL),
@@ -315,41 +471,42 @@ DROP TABLE IF EXISTS `payroll`;
 CREATE TABLE IF NOT EXISTS `payroll` (
   `id` varchar(9) NOT NULL,
   `personalId` varchar(50) NOT NULL DEFAULT '',
-  `salary` double NOT NULL DEFAULT 0,
+  `salary` double NOT NULL DEFAULT '0',
   `salaryType` varchar(2) NOT NULL DEFAULT '',
   `bankName` varchar(50) NOT NULL DEFAULT '',
   `bankAccountNumber` varchar(50) NOT NULL DEFAULT '',
   `bankAccountHolderName` varchar(50) NOT NULL DEFAULT '',
-  `hourlyRate` double NOT NULL DEFAULT 0,
-  `tunjangan` double NOT NULL DEFAULT 0,
+  `hourlyRate` double NOT NULL DEFAULT '0',
+  `tunjangan` double NOT NULL DEFAULT '0',
   `taxNpwp` varchar(50) NOT NULL DEFAULT '',
   `taxMethod` varchar(50) NOT NULL DEFAULT '',
   `taxableDate` date NOT NULL DEFAULT '2020-01-01',
   `taxHolderName` varchar(50) NOT NULL DEFAULT '',
   `taxPtkpStatus` varchar(50) NOT NULL DEFAULT '',
-  `taxSalary` double NOT NULL DEFAULT 0,
+  `taxSalary` double NOT NULL DEFAULT '0',
   `EmploymentTaxStatus` varchar(50) NOT NULL DEFAULT '0',
   `taxPktpAccountHolder` varchar(50) NOT NULL DEFAULT '0',
   `bpsjTkNo` varchar(50) NOT NULL DEFAULT '',
   `bpsjKesehatanNo` varchar(50) NOT NULL DEFAULT '',
-  `JhtCost` double NOT NULL DEFAULT 0,
-  `JaminanPensiunCost` double NOT NULL DEFAULT 0,
+  `JhtCost` double NOT NULL DEFAULT '0',
+  `JaminanPensiunCost` double NOT NULL DEFAULT '0',
   `bpjsTkDate` date NOT NULL DEFAULT '2023-01-01',
   `bpjsKesehatanFamily` varchar(50) NOT NULL DEFAULT '',
   `JaminanPensiunDate` date NOT NULL DEFAULT '2023-01-01',
-  `status` int(2) NOT NULL DEFAULT 1,
-  `presence` int(2) NOT NULL DEFAULT 1,
+  `status` int NOT NULL DEFAULT '1',
+  `presence` int NOT NULL DEFAULT '1',
   `updateDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
   `inputDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `personalId` (`personalId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.payroll: ~1 rows (approximately)
+-- Dumping data for table hris.payroll: ~4 rows (approximately)
 INSERT INTO `payroll` (`id`, `personalId`, `salary`, `salaryType`, `bankName`, `bankAccountNumber`, `bankAccountHolderName`, `hourlyRate`, `tunjangan`, `taxNpwp`, `taxMethod`, `taxableDate`, `taxHolderName`, `taxPtkpStatus`, `taxSalary`, `EmploymentTaxStatus`, `taxPktpAccountHolder`, `bpsjTkNo`, `bpsjKesehatanNo`, `JhtCost`, `JaminanPensiunCost`, `bpjsTkDate`, `bpjsKesehatanFamily`, `JaminanPensiunDate`, `status`, `presence`, `updateDate`, `inputDate`) VALUES
-	('PYL000014', 'P000003', 10000000, 'M', 'Paypal', '09999777774', 'maria sarapova Bank', 0, 1000000, 'NPWP00001111', '', '2020-01-01', '', 'TK/0', 0, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-01-31 10:20:01', '2023-01-25 11:15:20'),
+	('PYL000014', 'P000003', 14000000, 'M', 'Paypal', '09999777774', 'maria sarapova Bank', 0, 1000000, 'NPWP00001111', '', '2020-01-01', '', 'TK/0', 10000000, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-02-03 06:45:47', '2023-01-25 11:15:20'),
 	('PYL000015', 'P000010', 0, '', '', '', '', 0, 0, '', '', '2020-01-01', '', '', 0, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-01-01 00:00:00', '2023-01-25 11:45:16'),
-	('PYL000016', '1', 0, '', '', '', '', 0, 0, '', '', '2020-01-01', '', '', 0, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-01-01 00:00:00', '2023-01-26 08:54:28');
+	('PYL000016', '1', 0, '', '', '', '', 0, 0, '', '', '2020-01-01', '', '', 0, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-01-01 00:00:00', '2023-01-26 08:54:28'),
+	('PYL000017', 'P000005', 7000000, '', '', '', '', 0, 700000, '', '', '2020-01-01', '', 'K/I/0', 6000000, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-02-08 07:53:47', '2023-02-08 07:52:52');
 
 -- Dumping structure for table hris.personal
 DROP TABLE IF EXISTS `personal`;
@@ -363,30 +520,30 @@ CREATE TABLE IF NOT EXISTS `personal` (
   `birthPlace` varchar(50) NOT NULL DEFAULT '',
   `birthDate` varchar(50) NOT NULL DEFAULT '',
   `gender` varchar(2) NOT NULL DEFAULT '',
-  `marital` int(2) NOT NULL DEFAULT 0,
+  `marital` int NOT NULL DEFAULT '0',
   `blood` varchar(2) NOT NULL DEFAULT '',
-  `religion` int(2) NOT NULL DEFAULT 0,
-  `idType` int(2) DEFAULT 1,
+  `religion` int NOT NULL DEFAULT '0',
+  `idType` int DEFAULT '1',
   `idNumber` varchar(50) DEFAULT '',
   `expDate` date DEFAULT '2023-01-01',
-  `permanent` int(1) DEFAULT 0,
+  `permanent` int DEFAULT '0',
   `postalCode` varchar(6) DEFAULT '',
   `address` varchar(250) DEFAULT '',
-  `presence` int(2) DEFAULT 1,
-  `status` int(2) DEFAULT 1,
+  `presence` int DEFAULT '1',
+  `status` int DEFAULT '1',
   `inputDate` datetime DEFAULT '2023-01-01 00:00:00',
   `updateDate` datetime DEFAULT '2023-01-01 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table hris.personal: ~11 rows (approximately)
 INSERT INTO `personal` (`id`, `idx`, `name`, `phone`, `email`, `password`, `birthPlace`, `birthDate`, `gender`, `marital`, `blood`, `religion`, `idType`, `idNumber`, `expDate`, `permanent`, `postalCode`, `address`, `presence`, `status`, `inputDate`, `updateDate`) VALUES
-	('1', '11223344', 'admin', '007', 'hris@admin.com', '25f9e794323b453885f5181f1b624d0b', '', '', '0', 0, '', 0, 1, '', '2023-01-01', 1, '', '', 1, 1, '2023-01-16 13:32:39', '2023-01-16 13:32:39'),
+	('1', '11223344', 'administrator', '007', 'hris@admin.com', '25f9e794323b453885f5181f1b624d0b', '', '', '0', 0, '', 0, 1, '', '2023-01-01', 1, '', '', 1, 1, '2023-01-16 13:32:39', '2023-01-16 13:32:39'),
 	('800', '20190001', 'asd', '', '', '', '', '', '0', 0, '', 0, 1, '', '2023-01-01', 1, '', '', 0, 0, '2023-01-16 13:32:58', '2023-01-16 13:32:58'),
 	('P000002', '20189900', 'asd', '', '', '', '', '', '0', 0, '', 0, 1, '', '2023-01-01', 1, '', '', 0, 0, '2023-01-16 13:43:32', '2023-01-16 13:43:32'),
-	('P000003', '20050082', 'maria', '234234324', 'admin@abac.org', '25d55ad283aa400af464c76d713c07ad', 'gagagagagag', '1990-1-27', 'M', 4, 'A', 3, 2, '88854454520000454', '2023-03-17', 1, '535345', '245234523 2 43 2345 2345', 1, 1, '2023-01-31 08:37:25', '2023-01-31 08:37:25'),
+	('P000003', '20050082', 'Maria Sarapova Kave', '234234324', 'maria@abc.com', '25f9e794323b453885f5181f1b624d0b', 'gagagagagag', '1990-1-27', 'F', 4, 'A', 3, 2, '88854454520000454', '2023-03-17', 1, '535345', '245234523 2 43 2345 2345', 1, 1, '2023-02-06 10:44:33', '2023-02-06 10:44:33'),
 	('P000004', '20120542', 'AkanShari', '', '', '', '', '1990-1-19', '0', 0, '', 0, 1, '', '2023-01-01', 1, '', '', 1, 1, '2023-01-16 13:14:47', '2023-01-16 13:14:47'),
-	('P000005', '20130588', 'Sayako', '1234234', 'admin@admin.com', '', '', '1990-1-1', 'M', 0, '', 0, 1, '', '2023-01-01', 1, '', '', 1, 1, '2023-01-17 10:41:04', '2023-01-17 10:41:04'),
+	('P000005', '20130588', 'joni yes papa', '1234234', 'joni@admin.com', 'e99a18c428cb38d5f260853678922e03', '', '1990-1-1', 'M', 0, '', 0, 1, '', '2023-01-01', 1, '', '', 1, 1, '2023-02-08 08:25:33', '2023-02-08 08:27:37'),
 	('P000006', '20130607', 'Kitaro', '43234234', 'rey_nave@yahoo.com', '', '', '1990-1-1', 'M', 0, '', 0, 1, '', '2023-01-01', 1, '', '', 1, 1, '2023-01-16 13:17:41', '2023-01-16 13:17:41'),
 	('P000007', '20140622', 'Olive alson', '999976666', 'alson@email.com', '', '', '1981-1-2', 'M', 0, '', 0, 1, '', '2023-01-01', 0, '', '', 1, 1, '2023-01-18 10:06:42', '2023-01-18 10:06:42'),
 	('P000008', '', 'Melanisa', '78988565555', 'admi223n@jasa.com', '', '', '1990-1-1', 'M', 0, '', 0, 1, '', '2023-01-01', 0, '', '', 1, 1, '2023-01-24 10:10:18', '2023-01-24 10:10:18'),
@@ -396,7 +553,7 @@ INSERT INTO `personal` (`id`, `idx`, `name`, `phone`, `email`, `password`, `birt
 -- Dumping structure for table hris.personal_access
 DROP TABLE IF EXISTS `personal_access`;
 CREATE TABLE IF NOT EXISTS `personal_access` (
-  `id` int(9) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `personalId` varchar(50) NOT NULL DEFAULT '',
   `token` varchar(50) NOT NULL DEFAULT '',
   `agent` varchar(250) NOT NULL DEFAULT '',
@@ -404,9 +561,9 @@ CREATE TABLE IF NOT EXISTS `personal_access` (
   `status` varchar(2) NOT NULL DEFAULT '1',
   `inputDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.personal_access: ~7 rows (approximately)
+-- Dumping data for table hris.personal_access: ~11 rows (approximately)
 INSERT INTO `personal_access` (`id`, `personalId`, `token`, `agent`, `client_ip`, `status`, `inputDate`) VALUES
 	(1, '1', '1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36', '::1', '1', '0000-00-00 00:00:00'),
 	(2, '1', '4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36', '::1', '1', '0000-00-00 00:00:00'),
@@ -414,16 +571,20 @@ INSERT INTO `personal_access` (`id`, `personalId`, `token`, `agent`, `client_ip`
 	(4, '1', 'g', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36', '::1', '1', '0000-00-00 00:00:00'),
 	(6, '1', 'e', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36', '::1', '1', '0000-00-00 00:00:00'),
 	(7, '1', '3', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36', '::1', '1', '0000-00-00 00:00:00'),
-	(8, '1', 'TT-f65337aef142c307a7fab7f9421dcee0', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36', '::1', '1', '0000-00-00 00:00:00');
+	(9, '1', 'TT-31652bef323f48e6a29edc291b68d3db', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36', '128.199.94.89', '1', '0000-00-00 00:00:00'),
+	(10, '1', 'TT-80706a987e5f0c49364827264baf44af', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36', '128.199.94.89', '1', '0000-00-00 00:00:00'),
+	(16, '1', 'TT-2cd903653c091985e9a44e83c1c9b272', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36', '::1', '1', '0000-00-00 00:00:00'),
+	(18, '1', 'TT-eb6aaa20fd886155953df5abdf0007ac', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36', '128.199.94.89', '1', '0000-00-00 00:00:00'),
+	(24, 'P000005', 'TT-3f3a592b2f32d8d5322e39541493e6a2', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36', '::1', '1', '0000-00-00 00:00:00');
 
 -- Dumping structure for table hris.personal_id
 DROP TABLE IF EXISTS `personal_id`;
 CREATE TABLE IF NOT EXISTS `personal_id` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL DEFAULT '',
-  `other` int(1) NOT NULL DEFAULT 0,
+  `other` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table hris.personal_id: ~3 rows (approximately)
 INSERT INTO `personal_id` (`id`, `name`, `other`) VALUES
@@ -434,29 +595,29 @@ INSERT INTO `personal_id` (`id`, `name`, `other`) VALUES
 -- Dumping structure for table hris.personal_load
 DROP TABLE IF EXISTS `personal_load`;
 CREATE TABLE IF NOT EXISTS `personal_load` (
-  `id` int(9) NOT NULL AUTO_INCREMENT,
-  `loadId` int(9) NOT NULL DEFAULT 0,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `loadId` int NOT NULL DEFAULT '0',
   `personalId` varchar(9) NOT NULL DEFAULT '',
-  `loadAmount` double NOT NULL DEFAULT 0,
-  `installment` int(3) NOT NULL DEFAULT 0,
-  `interest` int(3) NOT NULL DEFAULT 0,
+  `loadAmount` double NOT NULL DEFAULT '0',
+  `installment` int NOT NULL DEFAULT '0',
+  `interest` int NOT NULL DEFAULT '0',
   `effectiveDate` date NOT NULL DEFAULT '2023-01-01',
   `inputDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
   `updateDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table hris.personal_load: ~0 rows (approximately)
 
 -- Dumping structure for table hris.personal_marital
 DROP TABLE IF EXISTS `personal_marital`;
 CREATE TABLE IF NOT EXISTS `personal_marital` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL DEFAULT '',
-  `other` int(1) NOT NULL DEFAULT 0,
-  `presence` int(1) NOT NULL DEFAULT 1,
+  `other` int NOT NULL DEFAULT '0',
+  `presence` int NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table hris.personal_marital: ~4 rows (approximately)
 INSERT INTO `personal_marital` (`id`, `name`, `other`, `presence`) VALUES
@@ -468,12 +629,12 @@ INSERT INTO `personal_marital` (`id`, `name`, `other`, `presence`) VALUES
 -- Dumping structure for table hris.personal_religion
 DROP TABLE IF EXISTS `personal_religion`;
 CREATE TABLE IF NOT EXISTS `personal_religion` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL DEFAULT '',
-  `other` int(1) NOT NULL DEFAULT 0,
-  `presence` int(1) NOT NULL DEFAULT 1,
+  `other` int NOT NULL DEFAULT '0',
+  `presence` int NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table hris.personal_religion: ~6 rows (approximately)
 INSERT INTO `personal_religion` (`id`, `name`, `other`, `presence`) VALUES
@@ -488,16 +649,16 @@ INSERT INTO `personal_religion` (`id`, `name`, `other`, `presence`) VALUES
 DROP TABLE IF EXISTS `pph21_ptkp`;
 CREATE TABLE IF NOT EXISTS `pph21_ptkp` (
   `id` varchar(9) NOT NULL,
-  `sorting` int(2) NOT NULL DEFAULT 0,
-  `jumlahAnak` int(2) NOT NULL DEFAULT 0,
+  `sorting` int NOT NULL DEFAULT '0',
+  `jumlahAnak` int NOT NULL DEFAULT '0',
   `label` varchar(50) NOT NULL,
-  `amount` double NOT NULL DEFAULT 0,
-  `presence` int(1) NOT NULL DEFAULT 1,
+  `amount` double NOT NULL DEFAULT '0',
+  `presence` int NOT NULL DEFAULT '1',
   `updateDate` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.pph21_ptkp: ~11 rows (approximately)
+-- Dumping data for table hris.pph21_ptkp: ~12 rows (approximately)
 INSERT INTO `pph21_ptkp` (`id`, `sorting`, `jumlahAnak`, `label`, `amount`, `presence`, `updateDate`) VALUES
 	('K/0', 1, 0, 'PTKP Kawin ', 58500000, 1, '2023-01-31 08:02:09'),
 	('K/1', 2, 1, 'PTKP Kawin ', 63000000, 1, '2023-01-31 08:02:09'),
@@ -515,15 +676,15 @@ INSERT INTO `pph21_ptkp` (`id`, `sorting`, `jumlahAnak`, `label`, `amount`, `pre
 -- Dumping structure for table hris.pph21_tarif_pajak
 DROP TABLE IF EXISTS `pph21_tarif_pajak`;
 CREATE TABLE IF NOT EXISTS `pph21_tarif_pajak` (
-  `id` int(5) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `note` varchar(250) NOT NULL DEFAULT '',
-  `minAmount` double NOT NULL DEFAULT 0,
-  `maxAmount` double NOT NULL DEFAULT 0,
-  `taxPercent` float NOT NULL DEFAULT 0,
-  `presence` int(1) NOT NULL DEFAULT 1,
+  `minAmount` double NOT NULL DEFAULT '0',
+  `maxAmount` double NOT NULL DEFAULT '0',
+  `taxPercent` float NOT NULL DEFAULT '0',
+  `presence` int NOT NULL DEFAULT '1',
   `updateDate` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table hris.pph21_tarif_pajak: ~5 rows (approximately)
 INSERT INTO `pph21_tarif_pajak` (`id`, `note`, `minAmount`, `maxAmount`, `taxPercent`, `presence`, `updateDate`) VALUES
@@ -538,43 +699,98 @@ DROP TABLE IF EXISTS `reimbursement`;
 CREATE TABLE IF NOT EXISTS `reimbursement` (
   `id` varchar(50) NOT NULL,
   `personalId` varchar(50) NOT NULL DEFAULT '',
-  `reimbursementNameId` int(10) NOT NULL DEFAULT 0,
+  `reimbursementNameId` int NOT NULL DEFAULT '0',
   `description` text NOT NULL,
-  `requestAmount` double NOT NULL DEFAULT 0,
-  `paidAmount` double NOT NULL DEFAULT 0,
+  `requestAmount` double NOT NULL DEFAULT '0',
+  `paidAmount` double NOT NULL DEFAULT '0',
   `requestDate` date NOT NULL,
+  `approved` int NOT NULL DEFAULT '0',
   `approvedBy` varchar(50) NOT NULL DEFAULT '',
   `approvedDate` datetime DEFAULT NULL,
-  `presence` int(10) NOT NULL DEFAULT 1,
+  `presence` int NOT NULL DEFAULT '1',
   `inputDate` datetime DEFAULT NULL,
   `updateDate` datetime DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.reimbursement: ~4 rows (approximately)
-INSERT INTO `reimbursement` (`id`, `personalId`, `reimbursementNameId`, `description`, `requestAmount`, `paidAmount`, `requestDate`, `approvedBy`, `approvedDate`, `presence`, `inputDate`, `updateDate`) VALUES
-	('REM000019', 'P000003', 5, 'Description Description', 80000, 2444220, '2023-01-19', 'P0004', '2023-01-19 11:47:52', 0, '2023-01-19 11:54:50', '2023-01-19 11:54:50'),
-	('REM000020', 'P000004', 6, 'ok', 555530, 555530, '2023-01-19', '0', '2023-01-19 11:34:46', 0, '2023-01-19 11:54:54', '2023-01-19 11:54:54'),
-	('REM000021', 'P000007', 6, '123123', 33320, 33320, '2023-01-19', '0', '2023-01-19 11:34:59', 1, '2023-01-19 09:47:16', '2023-01-19 11:34:59'),
-	('REM000023', 'P000003', 5, '234234324', 312320, 23440, '2023-01-19', 'P0004', '2023-01-19 11:47:21', 1, '2023-01-19 11:33:24', '2023-01-19 11:47:21'),
-	('REM000024', 'P000004', 5, 'Description', 444110, 0, '2023-01-24', 'P0004', '2023-01-24 10:08:06', 1, '2023-01-24 10:07:40', '2023-01-24 10:08:06');
+-- Dumping data for table hris.reimbursement: ~13 rows (approximately)
+INSERT INTO `reimbursement` (`id`, `personalId`, `reimbursementNameId`, `description`, `requestAmount`, `paidAmount`, `requestDate`, `approved`, `approvedBy`, `approvedDate`, `presence`, `inputDate`, `updateDate`) VALUES
+	('REM000019', 'P000003', 5, 'Description Description', 80000, 2444220, '2023-01-19', 0, 'P0004', '2023-01-19 11:47:52', 0, '2023-01-19 11:54:50', '2023-01-19 11:54:50'),
+	('REM000020', 'P000004', 6, 'ok', 555530, 555530, '2023-01-19', 0, '0', '2023-01-19 11:34:46', 0, '2023-01-19 11:54:54', '2023-01-19 11:54:54'),
+	('REM000021', 'P000007', 6, '123123', 33320, 33320, '2023-01-19', 0, '0', '2023-01-19 11:34:59', 1, '2023-01-19 09:47:16', '2023-01-19 11:34:59'),
+	('REM000023', 'P000003', 5, '234234324', 312320, 23440, '2023-01-19', 1, '1', '2023-02-06 13:25:34', 1, '2023-01-19 11:33:24', '2023-02-06 13:25:34'),
+	('REM000024', 'P000004', 5, 'Description', 444110, 0, '2023-01-24', 4, '1', '2023-02-06 13:25:42', 1, '2023-01-24 10:07:40', '2023-02-06 13:25:42'),
+	('REM000025', 'P000003', 4, 'SPG stuf', 50000000, 0, '2023-02-06', 0, '', NULL, 1, '2023-02-06 11:12:06', NULL),
+	('REM000026', '1', 4, 'Description hhh332333', 88888650, 60006500, '2023-02-09', 1, '1', '2023-02-06 13:27:49', 1, '2023-02-06 11:53:35', '2023-02-06 13:27:49'),
+	('REM000027', 'P000003', 6, '', 2222250, 2222250, '2023-02-06', 1, '1', '2023-02-06 13:25:52', 1, '2023-02-06 12:14:02', '2023-02-06 13:25:52'),
+	('REM000028', 'P000003', 6, '', 2222250, 0, '2023-02-06', 0, '', NULL, 0, '2023-02-06 12:14:17', '2023-02-06 12:14:17'),
+	('REM000029', 'P000003', 5, '', 41130, 0, '2023-02-06', 0, '', NULL, 0, '2023-02-06 13:26:45', '2023-02-06 13:26:45'),
+	('REM000030', 'P000003', 6, '', 41441, 41441, '2023-02-06', 4, '1', '2023-02-06 13:26:55', 1, '2023-02-06 12:16:30', '2023-02-06 13:26:55'),
+	('REM000031', 'P000003', 5, '31', 333120, 0, '2023-02-06', 0, '', NULL, 1, '2023-02-06 12:17:14', NULL),
+	('REM000032', 'P000003', 5, '', 6000000, 0, '2023-02-08', 0, '', NULL, 1, '2023-02-08 05:43:01', NULL);
 
 -- Dumping structure for table hris.reimbursement_name
 DROP TABLE IF EXISTS `reimbursement_name`;
 CREATE TABLE IF NOT EXISTS `reimbursement_name` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(250) NOT NULL DEFAULT '',
-  `presence` int(1) NOT NULL DEFAULT 1,
+  `presence` int NOT NULL DEFAULT '1',
   `inputDate` datetime DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 
--- Dumping data for table hris.reimbursement_name: ~2 rows (approximately)
+-- Dumping data for table hris.reimbursement_name: ~4 rows (approximately)
 INSERT INTO `reimbursement_name` (`id`, `name`, `presence`, `inputDate`) VALUES
 	(4, 'Pewaratan', 1, NULL),
 	(5, 'kaca mata', 1, NULL),
 	(6, 'transportasi', 1, NULL),
 	(7, '123123', 1, NULL);
+
+-- Dumping structure for table hris.salary
+DROP TABLE IF EXISTS `salary`;
+CREATE TABLE IF NOT EXISTS `salary` (
+  `id` varchar(50) NOT NULL,
+  `periodStartDate` date DEFAULT NULL,
+  `periodEndDate` date DEFAULT NULL,
+  `asLock` int NOT NULL DEFAULT '0',
+  `personalId` varchar(50) DEFAULT NULL,
+  `ttGajiPokok` double DEFAULT NULL,
+  `ttAca` double DEFAULT NULL,
+  `ttMakan` double DEFAULT NULL,
+  `ttTGol` double DEFAULT NULL,
+  `ttAskes` double DEFAULT NULL,
+  `tttMakan` double DEFAULT NULL,
+  `tttTransport` double DEFAULT NULL,
+  `tttJabatan` double DEFAULT NULL,
+  `tttAbsen` double DEFAULT NULL,
+  `tttLembur` double DEFAULT NULL,
+  `tttKasir` double DEFAULT NULL,
+  `tttKekuranganBulanLalu` double DEFAULT NULL,
+  `tttLainLain` double DEFAULT NULL,
+  `pKelebihanBulanLalu` double DEFAULT NULL,
+  `pKeterlambatan` double DEFAULT NULL,
+  `pIzin` double DEFAULT NULL,
+  `pAlpha` double DEFAULT NULL,
+  `pKasbon` double DEFAULT NULL,
+  `pJamsostek` double DEFAULT NULL,
+  `pPphPsl21` double DEFAULT NULL,
+  `pLainLain` double DEFAULT NULL,
+  `takeHomePay` double DEFAULT NULL,
+  `presence` int NOT NULL DEFAULT '1',
+  `inputDate` datetime DEFAULT '2023-01-01 00:00:00',
+  `updateDate` datetime DEFAULT '2023-01-01 00:00:00',
+  `inputBy` varchar(50) DEFAULT NULL,
+  `updateBy` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Dumping data for table hris.salary: ~5 rows (approximately)
+INSERT INTO `salary` (`id`, `periodStartDate`, `periodEndDate`, `asLock`, `personalId`, `ttGajiPokok`, `ttAca`, `ttMakan`, `ttTGol`, `ttAskes`, `tttMakan`, `tttTransport`, `tttJabatan`, `tttAbsen`, `tttLembur`, `tttKasir`, `tttKekuranganBulanLalu`, `tttLainLain`, `pKelebihanBulanLalu`, `pKeterlambatan`, `pIzin`, `pAlpha`, `pKasbon`, `pJamsostek`, `pPphPsl21`, `pLainLain`, `takeHomePay`, `presence`, `inputDate`, `updateDate`, `inputBy`, `updateBy`) VALUES
+	('2', '2023-01-25', '2023-02-25', 0, 'P000005', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2023-02-08 10:35:52', NULL, '0000-00-00 00:00:00', NULL),
+	('3', '2022-12-25', '2023-01-25', 0, 'P000005', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2023-02-08 10:40:02', NULL, '0000-00-00 00:00:00', NULL),
+	('4', '2023-01-25', '2023-02-25', 0, 'P000003', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2023-02-08 11:04:13', NULL, '0000-00-00 00:00:00', NULL),
+	('S00000263e3763987193', '2023-01-25', '2023-02-25', 0, 'P000003', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2023-02-08 11:15:21', '2023-01-01 00:00:00', '0', NULL),
+	('S000003.63e376b50048a', '2023-01-25', '2023-02-25', 0, 'P000003', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2023-02-08 11:17:25', '2023-01-01 00:00:00', '0', NULL);
 
 -- Dumping structure for procedure hris.spTest
 DROP PROCEDURE IF EXISTS `spTest`;
@@ -588,20 +804,20 @@ DELIMITER ;
 -- Dumping structure for table hris.time_management
 DROP TABLE IF EXISTS `time_management`;
 CREATE TABLE IF NOT EXISTS `time_management` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `personalId` varchar(50) NOT NULL DEFAULT '',
   `date` date DEFAULT NULL,
   `shiftId` varchar(50) NOT NULL DEFAULT 'W',
   `checkIn` time NOT NULL DEFAULT '00:00:00',
   `checkOut` time NOT NULL DEFAULT '00:00:00',
   `overTime` time NOT NULL DEFAULT '00:00:00',
-  `offTimeId` int(6) NOT NULL DEFAULT 0,
-  `presence` int(2) NOT NULL DEFAULT 1,
-  `importData` int(2) NOT NULL DEFAULT 0,
+  `offTimeId` int NOT NULL DEFAULT '0',
+  `presence` int NOT NULL DEFAULT '1',
+  `importData` int NOT NULL DEFAULT '0',
   `inputDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
   `updateDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4960 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4960 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table hris.time_management: ~170 rows (approximately)
 INSERT INTO `time_management` (`id`, `personalId`, `date`, `shiftId`, `checkIn`, `checkOut`, `overTime`, `offTimeId`, `presence`, `importData`, `inputDate`, `updateDate`) VALUES
@@ -779,22 +995,22 @@ INSERT INTO `time_management` (`id`, `personalId`, `date`, `shiftId`, `checkIn`,
 -- Dumping structure for table hris.time_management_shift
 DROP TABLE IF EXISTS `time_management_shift`;
 CREATE TABLE IF NOT EXISTS `time_management_shift` (
-  `idAuto` int(5) NOT NULL AUTO_INCREMENT,
+  `idAuto` int NOT NULL AUTO_INCREMENT,
   `id` varchar(9) NOT NULL DEFAULT '',
   `name` varchar(50) NOT NULL DEFAULT '',
   `scheduleIn` time NOT NULL DEFAULT '00:00:00',
   `scheduleOut` time NOT NULL DEFAULT '00:00:00',
-  `Sun` int(1) NOT NULL DEFAULT 0,
-  `Mon` int(1) NOT NULL DEFAULT 1,
-  `Tue` int(1) NOT NULL DEFAULT 1,
-  `Wed` int(1) NOT NULL DEFAULT 1,
-  `Thu` int(1) NOT NULL DEFAULT 1,
-  `Fri` int(1) NOT NULL DEFAULT 1,
-  `Sat` int(1) NOT NULL DEFAULT 1,
-  `presence` int(1) NOT NULL DEFAULT 1,
+  `Sun` int NOT NULL DEFAULT '0',
+  `Mon` int NOT NULL DEFAULT '1',
+  `Tue` int NOT NULL DEFAULT '1',
+  `Wed` int NOT NULL DEFAULT '1',
+  `Thu` int NOT NULL DEFAULT '1',
+  `Fri` int NOT NULL DEFAULT '1',
+  `Sat` int NOT NULL DEFAULT '1',
+  `presence` int NOT NULL DEFAULT '1',
   PRIMARY KEY (`idAuto`),
   UNIQUE KEY `id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table hris.time_management_shift: ~3 rows (approximately)
 INSERT INTO `time_management_shift` (`idAuto`, `id`, `name`, `scheduleIn`, `scheduleOut`, `Sun`, `Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`, `presence`) VALUES
@@ -810,9 +1026,20 @@ CREATE TABLE IF NOT EXISTS `user` (
   `password` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table hris.user: ~0 rows (approximately)
+
+-- Dumping structure for table hris.user_access
+DROP TABLE IF EXISTS `user_access`;
+CREATE TABLE IF NOT EXISTS `user_access` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `token` varchar(50) NOT NULL DEFAULT '',
+  `inputDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Dumping data for table hris.user_access: ~0 rows (approximately)
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
