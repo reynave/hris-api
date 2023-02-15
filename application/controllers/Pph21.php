@@ -126,6 +126,11 @@ class Pph21 extends CI_Controller
             $temp['pph21Month'] =  (int)($temp['pph21Year'] / 12);
 
 
+            if( $temp['pkp'] < 0)  $temp['pkp'] = 0;
+            if( $temp['pph21Year'] < 0)  $temp['pph21Year'] = 0;
+            if( $temp['pph21Month'] < 0)  $temp['pph21Month'] = 0;
+            
+
             array_push($data, array_merge($row, $temp));
         }
 
