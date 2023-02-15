@@ -27,6 +27,9 @@ class GlobalSetting extends CI_Controller
             "time_management_shift" => $this->model->sql("SELECT * FROM time_management_shift where  presence = 1 order by idAuto ASC "),
             "global_setting_jabatan" => $this->model->sql("SELECT * FROM global_setting where  id >= 100 or id <= 199 order by id ASC "),
 
+            "maintenance_equipment" => $this->model->sql("SELECT * FROM maintenance_equipment where  presence = 1 order by id ASC "),
+            "maintenance_category" => $this->model->sql("SELECT * FROM maintenance_category where  presence = 1 order by id ASC "),
+
         );
         echo json_encode($data);
     }
@@ -52,7 +55,7 @@ class GlobalSetting extends CI_Controller
 
         echo json_encode($data);
     }
-    function fnSave_employment_joblevel()
+    function fnSave_maintenance_equipment()
     {
         $post = json_decode(file_get_contents('php://input'), true);
         $data = array(
@@ -63,7 +66,7 @@ class GlobalSetting extends CI_Controller
                 $update = array(
                     "name" => $row['name'],
                 );
-                $this->db->update("employment_joblevel", $update, " id='" . $row['id'] . "' ");
+                $this->db->update("maintenance_equipment", $update, " id='" . $row['id'] . "' ");
             }
 
             $data = array(
@@ -73,6 +76,29 @@ class GlobalSetting extends CI_Controller
 
         echo json_encode($data);
     }
+
+    function fnSave_maintenance_category()
+    {
+        $post = json_decode(file_get_contents('php://input'), true);
+        $data = array(
+            "error" => true,
+        );
+        if ($post) {
+            foreach ($post as $row) {
+                $update = array(
+                    "name" => $row['name'],
+                );
+                $this->db->update("maintenance_category", $update, " id='" . $row['id'] . "' ");
+            }
+
+            $data = array(
+                "error" => false,
+            );
+        }
+
+        echo json_encode($data);
+    }
+
     function fnSave_reimbursement_name()
     {
         $post = json_decode(file_get_contents('php://input'), true);
@@ -120,6 +146,16 @@ class GlobalSetting extends CI_Controller
 
         echo json_encode($data);
     }
+
+
+
+
+ 
+
+
+
+
+
 
 
     function fnSave_time_management_shift()

@@ -16,7 +16,6 @@ class Maintenance extends CI_Controller
         }
     }
 
-
     function index()
     {
         $q = "SELECT m.*, c.name AS 'category', e.name AS 'equipment'
@@ -54,11 +53,13 @@ class Maintenance extends CI_Controller
             "equipment" => $this->model->sql("SELECT * from  maintenance_equipment  WHERE  presence = 1"),
             "category" => $this->model->sql("SELECT * from  maintenance_category  WHERE  presence = 1"),
             "item" => $this->model->sql($q)[0],
-            "images" => $this->model->sql("SELECT * from  maintenance_images  WHERE  presence = 1 and maintenanceId = '" . $id . "'"), 
+            "images" => $this->model->sql("SELECT * from  maintenance_images  WHERE  presence = 1 and maintenanceId = '" . $id . "'"),
             "schedule" => $this->model->sql("SELECT m.*, s.name AS 'statusName' 
             FROM  maintenance_schedule  AS m
             JOIN maintenance_status AS s ON m.`status` = s.id
-            WHERE  m.presence = 1 and m.maintenanceId = '" . $id . "'"),
+            WHERE  m.presence = 1 and m.maintenanceId = '" . $id . "' 
+            ORDER BY m.scheduleDate DESC
+            "),
         );
         echo json_encode($data);
     }
@@ -73,6 +74,27 @@ class Maintenance extends CI_Controller
         if ($post) {
 
             $id = $this->model->number('maintenance', date('y'));
+
+            $equipmentId = 0;
+            if ($post['insertEquipment'] != "") {
+                $insert2 = array(
+                    "name" => $post['insertEquipment'],
+                    "inputDate" => date("Y-m-d H:i:s")
+                );
+                $this->db->insert("maintenance_equipment", $insert2);
+                $equipmentId = $this->model->select("id", "maintenance_equipment", " 1 ORDER BY inputDate DESC limit 1 ");
+            }
+
+            $categoryId = 0;
+            if ($post['insertCategory'] != "") {
+                $insert3 = array(
+                    "name" => $post['insertCategory'],
+                    "inputDate" => date("Y-m-d H:i:s")
+                );
+                $this->db->insert("maintenance_category", $insert3);
+                $categoryId = $this->model->select("id", "maintenance_category", " 1 ORDER BY inputDate DESC limit 1 ");
+            }
+
             $error = true;
             $purchaseDate = $post['item']['purchaseDate']['year'] . "-" . $post['item']['purchaseDate']['month'] . "-" . $post['item']['purchaseDate']['day'];
             $warantyUntil = $post['item']['warantyUntil']['year'] . "-" . $post['item']['warantyUntil']['month'] . "-" . $post['item']['warantyUntil']['day'];
@@ -82,9 +104,9 @@ class Maintenance extends CI_Controller
                 "warantyUntil" => $warantyUntil,
                 "purchaseDate" => $purchaseDate,
                 "location" => $post['item']['location'],
-                "equipmentId" => $post['item']['equipmentId'],
+                "equipmentId" => $post['insertEquipment'] ? $equipmentId : $post['item']['equipmentId'],
+                "categoryId" => $post['insertCategory'] ? $categoryId : $post['item']['categoryId'],
                 "description" => $post['item']['description'],
-                "categoryId" => $post['item']['categoryId'],
                 "supplier" => $post['item']['supplier'],
                 "schedule" => $post['item']['schedule'],
 
@@ -158,6 +180,7 @@ class Maintenance extends CI_Controller
         }
 
     }
+
     function fnDoneTrans()
     {
 
@@ -166,15 +189,44 @@ class Maintenance extends CI_Controller
             "error" => true,
         );
         if ($post) {
+            $scheduleDetailDate = $post['scheduleDetailDate']['year'] . "-" . $post['scheduleDetailDate']['month'] . "-" . $post['scheduleDetailDate']['day'];
+
             $update = array(
+                "cost" => $post['item']['cost'],
+                "supplier" => $post['item']['supplier'],
+                "note" => $post['item']['note'],
+                "scheduleDate" => $scheduleDetailDate,
+                "maintenanceDate" => date("Y-m-d"),
                 "status" => 100,
                 "updateDate" => date("Y-m-d H:i:s"),
             );
             $this->db->update("maintenance_schedule", $update, "id='" . $post['item']['id'] . "'");
 
+            $warantyUntil = $this->model->select("warantyUntil", "maintenance", "id='" . $post['id'] . "'");
+
+
+
+            $time = strtotime($scheduleDetailDate);
+            $final = date("Y-m-d", strtotime("+1 month", $time));
+
+            if (strtotime($final) <= strtotime($warantyUntil) ) {
+
+
+                $id = $this->model->number('mlog', date('yd'));
+                $insert = array(
+                    "id" => $id,
+                    "maintenanceId" => $post['id'],
+                    "scheduleDate" => $final,
+                    "inputDate" => date("Y-m-d H:i:s"),
+                    "inputBy" => $this->model->userId(),
+                );
+                $this->db->insert("maintenance_schedule", $insert);
+            }
+
             $data = array(
-                "error" => false,
+                "error" => false, 
             );
+
             echo json_encode($data);
         }
 
@@ -211,6 +263,22 @@ class Maintenance extends CI_Controller
             echo json_encode($data);
         }
 
+    }
+
+
+    function schedule()
+    {
+        $data = array(
+            "data" => $this->model->sql("SELECT s.*, m.supplier, c.name AS 'category', e.name AS 'equipment'
+            FROM maintenance_schedule AS s
+            JOIN maintenance AS m ON m.id = s.maintenanceId
+            left JOIN maintenance_category AS c ON c.id = m.categoryId
+            LEFT JOIN maintenance_equipment AS e ON e.id = m.equipmentId
+            WHERE s.presence = 1 AND s.`status` = 1
+            
+            "),
+        );
+        echo json_encode($data);
     }
 
 }
