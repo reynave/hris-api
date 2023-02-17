@@ -18,10 +18,9 @@ class Maintenance extends CI_Controller
 
     function index()
     {
-        $q = "SELECT m.*, c.name AS 'category', e.name AS 'equipment'
+        $q = "SELECT m.*, c.name AS 'category'
         FROM maintenance AS m
-        left JOIN maintenance_category AS c ON c.id = m.categoryId
-        left JOIN maintenance_equipment AS e ON e.id = m.equipmentId
+        left JOIN maintenance_category AS c ON c.id = m.categoryId  
         WHERE m.presence = 1";
 
         $data = array(
@@ -43,22 +42,51 @@ class Maintenance extends CI_Controller
 
     function detail($id = "")
     {
-        $q = "SELECT m.*, c.name AS 'category', e.name AS 'equipment'
+        $q = "SELECT m.*, c.name AS 'category'
         FROM maintenance AS m
-        left JOIN maintenance_category AS c ON c.id = m.categoryId
-        left JOIN maintenance_equipment AS e ON e.id = m.equipmentId
+        left JOIN maintenance_category AS c ON c.id = m.categoryId 
         WHERE m.presence = 1 and m.id = '" . $id . "' ";
 
+        $item = $this->model->sql($q)[0];
+
+        $schedule = $item['schedule'];
+
+        $time = strtotime($item['purchaseDate']);
+
+        $nextScheduleDate = date("Y-m-d", strtotime("+$schedule month", $time));
+
+
+        $historyScheduleDate = $this->model->select("scheduleDate", "maintenance_schedule", "presence = 1 AND status = 100 AND maintenanceId = '$id' ORDER BY scheduleDate DESC limit 1");
+        if ($historyScheduleDate) {
+            $nextScheduleDate = date("Y-m-d", strtotime("+$schedule month", strtotime($historyScheduleDate))); ;
+        }
+
+
+
+        if (strtotime($nextScheduleDate) <= strtotime($item['warantyUntil'])) {
+            $next = array(
+                "expired" => false,
+                "nextScheduleDate" => $nextScheduleDate,
+                "Supplier" => $item['supplier']
+            );
+        } else {
+            $next = array(
+                "expired" => true,
+            );
+        }
+
+
         $data = array(
-            "equipment" => $this->model->sql("SELECT * from  maintenance_equipment  WHERE  presence = 1"),
+            "nextSchedule" => $next,
+            // "equipment" => $this->model->sql("SELECT * from  maintenance_equipment  WHERE  presence = 1"),
             "category" => $this->model->sql("SELECT * from  maintenance_category  WHERE  presence = 1"),
-            "item" => $this->model->sql($q)[0],
+            "item" => $item,
             "images" => $this->model->sql("SELECT * from  maintenance_images  WHERE  presence = 1 and maintenanceId = '" . $id . "'"),
             "schedule" => $this->model->sql("SELECT m.*, s.name AS 'statusName' 
-            FROM  maintenance_schedule  AS m
-            JOIN maintenance_status AS s ON m.`status` = s.id
-            WHERE  m.presence = 1 and m.maintenanceId = '" . $id . "' 
-            ORDER BY m.scheduleDate DESC
+                FROM  maintenance_schedule  AS m
+                JOIN maintenance_status AS s ON m.`status` = s.id
+                WHERE  m.presence = 1 and m.maintenanceId = '" . $id . "' 
+                ORDER BY m.scheduleDate DESC
             "),
         );
         echo json_encode($data);
@@ -75,15 +103,15 @@ class Maintenance extends CI_Controller
 
             $id = $this->model->number('maintenance', date('y'));
 
-            $equipmentId = 0;
-            if ($post['insertEquipment'] != "") {
-                $insert2 = array(
-                    "name" => $post['insertEquipment'],
-                    "inputDate" => date("Y-m-d H:i:s")
-                );
-                $this->db->insert("maintenance_equipment", $insert2);
-                $equipmentId = $this->model->select("id", "maintenance_equipment", " 1 ORDER BY inputDate DESC limit 1 ");
-            }
+            // $equipmentId = 0;
+            // if ($post['insertEquipment'] != "") {
+            //     $insert2 = array(
+            //         "name" => $post['insertEquipment'],
+            //         "inputDate" => date("Y-m-d H:i:s")
+            //     );
+            //     $this->db->insert("maintenance_equipment", $insert2);
+            //     $equipmentId = $this->model->select("id", "maintenance_equipment", " 1 ORDER BY inputDate DESC limit 1 ");
+            // }
 
             $categoryId = 0;
             if ($post['insertCategory'] != "") {
@@ -102,9 +130,10 @@ class Maintenance extends CI_Controller
             $insert = array(
                 "id" => $id,
                 "warantyUntil" => $warantyUntil,
+                "equipment" => $post['item']['equipment'],
                 "purchaseDate" => $purchaseDate,
                 "location" => $post['item']['location'],
-                "equipmentId" => $post['insertEquipment'] ? $equipmentId : $post['item']['equipmentId'],
+                //  "equipmentId" => $post['insertEquipment'] ? $equipmentId : $post['item']['equipmentId'],
                 "categoryId" => $post['insertCategory'] ? $categoryId : $post['item']['categoryId'],
                 "description" => $post['item']['description'],
                 "supplier" => $post['item']['supplier'],
@@ -140,7 +169,7 @@ class Maintenance extends CI_Controller
                 "warantyUntil" => $warantyUntil,
                 "purchaseDate" => $purchaseDate,
                 "location" => $post['item']['location'],
-                "equipmentId" => $post['item']['equipmentId'],
+                "equipment" => $post['item']['equipment'],
                 "description" => $post['item']['description'],
                 "categoryId" => $post['item']['categoryId'],
                 "supplier" => $post['item']['supplier'],
@@ -203,13 +232,14 @@ class Maintenance extends CI_Controller
             $this->db->update("maintenance_schedule", $update, "id='" . $post['item']['id'] . "'");
 
             $warantyUntil = $this->model->select("warantyUntil", "maintenance", "id='" . $post['id'] . "'");
+            $schedule = $this->model->select("schedule", "maintenance", "id='" . $post['id'] . "'");
 
 
 
             $time = strtotime($scheduleDetailDate);
-            $final = date("Y-m-d", strtotime("+1 month", $time));
+            $final = date("Y-m-d", strtotime("+$schedule month", $time));
 
-            if (strtotime($final) <= strtotime($warantyUntil) ) {
+            if (strtotime($final) <= strtotime($warantyUntil)) {
 
 
                 $id = $this->model->number('mlog', date('yd'));
@@ -224,7 +254,7 @@ class Maintenance extends CI_Controller
             }
 
             $data = array(
-                "error" => false, 
+                "error" => false,
             );
 
             echo json_encode($data);
@@ -269,11 +299,10 @@ class Maintenance extends CI_Controller
     function schedule()
     {
         $data = array(
-            "data" => $this->model->sql("SELECT s.*, m.supplier, c.name AS 'category', e.name AS 'equipment'
+            "data" => $this->model->sql("SELECT s.*, m.supplier, c.name AS 'category' 
             FROM maintenance_schedule AS s
             JOIN maintenance AS m ON m.id = s.maintenanceId
-            left JOIN maintenance_category AS c ON c.id = m.categoryId
-            LEFT JOIN maintenance_equipment AS e ON e.id = m.equipmentId
+            left JOIN maintenance_category AS c ON c.id = m.categoryId 
             WHERE s.presence = 1 AND s.`status` = 1
             
             "),
