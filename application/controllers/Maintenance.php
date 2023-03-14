@@ -299,12 +299,11 @@ class Maintenance extends CI_Controller
     function schedule()
     {
         $data = array(
-            "data" => $this->model->sql("SELECT s.*, m.supplier, c.name AS 'category' 
+            "data" => $this->model->sql("SELECT s.*, m.supplier, c.name AS 'category' ,  m.equipment
             FROM maintenance_schedule AS s
             JOIN maintenance AS m ON m.id = s.maintenanceId
             left JOIN maintenance_category AS c ON c.id = m.categoryId 
-            WHERE s.presence = 1 AND s.`status` = 1
-            
+            WHERE s.presence = 1 AND s.`status` = 1 
             "),
         );
         echo json_encode($data);
