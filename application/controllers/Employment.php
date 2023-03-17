@@ -77,7 +77,7 @@ class Employment extends CI_Controller
                 $idBranch = $this->model->select("id", "branch", "1 order by inputDate desc");
             }
             $id = $post['id'];
-            $update = array( 
+            $update = array(  
                 "dateJoinStart" =>  $post['model']['dateJoinStart']['year'] . "-" . $post['model']['dateJoinStart']['month'] . "-" . $post['model']['dateJoinStart']['day'],
                 "dateJoinEnd" =>  $post['model']['dateJoinEnd']['year'] . "-" . $post['model']['dateJoinEnd']['month'] . "-" . $post['model']['dateJoinEnd']['day'],
                 "jobLevelId" => $post['model']['jobLevelId'], 

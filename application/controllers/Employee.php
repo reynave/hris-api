@@ -15,7 +15,7 @@ class Employee extends CI_Controller
             exit;
         }
     }
- 
+
     function index()
     {
         $data = array(
@@ -37,16 +37,46 @@ class Employee extends CI_Controller
     }
 
     function detail($id)
-    { 
+    {
         $data = array(
-            "employmentId" => $this->model->select("id","employment","personalId = '$id'"), 
-            "payrollId" => $this->model->select("id","payroll","personalId = '$id'"), 
-            
+            "employmentId" => $this->model->select("id", "employment", "personalId = '$id'"),
+            "payrollId" => $this->model->select("id", "payroll", "personalId = '$id'"),
+
         );
         echo json_encode($data);
     }
 
-    function fnCreate(){
+    function contact($personalId)
+    {
+        $branch = [];
+        $id = $this->model->select("id", "employment", "personalId = '$personalId'");
+        $item = $this->model->sql("SELECT e.*, p.name from employment AS e
+        JOIN personal AS p ON p.id = e.personalId
+        WHERE e.presence = 1 and  e.id = '$id' ");
+
+        $data = array(
+            "id" => $id,
+            "item" => $item,
+            "personal" => $this->model->sql("SELECT *  from personal WHERE id = '$personalId' "),
+            "globalSetting" => array(
+                "companyName" => $this->model->select("value","global_setting","id=2"),
+                "CompanyAddress" => $this->model->select("value","global_setting","id=3"),
+                
+            )
+
+            // "employmentStatus" =>  $this->model->sql("SELECT * from employment_status"), 
+            // "approvedLine" =>  $this->model->sql("SELECT id, name from personal where presence = 1 order by name ASC  "),
+            // "JobPosition" =>  $this->model->sql("SELECT * from employment_jobposition where presence = 1 order by name ASC"), 
+            // "JobLevel" =>  $this->model->sql("SELECT * from employment_joblevel  where presence = 1 order by name ASC"), 
+            // "organization" =>  $this->model->sql("SELECT * from organization  where presence = 1 order by name ASC"), 
+
+        );
+        echo json_encode($data);
+    }
+
+
+    function fnCreate()
+    {
         $post = json_decode(file_get_contents('php://input'), true);
         $data = array(
             "error" => true,
@@ -54,34 +84,34 @@ class Employee extends CI_Controller
         if ($post) {
             $error = true;
             $personalId = $post['id'];
-            if($post['value'] == 'employment'){
-             
+            if ($post['value'] == 'employment') {
+
                 $id = $this->model->number('employment');
-                $insert = array( 
+                $insert = array(
                     "id" => $id,
                     "personalId" => $personalId,
-                    "inputDate"     => date("Y-m-d H:i:s"), 
+                    "inputDate" => date("Y-m-d H:i:s"),
                 );
                 $this->db->insert('employment', $insert);
-    
+
             }
-            if($post['value'] == 'payroll'){
-         
+            if ($post['value'] == 'payroll') {
+
                 $id = $this->model->number('payroll');
-                $insert = array( 
+                $insert = array(
                     "id" => $id,
                     "personalId" => $personalId,
-                    "inputDate"     => date("Y-m-d H:i:s"), 
+                    "inputDate" => date("Y-m-d H:i:s"),
                 );
                 $this->db->insert('payroll', $insert);
-    
+
             }
-           
+
             $data = array(
-                "id" => $id ,
+                "id" => $id,
                 "error" => false,
             );
         }
     }
-  
+
 }
