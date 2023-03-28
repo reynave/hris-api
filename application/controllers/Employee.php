@@ -36,6 +36,20 @@ class Employee extends CI_Controller
         echo json_encode($data);
     }
 
+    function reminderExp()
+    {
+        $n = 30;
+        $data = array(
+            "data" => $this->model->sql(" SELECT   e.personalId as 'id',  DATEDIFF(e.dateJoinEnd,NOW()) AS 'expDate', 
+            p.name, e.dateJoinEnd, e.dateJoinStart, es.name AS 'employmentStatus' 
+            FROM  employment AS e
+            JOIN employment_status AS es ON es.id = e.employmentStatusId
+            JOIN personal AS p ON p.id = e.personalId
+            WHERE e.presence = 1 AND e.STATUS = 1 and DATEDIFF(e.dateJoinEnd,NOW()) < $n"),
+        );
+        echo json_encode($data);
+    }
+
     function detail($id)
     {
         $data = array(
