@@ -86,11 +86,19 @@ class Pph21 extends CI_Controller
 
 
         $sqlEmployee = "SELECT p.id, p.name, r.taxSalary,  r.tunjangan, r.taxPtkpStatus, 
+        ((r.taxSalary) * ($employeeBPSJ/100))  AS 'bpjs_employeeBPSJ',
+        ((r.taxSalary) * ($employeeJHT/100))  AS 'bpjs_employeeJHT',
+        ((r.taxSalary) * ($employeeJP/100))  AS 'bpjs_employeeJP',
+
+
+
         ((r.taxSalary+ r.tunjangan) * ($companyBPSJ/100))  AS 'bpjs',
         ((r.taxSalary+ r.tunjangan) * ($companyJKK/100))  AS 'jkk',
         ((r.taxSalary+ r.tunjangan) * ($companyJKM/100))  AS 'jkm',
+
+
         ((r.taxSalary+ r.tunjangan) + 
-        ((r.taxSalary+ r.tunjangan) * ($employeeBPSJ/100)) +  
+        ((r.taxSalary+ r.tunjangan) * ($companyBPSJ/100)) +  
         ((r.taxSalary+ r.tunjangan) * ($companyJKK/100)) +  
         ((r.taxSalary+ r.tunjangan) * ($companyJKM/100)) )AS 'bruto'  
         FROM payroll AS r 
@@ -105,24 +113,34 @@ class Pph21 extends CI_Controller
         foreach( $employee as $row){
             $temp = array(
                 "byJabatan" => ($row['bruto'] *  $jabatanPercent) >  $jabatanAmount  ?  $jabatanAmount : ($row['bruto'] *  $jabatanPercent),
-                "bpjsKes" => $row['bruto'] * ($bpjsKes/100), 
-                "jht" => $row['bruto'] * ($employeeJHT/100), 
-                "jp" => $row['bruto'] * ($employeeJP/100), 
+                "bpjsKes" => $row['bpjs_employeeBPSJ'] , 
+                "jht" => $row['bpjs_employeeJHT'],
+                "jp" => $row['bpjs_employeeJP'],
                 "netto" => 0,  
                 "ptkpAmount" => (int)$this->model->select("amount","pph21_ptkp","id='".$row['taxPtkpStatus']."'"),
                 "pkp" => 0,
                 "pph21Year" => 0,
+                "pph21YearObj" => [],
                 "pph21Month" => 0,
                 "taxPercent" => 0
             );
 
             $temp['netto'] = $row['bruto'] - ($temp['byJabatan'] + $temp['bpjsKes'] + $temp['jht'] + $temp['jp']);
-            $temp['pkp'] = ($temp['netto'] * 12) + $row['taxSalary'] - $temp['ptkpAmount'];
+            $temp['pkp'] = ($temp['netto'] * 12) - $temp['ptkpAmount'];
 
             $temp['taxPercent'] =  (float)$this->model->select("taxPercent","pph21_tarif_pajak","maxAmount >= ".$temp['pkp']."
             ORDER BY taxPercent ASC LIMIT 1");
 
-            $temp['pph21Year'] =  (int) ($temp['pkp']  *  ($temp['taxPercent'] / 100));
+          
+            $temp['pph21YearObj'] =  $this->model->pkpObj($temp['pkp']);
+
+
+            foreach($this->model->pkpObj($temp['pkp']) as $obj){
+                $temp['pph21Year'] +=  $obj['taxAmount'];
+            }
+
+
+           
             $temp['pph21Month'] =  (int)($temp['pph21Year'] / 12);
 
 

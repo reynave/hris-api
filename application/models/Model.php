@@ -33,7 +33,7 @@ class Model extends CI_Model
         $query = $this->db->query($query);
         if ($query->row()) {
             $row = $query->row();
-            return  $row->$field;
+            return $row->$field;
         }
     }
 
@@ -41,53 +41,55 @@ class Model extends CI_Model
 
     function base64Decode($description = "")
     {
-        $description  = str_replace(' ', '+', $description);
-        $description  = base64_decode($description);
+        $description = str_replace(' ', '+', $description);
+        $description = base64_decode($description);
         return $description;
     }
 
     function token($token = "")
     {
-        if ($this->model->select('id',  $this->prefixDB . 'user', 'token= "' . $token . '"  and presence = 1')) {
-            return $this->model->select('id',  $this->prefixDB . 'user', 'token= "' . $token . '"  and presence = 1');
+        if ($this->model->select('id', $this->prefixDB . 'user', 'token= "' . $token . '"  and presence = 1')) {
+            return $this->model->select('id', $this->prefixDB . 'user', 'token= "' . $token . '"  and presence = 1');
         } else {
             return false;
         }
     }
-    function checkDeviceObj(){
+    function checkDeviceObj()
+    {
         $headers = apache_request_headers();
-        if($this->model->select("id","cso1_terminal"," presence = 1 and token = '".$headers['Token']."'") ){
-            $data = true; 
-        }else{
-            $data = false; 
+        if ($this->model->select("id", "cso1_terminal", " presence = 1 and token = '" . $headers['Token'] . "'")) {
+            $data = true;
+        } else {
+            $data = false;
         }
 
-        return  $data;
+        return $data;
     }
-    function getDeviceObj(){
+    function getDeviceObj()
+    {
         $headers = apache_request_headers();
-        if($this->model->select("id","cso1_terminal"," presence = 1 and token = '".$headers['Token']."'") ){
-          
-            $this->terminalId = $this->model->select("id","cso1_terminal"," presence = 1 and token = '".$headers['Token']."'");
-            $this->storeOutlesId = $this->model->select("storeOutlesId","cso1_terminal","  presence = 1 and token = '".$headers['Token']."'"); 
+        if ($this->model->select("id", "cso1_terminal", " presence = 1 and token = '" . $headers['Token'] . "'")) {
+
+            $this->terminalId = $this->model->select("id", "cso1_terminal", " presence = 1 and token = '" . $headers['Token'] . "'");
+            $this->storeOutlesId = $this->model->select("storeOutlesId", "cso1_terminal", "  presence = 1 and token = '" . $headers['Token'] . "'");
             $data = array(
                 "error" => false,
-                "headers" => $headers['Token'], 
+                "headers" => $headers['Token'],
                 "note" => "",
-                "terminalId" =>  $this->terminalId,
-                "storeOutlesId" =>  $this->storeOutlesId, 
+                "terminalId" => $this->terminalId,
+                "storeOutlesId" => $this->storeOutlesId,
             );
-        }else{
+        } else {
             $data = array(
                 "error" => true,
                 "header" => false,
                 "note" => "Token not register",
-                "terminalId" =>  false,
-                "storeOutlesId" => false, 
-            ); 
+                "terminalId" => false,
+                "storeOutlesId" => false,
+            );
         }
 
-        return  $data;
+        return $data;
     }
 
     function error($note = "")
@@ -125,16 +127,16 @@ class Model extends CI_Model
 
 
             if (isset($headers['Token'])) {
-                $token =  $headers['Token'];
+                $token = $headers['Token'];
             } else {
-                $token =  isset($headers['token']) ? $headers['token'] : false;
+                $token = isset($headers['token']) ? $headers['token'] : false;
             }
 
             if ($openAPI == true) {
-                return  true;
+                return true;
             } else if ($token) {
-                if (self::select('id',  $this->prefixDB . 'personal_access', "status = 1 and token= '" .  $token . "'")) {
-                    $userId = self::select('personalId', $this->prefixDB . 'personal_access', "status = 1 and token= '" .  $token . "'");
+                if (self::select('id', $this->prefixDB . 'personal_access', "status = 1 and token= '" . $token . "'")) {
+                    $userId = self::select('personalId', $this->prefixDB . 'personal_access', "status = 1 and token= '" . $token . "'");
                     if ($this->model->select("id", $this->prefixDB . "personal", "id='$userId'")) {
                         return true;
                     } else {
@@ -182,7 +184,7 @@ class Model extends CI_Model
             $token = isset($headers['token']) ? $headers['token'] : $headers['Token'];
 
             if ($this->model->select('id', $this->prefixDB . 'personal_access', "token= '$token'")) {
-                return  $this->model->select('personalId', $this->prefixDB . 'personal_access', "token= '$token'");
+                return $this->model->select('personalId', $this->prefixDB . 'personal_access', "token= '$token'");
             } else {
                 return false;
             }
@@ -197,7 +199,7 @@ class Model extends CI_Model
         return $this->model->personalId();
     }
 
-    function number($name = "",$prefixLabel = "")
+    function number($name = "", $prefixLabel = "")
     {
         if ($name) {
             $number = $this->model->select('runningNumber', 'auto_number', "name = '" . $name . "'") + 1;
@@ -206,14 +208,14 @@ class Model extends CI_Model
                 $prefix = date("Y");
             }
             $update = array(
-                "runningNumber"     => $number,
-                "updateDate"        =>  time(),
+                "runningNumber" => $number,
+                "updateDate" => time(),
             );
             $this->db->update("auto_number", $update, "name = '" . $name . "'");
 
             $new_number = str_pad($number, $this->model->select('digit', 'auto_number', "name = '" . $name . "'"), "0", STR_PAD_LEFT);
 
-            return $prefix.$prefixLabel . $new_number;
+            return $prefix . $prefixLabel . $new_number;
         }
     }
 
@@ -233,13 +235,13 @@ class Model extends CI_Model
         if ($id == 0) {
             return false;
         } else {
-            return $this->model->select('concat(first_name," ",last_name)',  $this->prefixDB . 'user', 'id="' . $id . '"');
+            return $this->model->select('concat(first_name," ",last_name)', $this->prefixDB . 'user', 'id="' . $id . '"');
         }
     }
 
     function id_currency()
     {
-        return  $this->model->select('value', 'global', 'id=10');
+        return $this->model->select('value', 'global', 'id=10');
     }
 
     function currency($colomn = "symbol")
@@ -251,9 +253,9 @@ class Model extends CI_Model
 
     /**
      * USER
-     */ 
+     */
 
-   
+
     function sendMail($subject = [])
     {
         $this->load->helper('email');
@@ -270,7 +272,7 @@ class Model extends CI_Model
         $config['smtp_port'] = $this->model->select("value", "global_setting", "id=703");
 
 
-        $to       = $subject['to'];
+        $to = $subject['to'];
 
         $this->email->initialize($config);
         $this->email->set_newline("\r\n");
@@ -280,7 +282,7 @@ class Model extends CI_Model
         $this->email->subject($subject['subject']);
         $this->email->message($subject['message']);
         $this->email->send(FALSE);
-        return  $this->email->print_debugger();
+        return $this->email->print_debugger();
     }
 
     function sql($q)
@@ -289,12 +291,12 @@ class Model extends CI_Model
         return $query->result_array();
     }
 
-  
+
     function clean($string)
     {
         $string = str_replace([' ', "'", '"'], '-', $string); // Replaces all spaces with hyphens.
 
-        return    $string; // Removes special chars.
+        return $string; // Removes special chars.
     }
 
     function array_flatten($array)
@@ -313,7 +315,7 @@ class Model extends CI_Model
         return $result;
     }
 
- 
+
 
     /***
      * BASE 64 images
@@ -323,7 +325,7 @@ class Model extends CI_Model
     function base64_to_jpeg($data, $output_file, $filename = "")
     {
         list($type, $data) = explode(';', $data);
-        list(, $data)      = explode(',', $data);
+        list(, $data) = explode(',', $data);
         $data = base64_decode($data);
         $signname = strtolower($filename);
         $signname = str_replace(" ", "-", $signname);
@@ -336,7 +338,7 @@ class Model extends CI_Model
 
     function cam_to_img($data, $output_file, $filename = "")
     {
-        $data =  str_replace("data:image/png;base64,","",$data);
+        $data = str_replace("data:image/png;base64,", "", $data);
 
         $data = base64_decode($data);
         $signname = strtolower($filename);
@@ -345,5 +347,80 @@ class Model extends CI_Model
         file_put_contents($output_file . $signname . '.png', $data);
 
         return $output_file . $signname . '.png';
+    }
+
+    function pkp($obj){
+        return $obj;
+    }
+    function pkpObj($value)
+    {
+
+        $pph21 = $this->model->sql("select * from pph21_tarif_pajak where presence = 1 order by taxPercent ASC ");
+        $taxAmount = 0;
+        $obj = [];
+        $pro1 = false;
+        $pro2 = false;
+        $pro3 = false;
+        $pro4 = false;
+
+        $newValue = 0;
+        if (($value - $pph21[0]['maxAmount']) > 0) {
+            //level 1
+            //=60000000*0,05 
+            $taxAmount = $pph21[0]['maxAmount'] * ($pph21[0]['taxPercent'] / 100);
+            $level1 = $taxAmount;
+
+        } else {
+            $taxAmount = $value * ($pph21[0]['taxPercent'] / 100);
+        }
+
+
+        $obj[0] = array(
+            "level" => 1,
+            "pph21Target" => (int)$pph21[0]['maxAmount'],
+            "pph21Percent" => ($pph21[0]['taxPercent'] / 100),
+            "value" => max($value,0),
+            "taxAmount" => max($taxAmount,0),
+            "nextLevel" => ($value - $pph21[0]['maxAmount']),
+        );
+
+
+        // if ($obj[0]['nextLevel'] > 0) {
+        //     $newValue = $value - $pph21[0]['maxAmount'];
+        //     $obj[1] = array(
+        //         "level" => 2,
+        //         "pph21Target" => (int)$pph21[1]['maxAmount'],
+        //         "pph21Percent" => ($pph21[1]['taxPercent'] / 100),
+        //         "value" => max($newValue,0),
+        //         "taxAmount" => max(($newValue) * ($pph21[1]['taxPercent'] / 100),0),
+        //         "nextLevel" => ($newValue - $pph21[1]['maxAmount']),
+        //     );
+        // }
+
+        for ($i = 1; $i <= 5; $i++) {
+ 
+            if (isset($obj[$i-1]) && $obj[$i-1]['nextLevel'] > 0) {
+                $newValue = $value - $pph21[$i-1]['maxAmount'];
+
+                $obj[$i] = array(
+                    "level" => $i+1,
+                    "pph21Target" => (int)$pph21[$i]['maxAmount'],
+                    "pph21Percent" => ($pph21[$i]['taxPercent'] / 100),
+                    "value" => max($newValue,0),
+                    "taxAmount" => max(($newValue) * ($pph21[$i]['taxPercent'] / 100),0),
+                    "nextLevel" => ($newValue - $pph21[$i]['maxAmount']),
+                );
+
+                if ($obj[$i]['value'] > $obj[$i]['pph21Target']) {
+                    $obj[$i]['taxAmount'] = (($obj[$i]['pph21Target']) * ($pph21[$i]['taxPercent'] / 100));
+                    $obj[$i]['nextLevel'] = $obj[$i]['value'] - $obj[$i]['pph21Target'];
+                }
+            }
+        }
+
+
+        return $obj;
+
+        // return  $finalTaxAmount;
     }
 }
