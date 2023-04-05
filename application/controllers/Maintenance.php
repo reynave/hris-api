@@ -27,7 +27,7 @@ class Maintenance extends CI_Controller
         $data = array(
             "q" => $q,
             "data" => $this->model->sql($q),
-            
+
 
         );
         echo json_encode($data);
@@ -35,11 +35,23 @@ class Maintenance extends CI_Controller
 
     function select()
     {
+        $sql_sparepart = $this->model->sql("SELECT * from  maintenance_sparepart  WHERE  presence = 1");
+        $sparepart = [];
+        foreach ($sql_sparepart as $row) {
+            $temp = array(
+                "id" => $row['id'],
+                "name" => $row['name'],
+                "used" => $this->model->select("id", "maintenance", "sparePartId = " . $row['id']) ? true : false,
+            );
+
+            array_push($sparepart, $temp);
+        }
+
         $data = array(
             "equipment" => $this->model->sql("SELECT * from  maintenance_equipment  WHERE  presence = 1"),
             "category" => $this->model->sql("SELECT * from  maintenance_category  WHERE  presence = 1"),
             "location" => $this->model->sql("SELECT * from  maintenance_location  WHERE  presence = 1"),
-            "sparepart" => $this->model->sql("SELECT * from  maintenance_sparepart  WHERE  presence = 1"),
+            "sparepart" => $sparepart,
         );
         echo json_encode($data);
     }
@@ -83,19 +95,39 @@ class Maintenance extends CI_Controller
             );
         }
 
+        $sql_sparepart = $this->model->sql("SELECT * from  maintenance_sparepart  WHERE  presence = 1");
+        $sparepart = [];
+        foreach ($sql_sparepart as $row) {
+            $temp = array(
+                "id" => $row['id'],
+                "name" => $row['name'],
+                "used" => $this->model->select("id", "maintenance", "sparePartId = " . $row['id']) ? true : false,
+            );
+            array_push($sparepart, $temp);
+        }
 
         $data = array(
             "nextSchedule" => $next,
             "equipment" => $this->model->sql("SELECT * from  maintenance_equipment  WHERE  presence = 1"),
             "category" => $this->model->sql("SELECT * from  maintenance_category  WHERE  presence = 1"),
             "location" => $this->model->sql("SELECT * from  maintenance_location  WHERE  presence = 1"),
-            "sparepart" => $this->model->sql("SELECT * from  maintenance_sparepart  WHERE  presence = 1"), 
+            "sparepart" => $sparepart,
+
             "item" => $item,
             "transfer_log" => $this->model->sql("SELECT m.* , l.name AS 'location'
             FROM maintenance_transfer_log AS m
             LEFT JOIN maintenance_location AS l ON l.id = m.locationId
             WHERE m.presence = 1 and m.maintenanceId = '$id' order by m.inputDate DESC "),
-          
+
+            "sparepart_log" => $this->model->sql("SELECT  l.id ,  l.sparepartIdLog, s1.name AS  'sparepartIdLogName',
+            l.sparepartId, s2.name, l.note
+            
+            FROM maintenance_sperepart_log  AS l
+            JOIN  maintenance_sparepart AS s1 ON l.sparepartIdLog =   s1.id
+            JOIN  maintenance_sparepart AS s2 ON l.sparepartId =  s2.id
+            
+            WHERE  l.presence = 1 and  l.maintenanceId = '$id'   order by  l.inputDate DESC "),
+
             "images" => $this->model->sql("SELECT * from  maintenance_images  WHERE  presence = 1 and maintenanceId = '" . $id . "'"),
             "schedule" => $this->model->sql("SELECT m.*, s.name AS 'statusName' 
                 FROM  maintenance_schedule  AS m
@@ -180,18 +212,18 @@ class Maintenance extends CI_Controller
 
             $update = array(
                 "warantyUntil" => $warantyUntil,
-                "purchaseDate" => $purchaseDate, 
+                "purchaseDate" => $purchaseDate,
                 "equipment" => $post['item']['equipment'],
                 "categoryId" => $post['item']['categoryId'],
                 "brand" => $post['item']['brand'],
                 "typeItem" => $post['item']['type'],
                 "capacity" => $post['item']['capacity'],
-                "serialNumber" => $post['item']['serialNumber'], 
-                "sparepartId" => $post['item']['sparepartId'],
+                "serialNumber" => $post['item']['serialNumber'],
+                //  "sparepartId" => $post['item']['sparepartId'],
                 "description" => $post['item']['description'],
                 "supplier" => $post['item']['supplier'],
                 "schedule" => $post['item']['schedule'],
- 
+
 
                 "updateDate" => date("Y-m-d H:i:s"),
                 "updateBy" => $this->model->userId(),
@@ -327,34 +359,68 @@ class Maintenance extends CI_Controller
         echo json_encode($data);
     }
 
-    function onTransfer(){
+    function onTransfer()
+    {
         $post = json_decode(file_get_contents('php://input'), true);
         $data = array(
             "error" => true,
         );
-        if ($post) { 
+        if ($post) {
             $error = true;
             $scheduleDate = $post['item']['date']['year'] . "-" . $post['item']['date']['month'] . "-" . $post['item']['date']['day'];
 
             $update = array(
-                "locationId" =>  $post['item']['locationId'],
+                "locationId" => $post['item']['locationId'],
                 "updateDate" => date("Y-m-d H:i:s"),
                 "updateBy" => $this->model->userId(),
             );
-            $this->db->update("maintenance", $update,"id= '".$post['id']."' ");
- 
-            $insert = array( 
+            $this->db->update("maintenance", $update, "id= '" . $post['id'] . "' ");
+
+            $insert = array(
                 "maintenanceId" => $post['id'],
                 "locationId" => $post['item']['locationId'],
-                "scheduleDate" => $scheduleDate, 
-                "note" => $post['item']['note'], 
+                "scheduleDate" => $scheduleDate,
+                "note" => $post['item']['note'],
                 "inputDate" => date("Y-m-d H:i:s"),
                 "inputBy" => $this->model->userId(),
             );
             $this->db->insert("maintenance_transfer_log", $insert);
 
             $data = array(
-                "error" => false, 
+                "error" => false,
+            );
+            echo json_encode($data);
+        }
+    }
+
+    function onChangeSparePart()
+    {
+        $post = json_decode(file_get_contents('php://input'), true);
+        $data = array(
+            "error" => true,
+        );
+        if ($post) {
+            $error = true;
+            $sparePartIdLog = $this->model->select("sparepartId","maintenance","id = '".$post['id']."' ");
+            $update = array(
+                "sparepartId" => $post['item']['sparePartId'],
+                "updateDate" => date("Y-m-d H:i:s"),
+                "updateBy" => $this->model->userId(),
+            );
+            $this->db->update("maintenance", $update, "id= '" . $post['id'] . "' ");
+
+            $insert = array(
+                "maintenanceId" => $post['id'],
+                "sparepartIdLog" =>  $sparePartIdLog ,  
+                "sparepartId" => $post['item']['sparePartId'],  
+                "note" => $post['item']['note'],
+                "inputDate" => date("Y-m-d H:i:s"),
+                "inputBy" => $this->model->userId(),
+            );
+            $this->db->insert("maintenance_sperepart_log", $insert);
+
+            $data = array(
+                "error" => false,
             );
             echo json_encode($data);
         }

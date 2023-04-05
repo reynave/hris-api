@@ -32,8 +32,7 @@ class Pph21 extends CI_Controller
             $error = true;
             foreach($post['ptkp'] as $row){
                 $update = array(
-                    "amount" => $row['amount'], 
-                   
+                    "amount" => $row['amount'],  
                     "updateDate" => date("Y-m-d H:i:s"),
                 );
                 $this->db->update('pph21_ptkp', $update, "id='".$row['id']."'");
@@ -44,7 +43,7 @@ class Pph21 extends CI_Controller
                     "note" => $row['note'], 
                     "minAmount" => $row['minAmount'], 
                     "maxAmount" => $row['maxAmount'],   
-                    "TaxPercent" => $row['TaxPercent'],   
+                    "TaxPercent" => $row['taxPercent'],   
                     "updateDate" => date("Y-m-d H:i:s"),
                 );
                 $this->db->update('pph21_tarif_pajak', $update, "id='".$row['id']."'");
@@ -85,17 +84,14 @@ class Pph21 extends CI_Controller
         $employeeJP = $this->model->select("employee", "bpjs_setting", "id=112");
 
 
-        $sqlEmployee = "SELECT p.id, p.name, r.taxSalary,  r.tunjangan, r.taxPtkpStatus, 
+        $sqlEmployeeDEL = "SELECT p.id, p.name, r.taxSalary,  r.tunjangan, r.taxPtkpStatus, r.bpsjTkNo, r.bpsjKesehatanNo,
         ((r.taxSalary) * ($employeeBPSJ/100))  AS 'bpjs_employeeBPSJ',
         ((r.taxSalary) * ($employeeJHT/100))  AS 'bpjs_employeeJHT',
         ((r.taxSalary) * ($employeeJP/100))  AS 'bpjs_employeeJP',
 
-
-
         ((r.taxSalary+ r.tunjangan) * ($companyBPSJ/100))  AS 'bpjs',
         ((r.taxSalary+ r.tunjangan) * ($companyJKK/100))  AS 'jkk',
         ((r.taxSalary+ r.tunjangan) * ($companyJKM/100))  AS 'jkm',
-
 
         ((r.taxSalary+ r.tunjangan) + 
         ((r.taxSalary+ r.tunjangan) * ($companyBPSJ/100)) +  
@@ -104,6 +100,26 @@ class Pph21 extends CI_Controller
         FROM payroll AS r 
         JOIN personal AS p ON p.id = r.personalId
         WHERE r.presence = 1 order by p.name ASC;";
+
+        $sqlEmployee = "SELECT p.id, p.name, r.taxSalary, r.tunjangan, r.taxPtkpStatus, r.bpsjTkNo, r.bpsjKesehatanNo, 
+ 
+        IF(r.bpsjTkNo IS NULL or r.bpsjTkNo = '', 0, ((r.taxSalary) * ($employeeBPSJ/100)))  AS 'bpjs_employeeBPSJ', 
+        IF(r.bpsjTkNo IS NULL or r.bpsjTkNo = '', 0, ((r.taxSalary) * ($employeeJHT/100)))  AS 'bpjs_employeeJHT', 
+        IF(r.bpsjTkNo IS NULL or r.bpsjTkNo = '', 0, ((r.taxSalary) * ($employeeJP/100)))  AS 'bpjs_employeeJP', 
+          
+        IF(r.bpsjKesehatanNo IS NULL or r.bpsjKesehatanNo = '', 0, ((r.taxSalary+ r.tunjangan) * ($companyBPSJ/100)) )  AS 'bpjs', 
+        IF(r.bpsjKesehatanNo IS NULL or r.bpsjKesehatanNo = '', 0, ((r.taxSalary+ r.tunjangan) * ($companyJKK/100)) )  AS 'jkk', 
+        IF(r.bpsjKesehatanNo IS NULL or r.bpsjKesehatanNo = '', 0, ((r.taxSalary+ r.tunjangan) * ($companyJKM/100)) )  AS 'jkm', 
+               
+        
+        ((r.taxSalary+ r.tunjangan) + 
+        ((r.taxSalary+ r.tunjangan) * ($companyBPSJ/100))  + 
+        ((r.taxSalary+ r.tunjangan) * ($companyJKK/100)) + 
+        ((r.taxSalary+ r.tunjangan) * ($companyJKM/100)) )AS 'bruto' 
+        FROM payroll AS r 
+        JOIN personal AS p ON p.id = r.personalId 
+        WHERE r.presence = 1 order by p.name ASC";
+   
         $employee = $this->model->sql($sqlEmployee);
 
         $bpjsKes = 1;
@@ -111,7 +127,9 @@ class Pph21 extends CI_Controller
         $jabatanPercent = $this->model->select("value","global_setting","id=100");
         $jabatanAmount = $this->model->select("value","global_setting","id=101");
         foreach( $employee as $row){
-            $temp = array(
+
+           
+            $temp = array(  
                 "byJabatan" => ($row['bruto'] *  $jabatanPercent) >  $jabatanAmount  ?  $jabatanAmount : ($row['bruto'] *  $jabatanPercent),
                 "bpjsKes" => $row['bpjs_employeeBPSJ'] , 
                 "jht" => $row['bpjs_employeeJHT'],
@@ -131,23 +149,17 @@ class Pph21 extends CI_Controller
             $temp['taxPercent'] =  (float)$this->model->select("taxPercent","pph21_tarif_pajak","maxAmount >= ".$temp['pkp']."
             ORDER BY taxPercent ASC LIMIT 1");
 
-          
             $temp['pph21YearObj'] =  $this->model->pkpObj($temp['pkp']);
-
 
             foreach($this->model->pkpObj($temp['pkp']) as $obj){
                 $temp['pph21Year'] +=  $obj['taxAmount'];
             }
 
-
-           
             $temp['pph21Month'] =  (int)($temp['pph21Year'] / 12);
-
 
             if( $temp['pkp'] < 0)  $temp['pkp'] = 0;
             if( $temp['pph21Year'] < 0)  $temp['pph21Year'] = 0;
-            if( $temp['pph21Month'] < 0)  $temp['pph21Month'] = 0;
-            
+            if( $temp['pph21Month'] < 0)  $temp['pph21Month'] = 0; 
 
             array_push($data, array_merge($row, $temp));
         }
@@ -167,6 +179,7 @@ class Pph21 extends CI_Controller
             "error" => false,
             "thead" => $thead,
             "data" => $data,
+            "q" =>  trim(preg_replace('/\s+/', ' ', $sqlEmployee)) ,
         );
         echo json_encode($data);
     }
