@@ -404,7 +404,9 @@ class Model extends CI_Model
 
                 $obj[$i] = array(
                     "level" => $i+1,
-                    "pph21Target" => (int)$pph21[$i]['maxAmount'],
+                    "pph21Potongan_note" => (int)$pph21[$i-1]['maxAmount'], 
+                    "pph21Tarif_note" => (int)$pph21[$i]['maxAmount'], 
+                    "pph21Target" => (int)$pph21[$i]['maxAmount'] - (int)$pph21[$i-1]['maxAmount'], 
                     "pph21Percent" => ($pph21[$i]['taxPercent'] / 100),
                     "value" => max($newValue,0),
                     "taxAmount" => max(($newValue) * ($pph21[$i]['taxPercent'] / 100),0),
