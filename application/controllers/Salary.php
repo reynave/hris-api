@@ -45,6 +45,7 @@ class Salary extends CI_Controller
         );
         echo json_encode($data);
     }
+
     function fnDelete()
     {
         $id = 0;
@@ -58,7 +59,7 @@ class Salary extends CI_Controller
             $this->db->trans_start();
 
             $id = $post['id'];
-            
+
             $update = array(
                 "presence"=> 0,
             );
@@ -174,6 +175,7 @@ class Salary extends CI_Controller
 
     function reports($id)
     {
+       
         $data = array(
             "item" => $this->model->sql("SELECT s.*, p.name FROM salary as s
             join personal as p on p.id = s.personalId
@@ -181,7 +183,7 @@ class Salary extends CI_Controller
             "items1" => $this->model->sql("SELECT * from salary_detail where presence = 1 and (sorting < 200) and salaryId = '$id' "),
             "items2" => $this->model->sql("SELECT * from salary_detail where presence = 1 and (sorting > 200 and sorting < 300 ) and salaryId = '$id' "),
             "items3" => $this->model->sql("SELECT * from salary_detail where presence = 1 and  (sorting > 300 and sorting < 400 ) and  salaryId = '$id' "),
-            "salary_time" => $this->model->sql("SELECT * from salary_time where  salaryId = '$id' order by date ASC "),
+            "salary_time" =>  $this->model->sql("SELECT * FROM salary_time   where  salaryId = '$id' order by date ASC "),
 
         );
         echo json_encode($data);
@@ -194,6 +196,25 @@ class Salary extends CI_Controller
             "error" => true,
         );
         if ($post) {
+
+            $sqlTime = $this->model->sql("SELECT * FROM salary_time  WHERE  salaryId = '".$post['salaryId']."' ORDER BY date ASC "); 
+            foreach($sqlTime as $row){
+                if($row['late'] != "00:00:00"){
+                    $update = array(
+                        "amount"    => -1 * (int)$this->model->select("pinaltyFee","potongan_keterlambatan","lateMinute <= '".$row['late']."' ORDER BY lateMinute DESC LIMIT 1"), 
+                        "note"      => $this->model->select("note","potongan_keterlambatan","lateMinute <= '".$row['late']."' ORDER BY lateMinute DESC LIMIT 1")
+                    );
+              
+                }else{
+                    $update = array(
+                        "amount" =>  0, 
+                        "note" => "", 
+                    );
+                }
+                $this->db->update("salary_time",$update,"id = ".$row['id']);
+            }
+
+          
 
             foreach ($post['items1'] as $row) {
                 $update = array(
@@ -222,6 +243,13 @@ class Salary extends CI_Controller
                 );
                 $this->db->update("salary_detail", $update, "id= '" . $row['id'] . "' ");
             }
+
+            $update = array(
+                "value" => $this->model->select("sum(amount)","salary_time","salaryId ='".$post['salaryId']."' and presence = 1"  ),
+                "updateDate" => date("Y-m-d H:i:s"),
+                "updateBy" => $this->model->userId(),
+            );
+            $this->db->update("salary_detail", $update, "salaryId= '" .$post['salaryId'] . "' and sorting = 302 ");
 
 
             $update = array(
