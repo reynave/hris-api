@@ -11,8 +11,8 @@ class TimeManagement extends CI_Controller
         header('Access-Control-Allow-Methods: GET, POST, PUT');
         header('Content-Type: application/json');
         if (!$this->model->header($this->db->openAPI)) {
-            echo $this->model->error("Error auth");
-            exit;
+          //  echo $this->model->error("Error auth");
+           // exit;
         }
     }
 
@@ -74,8 +74,7 @@ class TimeManagement extends CI_Controller
                  
             from time_management_shift where presence = 1 "),
             "offtime" => $this->model->sql("SELECT id, name FROM  offtime  where presence = 1  order by name asc "),
-
-
+ 
         );
         echo json_encode($data);
     }
@@ -147,8 +146,7 @@ class TimeManagement extends CI_Controller
         }
         echo json_encode($data);
     }
-
-
+ 
     function attendanceInsert()
     {
         $post = json_decode(file_get_contents('php://input'), true);
@@ -268,7 +266,7 @@ class TimeManagement extends CI_Controller
             $checkIn = $this->model->select("checkIn", "time_management", $where);
             $checkOut = $this->model->select("checkOut", "time_management", $where);
 
-            $offDay = $this->model->select($dt->format("D"), "time_management_shift", "id='$shiftId'");
+            $workDay = $this->model->select($dt->format("D"), "time_management_shift", "id='$shiftId'");
 
           
 
@@ -276,16 +274,21 @@ class TimeManagement extends CI_Controller
                 "day" => $dt->format("D"),
                 "date" => $dt->format("Y-m-d"),
                 "hour" => '',
-                "job" => $offDay == 1 ? "Work" : 'Holiday',
+                "job" => $workDay == 1 ? "Work" : 'Holiday',
                 "checkIn" => '',
                 "checkOut" => '',
                 "late" => '',
                 "lateInt" => '',
                 "quickly" => '',
                 "overtime" => '',
-                "workingHour" => '',
+                "workingHour" => '', 
+                "minute" => array( 
+                    "late" => 0,
+                    "quickly" => 0,
+                    "overtime" => 0, 
+                ),
                 "note" => "",
-                "off" => $offDay,
+                "workDay" => $workDay,
                 "shiftId" => $this->model->select("shiftId", "time_management", $where),
                 "id" => $this->model->select("id", "time_management", $where),
             );
@@ -304,10 +307,11 @@ class TimeManagement extends CI_Controller
                 $time82 = new DateTime($checkIn);
                 $workingHours = $time81->diff($time82);
                 $temp["workingHour"] = $workingHours->h . "h" . $workingHours->i . "m";
-                $temp["job"] = $offDay == 1 ? $this->model->select("name", "time_management_shift", "id = '$shiftId' ") : 'Holiday';
+                $temp["job"] = $workDay == 1 ? $this->model->select("name", "time_management_shift", "id = '$shiftId' ") : 'Holiday';
                 if ((int) ($workingHours->h . $workingHours->i) > 0) {
 
-                    if ($offDay == 1) {
+                    if ($workDay == 1) {
+                       
                         $isLate = strtotime($checkIn) > strtotime($scheduleIn) ? true : false;
                         $isQuickly = strtotime($checkOut) < strtotime($scheduleOut) ? true : false;
                         $isOvertime = strtotime($checkOut) > strtotime($scheduleOut) ? true : false;
@@ -321,26 +325,33 @@ class TimeManagement extends CI_Controller
                         $temp["quickly"] = $isQuickly ? $intervalOut->h . "h" . $intervalOut->i . "m" : '';
                         $temp["overtime"] = $isOvertime ? $intervalOut->h . "h" . $intervalOut->i . "m" : '';
 
-                        $temp["off"] = $offDay;
+                        $temp["workDay"] = $workDay;
 
                         if ($isLate == true) {
                             $summary['late']['minutes'] += $intervalIn->i;
                             $summary['late']['hours'] += $intervalIn->h;
+
+                            $temp["minute"]['late'] = $intervalIn->h*60 + $intervalIn->i;
                         }
 
                         if ($isQuickly == true) {
                             $summary['quickly']['minutes'] += $intervalOut->i;
                             $summary['quickly']['hours'] += $intervalOut->h;
+
+                            $temp["minute"]['quickly'] =  $intervalOut->h*60 + $intervalOut->i;
                         }
 
                         if ($isOvertime == true) {
                             $summary['overtime']['minutes'] += $intervalOut->i;
                             $summary['overtime']['hours'] += $intervalOut->h;
+ 
+                            $temp["minute"]['overtime'] =  $intervalOut->h*60 + $intervalOut->i;
                         }
+ 
 
-                        $summary['working']['minutes'] += $workingHours->i;
-                        $summary['working']['hours'] += $workingHours->h;
 
+                      
+                     
 
                     }
                 }
@@ -365,6 +376,7 @@ class TimeManagement extends CI_Controller
                 "working" => ((int) ($summary['working']['hours'] + (int) date('H', mktime(0, $summary['working']['minutes'])))) . 'h' . date('i', mktime(0, $summary['working']['minutes'])) . 'm',
                 //   "h" => (int) date('H', mktime(0,$summary['working']['minutes'])),
             ),
+             
             "employee" => $employee,
             "items" => $items,
 
@@ -380,7 +392,7 @@ class TimeManagement extends CI_Controller
 
 
     }
-
+   
     function logs()
     {
         $data = array(
