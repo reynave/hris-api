@@ -61,20 +61,20 @@ class Salary extends CI_Controller
             $id = $post['id'];
 
             $update = array(
-                "presence"=> 0,
+                "presence" => 0,
             );
 
-            $this->db->update("salary",$update,"id = '$id'");
-            $this->db->update("salary_detail",$update,"salaryId = '$id'");
-            $this->db->update("salary_time",$update,"salaryId = '$id'"); 
+            $this->db->update("salary", $update, "id = '$id'");
+            $this->db->update("salary_detail", $update, "salaryId = '$id'");
+            $this->db->update("salary_time", $update, "salaryId = '$id'");
 
             $this->db->trans_complete();
             if ($this->db->trans_status() === FALSE) {
                 $error = true;
             }
-            $data = array( 
-                "error" => $error, 
-            ); 
+            $data = array(
+                "error" => $error,
+            );
         } else {
             $data = array(
                 "error" => true,
@@ -120,10 +120,34 @@ class Salary extends CI_Controller
                 $this->db->insert('salary_detail', $insertDetail);
             }
 
+            $salaryBruto = $this->model->select("salary", "payroll", "personalId = '" . $post['personalId'] . "' ");
             $update1 = array(
-                "value" => $this->model->select("salary", "payroll", "personalId = '" . $post['personalId'] . "' "),
+                "value" => $salaryBruto,
             );
             $this->db->update('salary_detail', $update1, " sorting = 100 and salaryId = '$id' ");
+
+
+            // BYJABATAN
+            $jabatanPercent = (double) $this->model->select("value", "global_setting", " id = 100");
+            $jabatanMaxAmount = (double) $this->model->select("value", "global_setting", " id = 101");
+            $byJabatan = ($salaryBruto * $jabatanPercent) > $jabatanMaxAmount ? $jabatanMaxAmount : ($salaryBruto * $jabatanPercent);
+
+            $update = array(
+                "value" => $byJabatan,
+                "updateDate" => date("Y-m-d H:i:s"),
+                "updateBy" => $this->model->userId(),
+            );
+            $this->db->update("salary_detail", $update, "salaryId= '" .$id . "' and sorting = 203 ");
+
+            $note = array(
+                "byJabatan" => $byJabatan,
+                "salary" => $jabatanPercent,
+                "jabatanMaxAmount" => $jabatanMaxAmount,
+
+            );
+
+
+
 
 
             foreach ($post['timeManagement'] as $row) {
@@ -175,7 +199,7 @@ class Salary extends CI_Controller
 
     function reports($id)
     {
-       
+
         $data = array(
             "item" => $this->model->sql("SELECT s.*, p.name FROM salary as s
             join personal as p on p.id = s.personalId
@@ -183,7 +207,7 @@ class Salary extends CI_Controller
             "items1" => $this->model->sql("SELECT * from salary_detail where presence = 1 and (sorting < 200) and salaryId = '$id' "),
             "items2" => $this->model->sql("SELECT * from salary_detail where presence = 1 and (sorting > 200 and sorting < 300 ) and salaryId = '$id' "),
             "items3" => $this->model->sql("SELECT * from salary_detail where presence = 1 and  (sorting > 300 and sorting < 400 ) and  salaryId = '$id' "),
-            "salary_time" =>  $this->model->sql("SELECT * FROM salary_time   where  salaryId = '$id' order by date ASC "),
+            "salary_time" => $this->model->sql("SELECT * FROM salary_time   where  salaryId = '$id' order by date ASC "),
 
         );
         echo json_encode($data);
@@ -197,24 +221,24 @@ class Salary extends CI_Controller
         );
         if ($post) {
 
-            $sqlTime = $this->model->sql("SELECT * FROM salary_time  WHERE  salaryId = '".$post['salaryId']."' ORDER BY date ASC "); 
-            foreach($sqlTime as $row){
-                if($row['late'] != "00:00:00"){
+            $sqlTime = $this->model->sql("SELECT * FROM salary_time  WHERE  salaryId = '" . $post['salaryId'] . "' ORDER BY date ASC ");
+            foreach ($sqlTime as $row) {
+                if ($row['late'] != "00:00:00") {
                     $update = array(
-                        "amount"    => -1 * (int)$this->model->select("pinaltyFee","potongan_keterlambatan","lateMinute <= '".$row['late']."' ORDER BY lateMinute DESC LIMIT 1"), 
-                        "note"      => $this->model->select("note","potongan_keterlambatan","lateMinute <= '".$row['late']."' ORDER BY lateMinute DESC LIMIT 1")
+                        "amount" => -1 * (int) $this->model->select("pinaltyFee", "potongan_keterlambatan", "lateMinute <= '" . $row['late'] . "' ORDER BY lateMinute DESC LIMIT 1"),
+                        "note" => $this->model->select("note", "potongan_keterlambatan", "lateMinute <= '" . $row['late'] . "' ORDER BY lateMinute DESC LIMIT 1")
                     );
-              
-                }else{
+
+                } else {
                     $update = array(
-                        "amount" =>  0, 
-                        "note" => "", 
+                        "amount" => 0,
+                        "note" => "",
                     );
                 }
-                $this->db->update("salary_time",$update,"id = ".$row['id']);
+                $this->db->update("salary_time", $update, "id = " . $row['id']);
             }
 
-          
+
 
             foreach ($post['items1'] as $row) {
                 $update = array(
@@ -244,12 +268,42 @@ class Salary extends CI_Controller
                 $this->db->update("salary_detail", $update, "id= '" . $row['id'] . "' ");
             }
 
+
+
+            /**
+             * CUSTOM FEE 
+             *  */
+
+            // POTONGAN KETERLAMBATAN
+            $ponaltyFee = (double) $this->model->select("sum(amount)", "salary_time", "salaryId ='" . $post['salaryId'] . "' and presence = 1");
             $update = array(
-                "value" => $this->model->select("sum(amount)","salary_time","salaryId ='".$post['salaryId']."' and presence = 1"  ),
+                "value" => $ponaltyFee,
                 "updateDate" => date("Y-m-d H:i:s"),
                 "updateBy" => $this->model->userId(),
             );
-            $this->db->update("salary_detail", $update, "salaryId= '" .$post['salaryId'] . "' and sorting = 302 ");
+            $this->db->update("salary_detail", $update, "salaryId= '" . $post['salaryId'] . "' and sorting = 302 ");
+
+
+
+            // BYJABATAN
+            $salaryBruto = $this->model->select("salary", "payroll", "personalId = '" . $post['personalId'] . "' ");
+            $jabatanPercent = (double) $this->model->select("value", "global_setting", " id = 100");
+            $jabatanMaxAmount = (double) $this->model->select("value", "global_setting", " id = 101");
+            $byJabatan = ($salaryBruto * $jabatanPercent) > $jabatanMaxAmount ? $jabatanMaxAmount : ($salaryBruto * $jabatanPercent);
+
+            $update = array(
+                "value" => $byJabatan,
+                "updateDate" => date("Y-m-d H:i:s"),
+                "updateBy" => $this->model->userId(),
+            );
+            $this->db->update("salary_detail", $update, "salaryId= '" . $post['salaryId'] . "' and sorting = 203 ");
+
+            $note = array(
+                "byJabatan" => $byJabatan,
+                "salary" => $jabatanPercent,
+                "jabatanMaxAmount" => $jabatanMaxAmount,
+
+            );
 
 
             $update = array(
@@ -259,6 +313,7 @@ class Salary extends CI_Controller
                 "takeHomePay" => 0,
                 "updateDate" => date("Y-m-d H:i:s"),
                 "updateBy" => $this->model->userId(),
+                "level" => 1,
             );
 
             $update['takeHomePay'] = $update['tunjanganTetap'] + $update['tunjanganTidakTetap'] + $update['potongan'];
@@ -266,6 +321,10 @@ class Salary extends CI_Controller
             $this->db->update("salary", $update, "id= '" . $post['salaryId'] . "' ");
 
 
+            $ress = array(
+                "note" => $note
+            );
+            echo json_encode($ress);
         }
     }
 }
