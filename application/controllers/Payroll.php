@@ -128,10 +128,21 @@ class Payroll extends CI_Controller
 
                 "updateDate" => date("Y-m-d H:i:s"),
             );
+
+            foreach( $post['salaryTunjangan'] as $row){
+                $update1 = array(
+                    "value" => $row['value']
+                );
+                $this->db->update('payroll_tunjangan', $update1, "id='".$row['id']."'"); 
+            }
+        
+
             $this->db->update('payroll', $update, "id='$id'");
 
+           
             $data = array(
                 "error" => false,
+                
             );
         }
         echo json_encode($data);
