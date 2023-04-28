@@ -119,7 +119,7 @@ class Maintenance extends CI_Controller
             LEFT JOIN maintenance_location AS l ON l.id = m.locationId
             WHERE m.presence = 1 and m.maintenanceId = '$id' order by m.inputDate DESC "),
 
-            "sparepart_log" => $this->model->sql("SELECT  l.id ,  l.sparepartIdLog, s1.name AS  'sparepartIdLogName',
+            "sparepart_log" => $this->model->sql("SELECT  l.id ,  l.sparepartIdLog, s1.name AS  'sparepartIdLogName', l.transferDate,
             l.sparepartId, s2.name, l.note
             
             FROM maintenance_sperepart_log  AS l
@@ -408,9 +408,11 @@ class Maintenance extends CI_Controller
                 "updateBy" => $this->model->userId(),
             );
             $this->db->update("maintenance", $update, "id= '" . $post['id'] . "' ");
+            $transferDate = $post['item']['transferDate']['year'] . "-" . $post['item']['transferDate']['month'] . "-" . $post['item']['transferDate']['day'];
 
             $insert = array(
                 "maintenanceId" => $post['id'],
+                "transferDate" => $transferDate,
                 "sparepartIdLog" =>  $sparePartIdLog ,  
                 "sparepartId" => $post['item']['sparePartId'],  
                 "note" => $post['item']['note'],

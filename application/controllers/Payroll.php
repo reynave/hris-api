@@ -34,17 +34,57 @@ class Payroll extends CI_Controller
     {
         $branch = [];
         $id = $this->model->select("id", "payroll", "personalId = '$personalId'");
+
+        $thead = array(
+            'companyBPSJ' => $this->model->select("company", "bpjs_setting", "id=200"),
+            'companyJHT' => $this->model->select("company", "bpjs_setting", "id=100"),
+            'companyJP' => $this->model->select("company", "bpjs_setting", "id=112"),
+
+            'employeeBPSJ' => $this->model->select("employee", "bpjs_setting", "id=200"),
+            'employeeJHT' => $this->model->select("employee", "bpjs_setting", "id=100"),
+            'employeeJP' => $this->model->select("employee", "bpjs_setting", "id=112"),
+
+        );
+
         $item = $this->model->sql("SELECT e.*, 
             p.name AS 'personal'
             from payroll AS e
             JOIN personal AS p ON p.id = e.personalId 
             WHERE e.presence = 1 and   e.id = '$id' ");
 
+        $salery = $item[0]['taxSalary'];
+        self::createTunjuangan($personalId);
         $data = array(
+            "thead" => $thead,
             "item" => $item,
+            "tunjangan" => $this->model->sql("SELECT t.* , l.label
+            FROM 
+            payroll_tunjangan AS t
+            JOIN salary_label AS l ON t.sorting = l.sorting
+            WHERE t.personalId = '$personalId' order by sorting ASC"),
+            "bpjs" => array(
+                "jht" => (($thead['companyBPSJ'] + $thead['employeeBPSJ']) / 100) * $salery,
+                "jp" => (($thead['companyJP'] + $thead['employeeJP']) / 100) * $salery,
+                "kesehatan" => (($thead['companyBPSJ'] + $thead['employeeBPSJ']) / 100) * $salery
+            ),
             "pph21_ptkp" => $this->model->sql("select * from pph21_ptkp order by sorting ASC "),
         );
         echo json_encode($data);
+    }
+
+    function createTunjuangan($personalId)
+    {
+        $sql = $this->model->sql("select * from salary_label where asCopy = 1");
+        foreach ($sql as $row) {  
+            $insert = array(
+                "personalId" => $personalId,
+                "value" => $row['value'],
+                "sorting" => $row['sorting'], 
+            );
+            if(!$this->model->select("id","payroll_tunjangan","personalId= '$personalId' and sorting = '".$row['sorting']."' ") ){
+                $this->db->insert("payroll_tunjangan", $insert);
+            } 
+        }
     }
 
     function fnSave()
@@ -54,23 +94,23 @@ class Payroll extends CI_Controller
             "error" => true,
         );
         if ($post) {
-            $error = true; 
+            $error = true;
             $personalId = $post['id'];
             $id = $this->model->select("id", "payroll", "personalId = '$personalId'");
             $update = array(
-                "taxableDate" => !isset($post['model']['taxableDate']) ? '' :  $post['model']['taxableDate']['year'] . "-" . $post['model']['taxableDate']['month'] . "-" . $post['model']['taxableDate']['day'],
+                "taxableDate" => !isset($post['model']['taxableDate']) ? '' : $post['model']['taxableDate']['year'] . "-" . $post['model']['taxableDate']['month'] . "-" . $post['model']['taxableDate']['day'],
                 "bpjsTkDate" => !isset($post['model']['bpjsTkDate']) ? '' : $post['model']['bpjsTkDate']['year'] . "-" . $post['model']['bpjsTkDate']['month'] . "-" . $post['model']['bpjsTkDate']['day'],
-                "JaminanPensiunDate" => !isset($post['model']['JaminanPensiunDate']) ? '' :  $post['model']['JaminanPensiunDate']['year'] . "-" . $post['model']['JaminanPensiunDate']['month'] . "-" . $post['model']['JaminanPensiunDate']['day'],
-               
-                
-                "salary" => $post['model']['salary'], 
+                "JaminanPensiunDate" => !isset($post['model']['JaminanPensiunDate']) ? '' : $post['model']['JaminanPensiunDate']['year'] . "-" . $post['model']['JaminanPensiunDate']['month'] . "-" . $post['model']['JaminanPensiunDate']['day'],
+
+
+                "salary" => $post['model']['salary'],
                 "salaryType" => $post['model']['salaryType'],
                 "bankName" => $post['model']['bankName'],
                 "bankAccountNumber" => $post['model']['bankAccountNumber'],
                 "bankAccountHolderName" => $post['model']['bankAccountHolderName'],
                 "hourlyRate" => $post['model']['hourlyRate'],
                 "tunjangan" => $post['model']['tunjangan'],
-                
+
 
                 "taxNpwp" => $post['model']['taxNpwp'],
                 "taxMethod" => $post['model']['taxMethod'],
@@ -84,7 +124,7 @@ class Payroll extends CI_Controller
                 "JhtCost" => $post['model']['JhtCost'],
                 "JaminanPensiunCost" => $post['model']['JaminanPensiunCost'],
                 "bpjsKesehatanFamily" => $post['model']['bpjsKesehatanFamily'],
-                
+
 
                 "updateDate" => date("Y-m-d H:i:s"),
             );
@@ -96,7 +136,6 @@ class Payroll extends CI_Controller
         }
         echo json_encode($data);
     }
-
 
     function insert()
     {
