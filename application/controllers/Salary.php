@@ -237,10 +237,11 @@ class Salary extends CI_Controller
         );
         if ($post) {
             $workingDays = $this->model->select("value","global_setting","id=10");
-            $salaryBruto = $this->model->select("salary", "payroll", "personalId = '" . $post['personalId'] . "' ");
+            $salaryBruto = $this->model->select("value", "payroll_tunjangan", "personalId = '" . $post['personalId'] . "' and sorting = 100 ");
 
             $absen = $salaryBruto / $workingDays;
             $sqlTime = $this->model->sql("SELECT * FROM salary_time  WHERE  salaryId = '" . $post['salaryId'] . "' ORDER BY date ASC ");
+            $n = 1;
             foreach ($sqlTime as $row) {
                 if ($row['late'] != "00:00:00") {
                     $update = array(
@@ -251,8 +252,8 @@ class Salary extends CI_Controller
                 } else {
                     if($row['job'] != 'Holiday'){
                         $update = array(
-                            "amount" => (int)$absen * -1,
-                            "note" => "Absen",
+                            "amount" => (int) $absen * -1,
+                            "note" => "Absen ".$n++,
                         );
                     }else{
                         $update = array(
@@ -462,5 +463,44 @@ class Salary extends CI_Controller
             );
             echo json_encode($ress);
         }
+    }
+
+    function fnPublish(){
+        $id = 0;
+        $post = json_decode(file_get_contents('php://input'), true);
+        $data = array(
+            "error" => true,
+        );
+
+        if ($post) {
+            $error = false;
+            $this->db->trans_start();
+
+            $id = $post['id'];
+
+            $update = array(
+                "asLock" => 1,
+            );
+
+            $this->db->update("salary", $update, "id = '$id'");
+            $this->db->update("salary_detail", $update, "salaryId = '$id'");
+            $this->db->update("salary_time", $update, "salaryId = '$id'");
+
+            $this->db->trans_complete();
+            if ($this->db->trans_status() === FALSE) {
+                $error = true;
+            }
+            $data = array(
+                "post" => $post,
+                "error" => $error,
+
+            );
+        } else {
+            $data = array(
+                "post" => $post,
+                "error" => true,
+            );
+        }
+        echo json_encode($data);
     }
 }
