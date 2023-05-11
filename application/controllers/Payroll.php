@@ -74,14 +74,14 @@ class Payroll extends CI_Controller
 
     function createTunjuangan($personalId)
     {
-        $sql = $this->model->sql("select * from salary_label where asCopy = 1");
+        $sql = $this->model->sql("select * from salary_label where asCopy = 1 and presence = 1 ");
         foreach ($sql as $row) {  
             $insert = array(
                 "personalId" => $personalId,
                 "value" => $row['value'],
                 "sorting" => $row['sorting'], 
             );
-            if(!$this->model->select("id","payroll_tunjangan","personalId= '$personalId' and sorting = '".$row['sorting']."' ") ){
+            if(!$this->model->select("id","payroll_tunjangan"," personalId= '$personalId' and sorting = '".$row['sorting']."' ") ){
                 $this->db->insert("payroll_tunjangan", $insert);
             } 
         }
@@ -236,5 +236,22 @@ class Payroll extends CI_Controller
             );
         }
         echo json_encode($data);
+    }
+
+
+    function fnDeleteTunjangan(){
+        $post = json_decode(file_get_contents('php://input'), true);
+        $data = array(
+            "error" => true,
+        );
+        if ($post) {
+            $this->db->delete("payroll_tunjangan",  "id=" . $post['id']);
+            $data = array( 
+                "post" => $post,
+            );
+            echo json_encode($data);
+           
+        
+        }
     }
 }

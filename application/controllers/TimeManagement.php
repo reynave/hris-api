@@ -5,14 +5,14 @@ class TimeManagement extends CI_Controller
 
     public function __construct()
     {
-        parent::__construct(); 
+        parent::__construct();
         header('Access-Control-Allow-Origin: *');
         header("Access-Control-Allow-Headers: key, token,  Content-Type");
         header('Access-Control-Allow-Methods: GET, POST, PUT');
         header('Content-Type: application/json');
         if (!$this->model->header($this->db->openAPI)) {
-          //  echo $this->model->error("Error auth");
-           // exit;
+            //  echo $this->model->error("Error auth");
+            // exit;
         }
     }
 
@@ -47,10 +47,33 @@ class TimeManagement extends CI_Controller
             JOIN personal AS p ON p.id = e.personalId 
             WHERE e.presence = 1 
              "),
+            "potongan_keterlambatan" => $this->model->sql("SELECT * from potongan_keterlambatan where presence = 1 order by pinaltyFee ASC")
         );
         echo json_encode($data);
     }
 
+
+    function fnUpdateKeterlambatan()
+    {
+        $post = json_decode(file_get_contents('php://input'), true);
+        $error = true;
+        if ($post) {
+            $error = true;
+            foreach ($post['item'] as $row) { 
+                $update = array(
+                    "note" =>  $row['note'],
+                    "lateMinute" =>  $row['lateMinute'],
+                    "pinaltyFee" => (int)$row['pinaltyFee'],
+                );
+                $this->db->update('potongan_keterlambatan', $update, "id = '" .  $row['id'] . "'");
+            }
+            $data = array(
+                "error" => false, 
+                "post" => $post,
+            );
+        }
+        echo json_encode($data);
+    }
     function today($id)
     {
 
@@ -74,7 +97,7 @@ class TimeManagement extends CI_Controller
                  
             from time_management_shift where presence = 1 "),
             "offtime" => $this->model->sql("SELECT id, name FROM  offtime  where presence = 1  order by name asc "),
- 
+
         );
         echo json_encode($data);
     }
@@ -126,6 +149,41 @@ class TimeManagement extends CI_Controller
         echo json_encode($data);
     }
 
+    function fnDeleteKeterlambatan()
+    {
+        $post = json_decode(file_get_contents('php://input'), true);
+        $error = true;
+        if ($post) {
+            $error = true;
+            $id = $post['id'];
+            $update = array(
+                "presence" => 0, 
+            );
+            $this->db->update('potongan_keterlambatan', $update, "id='$id'");
+            $data = array(
+                "error" => false,
+            );
+        }
+        echo json_encode($data);
+    }
+    function fnAddKeterlambatan()
+    {
+        $post = json_decode(file_get_contents('php://input'), true);
+        $error = true;
+        if ($post) {
+            $error = true; 
+            $insert = array( 
+                "presence" => 1, 
+            );
+            $this->db->insert('potongan_keterlambatan', $insert);
+            $data = array(
+                "error" => false,
+            );
+        }
+        echo json_encode($data);
+    }
+
+
     function fnUpdate()
     {
         $post = json_decode(file_get_contents('php://input'), true);
@@ -146,7 +204,7 @@ class TimeManagement extends CI_Controller
         }
         echo json_encode($data);
     }
- 
+
     function attendanceInsert()
     {
         $post = json_decode(file_get_contents('php://input'), true);
@@ -268,7 +326,7 @@ class TimeManagement extends CI_Controller
 
             $workDay = $this->model->select($dt->format("D"), "time_management_shift", "id='$shiftId'");
 
-          
+
 
             $temp = array(
                 "day" => $dt->format("D"),
@@ -281,11 +339,11 @@ class TimeManagement extends CI_Controller
                 "lateInt" => '',
                 "quickly" => '',
                 "overtime" => '',
-                "workingHour" => '', 
-                "minute" => array( 
+                "workingHour" => '',
+                "minute" => array(
                     "late" => 0,
                     "quickly" => 0,
-                    "overtime" => 0, 
+                    "overtime" => 0,
                 ),
                 "note" => "",
                 "workDay" => $workDay,
@@ -311,7 +369,7 @@ class TimeManagement extends CI_Controller
                 if ((int) ($workingHours->h . $workingHours->i) > 0) {
 
                     if ($workDay == 1) {
-                       
+
                         $isLate = strtotime($checkIn) > strtotime($scheduleIn) ? true : false;
                         $isQuickly = strtotime($checkOut) < strtotime($scheduleOut) ? true : false;
                         $isOvertime = strtotime($checkOut) > strtotime($scheduleOut) ? true : false;
@@ -331,27 +389,22 @@ class TimeManagement extends CI_Controller
                             $summary['late']['minutes'] += $intervalIn->i;
                             $summary['late']['hours'] += $intervalIn->h;
 
-                            $temp["minute"]['late'] = $intervalIn->h*60 + $intervalIn->i;
+                            $temp["minute"]['late'] = $intervalIn->h * 60 + $intervalIn->i;
                         }
 
                         if ($isQuickly == true) {
                             $summary['quickly']['minutes'] += $intervalOut->i;
                             $summary['quickly']['hours'] += $intervalOut->h;
 
-                            $temp["minute"]['quickly'] =  $intervalOut->h*60 + $intervalOut->i;
+                            $temp["minute"]['quickly'] = $intervalOut->h * 60 + $intervalOut->i;
                         }
 
                         if ($isOvertime == true) {
                             $summary['overtime']['minutes'] += $intervalOut->i;
                             $summary['overtime']['hours'] += $intervalOut->h;
- 
-                            $temp["minute"]['overtime'] =  $intervalOut->h*60 + $intervalOut->i;
+
+                            $temp["minute"]['overtime'] = $intervalOut->h * 60 + $intervalOut->i;
                         }
- 
-
-
-                      
-                     
 
                     }
                 }
@@ -376,7 +429,7 @@ class TimeManagement extends CI_Controller
                 "working" => ((int) ($summary['working']['hours'] + (int) date('H', mktime(0, $summary['working']['minutes'])))) . 'h' . date('i', mktime(0, $summary['working']['minutes'])) . 'm',
                 //   "h" => (int) date('H', mktime(0,$summary['working']['minutes'])),
             ),
-             
+
             "employee" => $employee,
             "items" => $items,
 
@@ -392,7 +445,7 @@ class TimeManagement extends CI_Controller
 
 
     }
-   
+
     function logs()
     {
         $data = array(

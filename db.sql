@@ -1,6 +1,6 @@
 -- --------------------------------------------------------
 -- Host:                         128.199.94.89
--- Server version:               8.0.32-0ubuntu0.22.10.2 - (Ubuntu)
+-- Server version:               8.0.33-0ubuntu0.22.10.1 - (Ubuntu)
 -- Server OS:                    Linux
 -- HeidiSQL Version:             12.4.0.6659
 -- --------------------------------------------------------
@@ -61,12 +61,12 @@ CREATE TABLE IF NOT EXISTS `auto_number` (
 
 -- Dumping data for table hris.auto_number: ~7 rows (approximately)
 INSERT INTO `auto_number` (`id`, `name`, `prefix`, `digit`, `runningNumber`, `updateDate`) VALUES
-	(1, 'personal', 'P', 6, 10, '0000-00-00 00:00:00'),
-	(2, 'employment', 'E', 6, 40, '0000-00-00 00:00:00'),
-	(3, 'payroll', 'PYL', 6, 23, '0000-00-00 00:00:00'),
+	(1, 'personal', 'P', 6, 11, '0000-00-00 00:00:00'),
+	(2, 'employment', 'E', 6, 41, '0000-00-00 00:00:00'),
+	(3, 'payroll', 'PYL', 6, 24, '0000-00-00 00:00:00'),
 	(4, 'reimbursement', 'REM', 6, 33, '0000-00-00 00:00:00'),
 	(5, 'loan', 'LN', 6, 26, '0000-00-00 00:00:00'),
-	(6, 'salery', 'S', 6, 46, '0000-00-00 00:00:00'),
+	(6, 'salery', 'S', 6, 47, '0000-00-00 00:00:00'),
 	(7, 'maintenance', 'M', 6, 12, '0000-00-00 00:00:00'),
 	(8, 'mlog', 'MS', 6, 17, '0000-00-00 00:00:00');
 
@@ -141,7 +141,7 @@ CREATE TABLE IF NOT EXISTS `employment` (
   UNIQUE KEY `personalId` (`personalId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.employment: ~10 rows (approximately)
+-- Dumping data for table hris.employment: ~9 rows (approximately)
 INSERT INTO `employment` (`id`, `personalId`, `approvalLineId`, `employmentStatusId`, `timeManagementShiftId`, `dateJoinStart`, `dateJoinEnd`, `jobPositionId`, `jobLevelId`, `branchId`, `organizationId`, `presence`, `status`, `inputDate`, `updateDate`) VALUES
 	('E000031', '1', '1', 1, '', '0000-00-00', '2030-01-01', 1, 0, 0, 0, 1, 1, '2023-01-25 10:50:22', '2023-01-01 00:00:00'),
 	('E000032', 'P000003', '1', 2, '', '2023-01-01', '2024-03-01', 6, 6, 4, 2, 1, 1, '2023-01-25 11:13:08', '2023-03-29 05:24:28'),
@@ -152,7 +152,8 @@ INSERT INTO `employment` (`id`, `personalId`, `approvalLineId`, `employmentStatu
 	('E000037', 'P000007', '', 0, '', '0000-00-00', '2030-01-01', 0, 0, 0, 0, 1, 1, '2023-03-28 08:12:36', '2023-01-01 00:00:00'),
 	('E000038', 'P000009', '', 0, '', '0000-00-00', '2030-01-01', 0, 0, 0, 0, 1, 1, '2023-03-28 08:12:42', '2023-01-01 00:00:00'),
 	('E000039', 'P000008', '', 0, '', '0000-00-00', '2030-01-01', 0, 0, 0, 0, 1, 1, '2023-03-28 08:13:07', '2023-01-01 00:00:00'),
-	('E000040', 'E000032', '', 0, '', '0000-00-00', '2030-01-01', 0, 0, 0, 0, 1, 1, '2023-03-28 09:36:50', '2023-01-01 00:00:00');
+	('E000040', 'E000032', '', 0, '', '0000-00-00', '2030-01-01', 0, 0, 0, 0, 1, 1, '2023-03-28 09:36:50', '2023-01-01 00:00:00'),
+	('E000041', 'P000011', '', 0, '', '0000-00-00', '2030-01-01', 0, 0, 0, 0, 1, 1, '2023-05-05 04:44:33', '2023-01-01 00:00:00');
 
 -- Dumping structure for table hris.employment_joblevel
 CREATE TABLE IF NOT EXISTS `employment_joblevel` (
@@ -328,7 +329,7 @@ CREATE TABLE IF NOT EXISTS `maintenance` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table hris.maintenance: ~10 rows (approximately)
+-- Dumping data for table hris.maintenance: ~9 rows (approximately)
 INSERT INTO `maintenance` (`id`, `equipment`, `description`, `brand`, `typeItem`, `capacity`, `serialNumber`, `categoryId`, `locationId`, `sparepartId`, `purchaseDate`, `supplier`, `warantyUntil`, `schedule`, `lastDate`, `presence`, `status`, `inputDate`, `inputBy`, `updateDate`, `updateBy`) VALUES
 	('M2023000002', 'AC', 'Description', 'B1', 'Ty', 'cag', 'SN888854', 5, 3, 4, '2023-02-24', 'Supplier', '2025-02-17', 2, '2020-01-01', 1, 1, '2023-02-13 09:02:48', 'P000005', '2023-04-28 13:03:02', '1'),
 	('M2023000003', 'MOTOR', '33232', NULL, NULL, NULL, NULL, 5, NULL, NULL, '2013-02-01', '1111', '2025-02-08', 1, '2020-01-01', 1, 1, '2023-02-13 09:59:35', 'P000005', '2023-02-16 06:19:13', '1'),
@@ -350,7 +351,7 @@ CREATE TABLE IF NOT EXISTS `maintenance_category` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 
--- Dumping data for table hris.maintenance_category: ~10 rows (approximately)
+-- Dumping data for table hris.maintenance_category: ~9 rows (approximately)
 INSERT INTO `maintenance_category` (`id`, `name`, `presence`, `inputDate`) VALUES
 	(1, 'A', 0, '2020-01-01 00:00:00'),
 	(2, 'B', 0, '2020-01-01 00:00:00'),
@@ -437,7 +438,7 @@ CREATE TABLE IF NOT EXISTS `maintenance_schedule` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table hris.maintenance_schedule: ~15 rows (approximately)
+-- Dumping data for table hris.maintenance_schedule: ~14 rows (approximately)
 INSERT INTO `maintenance_schedule` (`id`, `maintenanceId`, `scheduleDate`, `maintenanceDate`, `supplier`, `cost`, `note`, `status`, `presence`, `inputDate`, `updateDate`, `inputBy`, `updateBy`) VALUES
 	('MS202313000002', 'M2023000003', '2023-02-24', '2023-01-01', '', 5555510, '123213123', 1, 0, '2023-02-13 12:11:23', '2023-02-15 09:37:25', 'P000005', ''),
 	('MS202313000003', 'M2023000003', '2023-02-26', '2023-01-01', '', 57770, '123123', 100, 0, '2023-02-13 12:11:58', '2023-02-15 09:38:59', 'P000005', ''),
@@ -464,7 +465,7 @@ CREATE TABLE IF NOT EXISTS `maintenance_sparepart` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
 
--- Dumping data for table hris.maintenance_sparepart: ~12 rows (approximately)
+-- Dumping data for table hris.maintenance_sparepart: ~11 rows (approximately)
 INSERT INTO `maintenance_sparepart` (`id`, `name`, `presence`, `inputDate`) VALUES
 	(1, 'Spare Part H-0332-0153', 1, '2000-01-01 00:00:00'),
 	(2, 'Spare Part 332', 1, '2000-01-01 00:00:00'),
@@ -496,7 +497,7 @@ CREATE TABLE IF NOT EXISTS `maintenance_sperepart_log` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=latin1;
 
--- Dumping data for table hris.maintenance_sperepart_log: ~5 rows (approximately)
+-- Dumping data for table hris.maintenance_sperepart_log: ~4 rows (approximately)
 INSERT INTO `maintenance_sperepart_log` (`id`, `transferDate`, `maintenanceId`, `sparepartIdLog`, `sparepartId`, `note`, `presence`, `status`, `inputDate`, `inputBy`, `updateDate`, `updateBy`) VALUES
 	(7, '2023-01-01', 'M2023000002', 3, 10, '', 1, 1, '2023-04-05 11:25:50', '1', '2020-01-01 00:00:00', NULL),
 	(8, '2023-01-01', 'M2023000002', 10, 7, 'Notes 123', 1, 1, '2023-04-05 11:35:13', '1', '2020-01-01 00:00:00', NULL),
@@ -554,8 +555,8 @@ CREATE TABLE IF NOT EXISTS `offtime` (
 
 -- Dumping data for table hris.offtime: ~2 rows (approximately)
 INSERT INTO `offtime` (`id`, `name`, `presence`, `inputDate`, `updateDate`, `inputBy`, `updateBy`) VALUES
-	(886, 'Cuti Stress', 1, NULL, NULL, NULL, NULL),
-	(887, 'Cuti Ga Jelas', 1, NULL, NULL, NULL, NULL);
+	(886, 'Cuti Sakit', 1, NULL, NULL, NULL, NULL),
+	(887, 'Cuti Keluar Kota', 1, NULL, NULL, NULL, NULL);
 
 -- Dumping structure for table hris.organization
 CREATE TABLE IF NOT EXISTS `organization` (
@@ -617,7 +618,7 @@ CREATE TABLE IF NOT EXISTS `payroll` (
   UNIQUE KEY `personalId` (`personalId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.payroll: ~10 rows (approximately)
+-- Dumping data for table hris.payroll: ~11 rows (approximately)
 INSERT INTO `payroll` (`id`, `personalId`, `salary`, `salaryType`, `bankName`, `bankAccountNumber`, `bankAccountHolderName`, `hourlyRate`, `tunjangan`, `taxNpwp`, `taxMethod`, `taxableDate`, `taxHolderName`, `taxPtkpStatus`, `taxSalary`, `EmploymentTaxStatus`, `taxPktpAccountHolder`, `bpsjTkNo`, `bpsjKesehatanNo`, `JhtCost`, `JaminanPensiunCost`, `bpjsTkDate`, `bpjsKesehatanFamily`, `JaminanPensiunDate`, `status`, `presence`, `updateDate`, `inputDate`) VALUES
 	('PYL000014', 'P000003', 0, 'M', 'Paypal', '09999777774', 'maria sarapova Bank', 0, 0, 'NPWP00001111', '', '2020-01-01', 'Account Holder Name', 'TK/3', 12000000, '0', 'Tax PKTP Account Holder Name', '666555', '234234324', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-05-02 10:40:18', '2023-01-25 11:15:20'),
 	('PYL000015', 'P000010', 12000000, '', '', '', '', 0, 500000, '', '', '2020-01-01', '', 'TK/3', 12000000, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-01-01 00:00:00', '2023-01-25 11:45:16'),
@@ -628,7 +629,8 @@ INSERT INTO `payroll` (`id`, `personalId`, `salary`, `salaryType`, `bankName`, `
 	('PYL000020', 'P000007', 62000000, '', '', '', '', 0, 500000, '', '', '2020-01-01', '', 'TK/3', 62000000, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-01-01 00:00:00', '2023-03-28 08:12:35'),
 	('PYL000021', 'P000009', 152000000, '', '', '', '', 0, 500000, '', '', '2020-01-01', '', 'TK/3', 150000000, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-01-01 00:00:00', '2023-03-28 08:12:41'),
 	('PYL000022', 'P000008', 25000000, '', '', '', '', 0, 500000, '', '', '2020-01-01', '', 'TK/3', 25000000, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-03-29 05:35:59', '2023-03-28 08:13:05'),
-	('PYL000023', 'E000032', 0, '', '', '', '', 0, 0, '', '', '2020-01-01', '', '', 0, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-01-01 00:00:00', '2023-03-28 09:36:50');
+	('PYL000023', 'E000032', 0, '', '', '', '', 0, 0, '', '', '2020-01-01', '', '', 0, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-01-01 00:00:00', '2023-03-28 09:36:50'),
+	('PYL000024', 'P000011', 0, '', '', '', '', 0, 0, '', '', '2020-01-01', '', '', 0, '0', '0', '', '', 0, 0, '2023-01-01', '', '2023-01-01', 1, 1, '2023-05-05 04:44:48', '2023-05-05 04:44:34');
 
 -- Dumping structure for table hris.payroll_tunjangan
 CREATE TABLE IF NOT EXISTS `payroll_tunjangan` (
@@ -637,9 +639,9 @@ CREATE TABLE IF NOT EXISTS `payroll_tunjangan` (
   `value` int NOT NULL DEFAULT '0',
   `sorting` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=latin1;
 
--- Dumping data for table hris.payroll_tunjangan: ~40 rows (approximately)
+-- Dumping data for table hris.payroll_tunjangan: ~43 rows (approximately)
 INSERT INTO `payroll_tunjangan` (`id`, `personalId`, `value`, `sorting`) VALUES
 	(1, 'P000003', 12000000, 100),
 	(2, 'P000003', 2000000, 101),
@@ -661,7 +663,28 @@ INSERT INTO `payroll_tunjangan` (`id`, `personalId`, `value`, `sorting`) VALUES
 	(18, 'P000003', 0, 305),
 	(19, 'P000003', 0, 306),
 	(20, 'P000003', 0, 307),
-	(21, 'P000003', 0, 1000);
+	(21, 'P000003', 0, 1000),
+	(22, 'P000011', 4500000, 100),
+	(23, 'P000011', 0, 101),
+	(24, 'P000011', 0, 102),
+	(25, 'P000011', 0, 103),
+	(26, 'P000011', 0, 104),
+	(27, 'P000011', 0, 105),
+	(28, 'P000011', 10000, 202),
+	(29, 'P000011', 10000, 201),
+	(30, 'P000011', 0, 203),
+	(31, 'P000011', 0, 204),
+	(32, 'P000011', 0, 205),
+	(33, 'P000011', 0, 206),
+	(34, 'P000011', 0, 207),
+	(35, 'P000011', 0, 301),
+	(36, 'P000011', 0, 302),
+	(37, 'P000011', 0, 303),
+	(38, 'P000011', 0, 304),
+	(39, 'P000011', 0, 305),
+	(40, 'P000011', 0, 306),
+	(41, 'P000011', 0, 307),
+	(42, 'P000011', 0, 1000);
 
 -- Dumping structure for table hris.personal
 CREATE TABLE IF NOT EXISTS `personal` (
@@ -702,7 +725,8 @@ INSERT INTO `personal` (`id`, `idx`, `name`, `phone`, `email`, `password`, `birt
 	('P000007', '20140622', 'Olive alson', '999976666', 'alson@email.com', '', '', '1981-1-2', 'M', 0, '', 0, 1, '', '2023-01-01', 0, '', '', 1, 1, '2023-01-18 10:06:42', '2023-01-18 10:06:42'),
 	('P000008', '', 'Melanisa', '78988565555', 'admi223n@jasa.com', '', '', '1990-1-1', 'M', 0, '', 0, 1, '', '2023-01-01', 0, '', '', 1, 1, '2023-01-24 10:10:18', '2023-01-24 10:10:18'),
 	('P000009', '', 'Leonhard', '77774434', 'Leonhard@email.com', '', '', '1990-1-19', 'M', 0, '', 0, 1, '', '2023-01-01', 0, '', '', 1, 1, '2023-01-25 10:01:18', '2023-01-25 10:01:18'),
-	('P000010', '', 'talita', '009944333333', 'talita@uaoo.com', '', '', '1981-1-2', 'F', 2, '', 0, 1, '', '2023-01-01', 0, '', '', 1, 1, '2023-01-25 11:45:02', '2023-01-25 11:45:02');
+	('P000010', '', 'talita', '009944333333', 'talita@uaoo.com', '', '', '1981-1-2', 'F', 2, '', 0, 1, '', '2023-01-01', 0, '', '', 1, 1, '2023-01-25 11:45:02', '2023-01-25 11:45:02'),
+	('P000011', '', 'Mika', '44443333', 'Mika@email.com', '', '', '1990-1-1', 'F', 0, '', 0, 1, '', '2023-01-01', 0, '', '', 1, 1, '2023-05-05 04:44:30', '2023-05-05 04:44:30');
 
 -- Dumping structure for table hris.personal_access
 CREATE TABLE IF NOT EXISTS `personal_access` (
@@ -714,9 +738,9 @@ CREATE TABLE IF NOT EXISTS `personal_access` (
   `status` varchar(2) NOT NULL DEFAULT '1',
   `inputDate` datetime NOT NULL DEFAULT '2023-01-01 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table hris.personal_access: ~17 rows (approximately)
+-- Dumping data for table hris.personal_access: ~18 rows (approximately)
 INSERT INTO `personal_access` (`id`, `personalId`, `token`, `agent`, `client_ip`, `status`, `inputDate`) VALUES
 	(1, '1', '1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36', '::1', '1', '0000-00-00 00:00:00'),
 	(2, '1', '4', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36', '::1', '1', '0000-00-00 00:00:00'),
@@ -819,7 +843,7 @@ CREATE TABLE IF NOT EXISTS `potongan_keterlambatan` (
   `pinaltyFee` int NOT NULL DEFAULT '0',
   `presence` int NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=latin1;
 
 -- Dumping data for table hris.potongan_keterlambatan: ~5 rows (approximately)
 INSERT INTO `potongan_keterlambatan` (`id`, `note`, `lateMinute`, `pinaltyFee`, `presence`) VALUES
@@ -827,7 +851,8 @@ INSERT INTO `potongan_keterlambatan` (`id`, `note`, `lateMinute`, `pinaltyFee`, 
 	(11, 'Telat 6-15 menit', '00:06:00', 20000, 1),
 	(12, 'Telat 15-30 menit', '00:15:00', 30000, 1),
 	(13, 'Telat 30-60 menit', '00:30:00', 100000, 1),
-	(100, 'Telat diatas 60 menit', '01:00:00', 100000, 1);
+	(100, 'Telat diatas 1 Jam', '01:01:00', 200000, 1),
+	(101, 'Telat diatas 2 Jam', '02:01:00', 344430, 0);
 
 -- Dumping structure for table hris.pph21_ptkp
 CREATE TABLE IF NOT EXISTS `pph21_ptkp` (
@@ -947,14 +972,15 @@ CREATE TABLE IF NOT EXISTS `salary` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table hris.salary: ~5 rows (approximately)
+-- Dumping data for table hris.salary: ~6 rows (approximately)
 INSERT INTO `salary` (`id`, `periodStartDate`, `periodEndDate`, `asLock`, `level`, `personalId`, `tunjanganTetap`, `tunjanganTidakTetap`, `potongan`, `takeHomePay`, `presence`, `inputDate`, `updateDate`, `inputBy`, `updateBy`) VALUES
 	('S000041.6450cfb375755', '2023-01-01', '2023-01-31', 0, 1, 'P000003', NULL, NULL, NULL, 0, 0, '2023-05-02 10:54:11', '2023-05-02 10:57:52', '0', '0'),
 	('S000042.6450d0aed0712', '2023-01-01', '2023-01-25', 0, 1, 'P000003', 21600000, 650000, -6020000, 16230000, 0, '2023-05-02 10:58:22', '2023-05-02 11:16:42', '0', '0'),
 	('S000043.6450d55e66425', '2023-01-01', '2023-05-25', 0, 1, 'P000003', 21600000, 1150000, -55460000, -32710000, 0, '2023-05-02 11:18:22', '2023-05-02 11:19:45', '0', '0'),
 	('S000044.6450d5fb7321a', '2023-01-25', '2023-01-25', 0, 1, 'P000003', 21600000, 1150000, -480000, 22270000, 0, '2023-05-02 11:20:59', '2023-05-02 11:22:13', '0', '0'),
 	('S000045.6450d66364fbb', '2023-01-01', '2023-01-25', 1, 1, 'P000003', 21600000, 650000, -6019800, 16230200, 1, '2023-05-02 11:22:43', '2023-05-02 11:41:21', '0', '0'),
-	('S000046.6450e62b124b2', '2023-01-01', '2023-01-10', 0, 0, 'P000003', 0, 0, 0, 0, 1, '2023-05-02 12:30:03', '2023-01-01 00:00:00', '0', NULL);
+	('S000046.6450e62b124b2', '2023-01-01', '2023-01-10', 0, 0, 'P000003', 0, 0, 0, 0, 1, '2023-05-02 12:30:03', '2023-01-01 00:00:00', '0', NULL),
+	('S000047.64548a474eb3c', '2023-01-01', '2023-01-25', 1, 1, 'P000003', 21600000, 650000, -5980000, 16270000, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0');
 
 -- Dumping structure for table hris.salary_detail
 CREATE TABLE IF NOT EXISTS `salary_detail` (
@@ -970,9 +996,9 @@ CREATE TABLE IF NOT EXISTS `salary_detail` (
   `inputBy` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
   `updateBy` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=121 DEFAULT CHARSET=latin1;
 
--- Dumping data for table hris.salary_detail: ~80 rows (approximately)
+-- Dumping data for table hris.salary_detail: ~120 rows (approximately)
 INSERT INTO `salary_detail` (`id`, `salaryId`, `sorting`, `label`, `value`, `asLock`, `presence`, `inputDate`, `updateDate`, `inputBy`, `updateBy`) VALUES
 	(1, 'S000042.6450d0aed0712', 100, 'Gaji Pokok', 12000000, 0, 0, '2023-05-02 10:58:22', '2023-05-02 11:16:41', '0', '0'),
 	(2, 'S000042.6450d0aed0712', 101, 'Transport', 2000000, 0, 0, '2023-05-02 10:58:22', '2023-05-02 11:16:41', '0', '0'),
@@ -1073,7 +1099,27 @@ INSERT INTO `salary_detail` (`id`, `salaryId`, `sorting`, `label`, `value`, `asL
 	(97, 'S000046.6450e62b124b2', 304, 'ALPA', 0, 0, 1, '2023-05-02 12:30:03', '2023-01-01 00:00:00', '0', NULL),
 	(98, 'S000046.6450e62b124b2', 305, 'Kasbon', 0, 0, 1, '2023-05-02 12:30:03', '2023-01-01 00:00:00', '0', NULL),
 	(99, 'S000046.6450e62b124b2', 306, 'JAMSOSTEK', 0, 0, 1, '2023-05-02 12:30:03', '2023-01-01 00:00:00', '0', NULL),
-	(100, 'S000046.6450e62b124b2', 307, 'PPH psl 21', 0, 0, 1, '2023-05-02 12:30:03', '2023-01-01 00:00:00', '0', NULL);
+	(100, 'S000046.6450e62b124b2', 307, 'PPH psl 21', 0, 0, 1, '2023-05-02 12:30:03', '2023-01-01 00:00:00', '0', NULL),
+	(101, 'S000047.64548a474eb3c', 100, 'Gaji Pokok', 12000000, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(102, 'S000047.64548a474eb3c', 101, 'Transport', 2000000, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(103, 'S000047.64548a474eb3c', 102, 'ACA', 3000000, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(104, 'S000047.64548a474eb3c', 103, 'U/Makan', 4000000, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(105, 'S000047.64548a474eb3c', 104, 'T.Gol', 600000, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(106, 'S000047.64548a474eb3c', 105, 'Askes', 0, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(107, 'S000047.64548a474eb3c', 202, 'U/Makan Tidak Tetap', 420000, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(108, 'S000047.64548a474eb3c', 201, 'U/Transport', 230000, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(109, 'S000047.64548a474eb3c', 203, 'T. Jabatan', 0, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(110, 'S000047.64548a474eb3c', 204, 'B. Absen', 0, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(111, 'S000047.64548a474eb3c', 205, 'Lembur', 0, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(112, 'S000047.64548a474eb3c', 206, 'T. Kasir', 0, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(113, 'S000047.64548a474eb3c', 207, 'Kekurangan Bulan Lalu', 0, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(114, 'S000047.64548a474eb3c', 301, 'Kelebihan Bulan Lalu', 0, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(115, 'S000047.64548a474eb3c', 302, 'Keterlambatan', -5980000, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(116, 'S000047.64548a474eb3c', 303, 'Izin Tidak Resmi', 0, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(117, 'S000047.64548a474eb3c', 304, 'ALPA', 0, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(118, 'S000047.64548a474eb3c', 305, 'Kasbon', 0, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(119, 'S000047.64548a474eb3c', 306, 'JAMSOSTEK', 0, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0'),
+	(120, 'S000047.64548a474eb3c', 307, 'PPH psl 21', 0, 1, 1, '2023-05-05 04:47:03', '2023-05-05 04:48:08', '0', '0');
 
 -- Dumping structure for table hris.salary_label
 CREATE TABLE IF NOT EXISTS `salary_label` (
@@ -1083,33 +1129,35 @@ CREATE TABLE IF NOT EXISTS `salary_label` (
   `sorting` int NOT NULL DEFAULT '0',
   `status` int NOT NULL DEFAULT '1',
   `asCopy` int NOT NULL DEFAULT '1',
+  `presence` int NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sorting` (`sorting`)
-) ENGINE=InnoDB AUTO_INCREMENT=149 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=latin1;
 
 -- Dumping data for table hris.salary_label: ~21 rows (approximately)
-INSERT INTO `salary_label` (`id`, `label`, `value`, `sorting`, `status`, `asCopy`) VALUES
-	(1, 'Gaji Pokok', 0, 100, 1, 1),
-	(2, 'Transport', 0, 101, 1, 1),
-	(3, 'ACA', 0, 102, 1, 1),
-	(4, 'U/Makan', 0, 103, 1, 1),
-	(5, 'T.Gol', 0, 104, 1, 1),
-	(6, 'Askes', 0, 105, 1, 1),
-	(7, 'U/Makan Tidak Tetap', 10000, 202, 1, 1),
-	(8, 'U/Transport', 10000, 201, 1, 1),
-	(9, 'T. Jabatan', 0, 203, 1, 1),
-	(10, 'B. Absen', 0, 204, 1, 1),
-	(11, 'Lembur', 0, 205, 1, 1),
-	(12, 'T. Kasir', 0, 206, 1, 1),
-	(13, 'Kekurangan Bulan Lalu', 0, 207, 1, 1),
-	(15, 'Kelebihan Bulan Lalu', 0, 301, 1, 1),
-	(16, 'Keterlambatan', 0, 302, 1, 1),
-	(17, 'Izin Tidak Resmi', 0, 303, 1, 1),
-	(18, 'ALPA', 0, 304, 1, 1),
-	(19, 'Kasbon', 0, 305, 1, 1),
-	(20, 'JAMSOSTEK', 0, 306, 1, 1),
-	(21, 'PPH psl 21', 0, 307, 1, 1),
-	(148, 'Lain lain', 0, 1000, 0, 1);
+INSERT INTO `salary_label` (`id`, `label`, `value`, `sorting`, `status`, `asCopy`, `presence`) VALUES
+	(1, 'Gaji Pokok', 0, 100, 1, 1, 1),
+	(2, 'Transport', 0, 101, 1, 1, 1),
+	(3, 'ACA', 0, 102, 1, 1, 1),
+	(4, 'U/Makan', 0, 103, 1, 1, 1),
+	(5, 'T.Gol', 0, 104, 1, 1, 1),
+	(6, 'Askes', 0, 105, 1, 1, 1),
+	(7, 'U/Makan Tidak Tetap', 10000, 202, 1, 1, 1),
+	(8, 'U/Transport', 10000, 201, 1, 1, 1),
+	(9, 'T. Jabatan', 0, 203, 1, 1, 1),
+	(10, 'B. Absen', 0, 204, 1, 1, 1),
+	(11, 'Lembur', 0, 205, 1, 1, 1),
+	(12, 'T. Kasir', 0, 206, 1, 1, 1),
+	(13, 'Kekurangan Bulan Lalu', 0, 207, 1, 1, 1),
+	(15, 'Kelebihan Bulan Lalu', 0, 301, 1, 1, 1),
+	(16, 'Keterlambatan', 0, 302, 1, 1, 1),
+	(17, 'Izin Tidak Resmi', 0, 303, 1, 1, 1),
+	(18, 'ALPA', 0, 304, 1, 1, 1),
+	(19, 'Kasbon', 0, 305, 1, 1, 1),
+	(20, 'JAMSOSTEK', 0, 306, 1, 1, 1),
+	(21, 'PPH psl 21', 0, 307, 1, 1, 1),
+	(148, 'Lain lain', 0, 1000, 0, 1, 1),
+	(150, 'Titipan Dinas', 7000000, 10003, 0, 1, 0);
 
 -- Dumping structure for table hris.salary_time
 CREATE TABLE IF NOT EXISTS `salary_time` (
@@ -1136,9 +1184,9 @@ CREATE TABLE IF NOT EXISTS `salary_time` (
   `updateDate` datetime NOT NULL DEFAULT '2022-01-01 00:00:00',
   `updateBy` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=207 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=232 DEFAULT CHARSET=latin1;
 
--- Dumping data for table hris.salary_time: ~196 rows (approximately)
+-- Dumping data for table hris.salary_time: ~231 rows (approximately)
 INSERT INTO `salary_time` (`id`, `salaryId`, `amount`, `date`, `hour`, `job`, `checkIn`, `checkOut`, `workingHour`, `late`, `quickly`, `overtime`, `workDay`, `shiftId`, `timeManagementId`, `note`, `asLock`, `presence`, `inputDate`, `inputBy`, `updateDate`, `updateBy`) VALUES
 	(1, 'S000042.6450d0aed0712', 0, '2023-01-01', '', 'Holiday', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '0', 'W', '4960', '', 0, 0, '2023-05-02 10:58:23', '0', '2023-05-02 10:58:23', '0'),
 	(2, 'S000042.6450d0aed0712', 0, '2023-01-02', '09:00-17:00', 'WEEKDAY', '23:50:00', '23:50:00', '14:46:00', '00:04:00', '00:00:00', '06:50:00', '1', 'W', '4969', NULL, 0, 0, '2023-05-02 10:58:23', '0', '2023-05-02 10:58:23', '0'),
@@ -1345,7 +1393,32 @@ INSERT INTO `salary_time` (`id`, `salaryId`, `amount`, `date`, `hour`, `job`, `c
 	(203, 'S000046.6450e62b124b2', 0, '2023-01-07', '09:00-17:00', 'WEEKDAY', '20:00:00', '20:00:00', '10:10:00', '00:50:00', '00:00:00', '03:00:00', '1', 'W', '5009', '', 0, 1, '2023-05-02 12:30:04', '0', '2023-05-02 12:30:04', '0'),
 	(204, 'S000046.6450e62b124b2', 0, '2023-01-08', '', 'Holiday', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '0', 'W', '5023', '', 0, 1, '2023-05-02 12:30:04', '0', '2023-05-02 12:30:04', '0'),
 	(205, 'S000046.6450e62b124b2', 0, '2023-01-09', '09:00-17:00', 'WEEKDAY', '18:06:00', '18:06:00', '09:08:00', '00:00:00', '00:00:00', '01:06:00', '1', 'W', '5029', '', 0, 1, '2023-05-02 12:30:04', '0', '2023-05-02 12:30:04', '0'),
-	(206, 'S000046.6450e62b124b2', 0, '2023-01-10', '09:00-17:00', 'WEEKDAY', '18:02:00', '18:02:00', '09:11:00', '00:00:00', '00:00:00', '01:02:00', '1', 'W', '5037', '', 0, 1, '2023-05-02 12:30:04', '0', '2023-05-02 12:30:04', '0');
+	(206, 'S000046.6450e62b124b2', 0, '2023-01-10', '09:00-17:00', 'WEEKDAY', '18:02:00', '18:02:00', '09:11:00', '00:00:00', '00:00:00', '01:02:00', '1', 'W', '5037', '', 0, 1, '2023-05-02 12:30:04', '0', '2023-05-02 12:30:04', '0'),
+	(207, 'S000047.64548a474eb3c', 0, '2023-01-01', '', 'Holiday', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '0', 'W', '4960', '', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(208, 'S000047.64548a474eb3c', 0, '2023-01-02', '09:00-17:00', 'WEEKDAY', '23:50:00', '23:50:00', '14:46:00', '00:04:00', '00:00:00', '06:50:00', '1', 'W', '4969', NULL, 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(209, 'S000047.64548a474eb3c', 0, '2023-01-03', '09:00-17:00', 'WEEKDAY', '17:56:00', '17:56:00', '08:55:00', '00:01:00', '00:00:00', '00:56:00', '1', 'W', '4983', NULL, 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(210, 'S000047.64548a474eb3c', -20000, '2023-01-04', '09:00-17:00', 'WEEKDAY', '18:04:00', '18:04:00', '08:52:00', '00:12:00', '00:00:00', '01:04:00', '1', 'W', '4984', 'Telat 6-15 menit', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(211, 'S000047.64548a474eb3c', -20000, '2023-01-05', '09:00-17:00', 'WEEKDAY', '18:02:00', '18:02:00', '08:49:00', '00:13:00', '00:00:00', '01:02:00', '1', 'W', '4998', 'Telat 6-15 menit', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(212, 'S000047.64548a474eb3c', -20000, '2023-01-06', '09:00-17:00', 'WEEKDAY', '18:08:00', '18:08:00', '08:58:00', '00:10:00', '00:00:00', '01:08:00', '1', 'W', '5007', 'Telat 6-15 menit', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(213, 'S000047.64548a474eb3c', -100000, '2023-01-07', '09:00-17:00', 'WEEKDAY', '20:00:00', '20:00:00', '10:10:00', '00:50:00', '00:00:00', '03:00:00', '1', 'W', '5009', 'Telat 30-60 menit', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(214, 'S000047.64548a474eb3c', 0, '2023-01-08', '', 'Holiday', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '0', 'W', '5023', '', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(215, 'S000047.64548a474eb3c', -480000, '2023-01-09', '09:00-17:00', 'WEEKDAY', '18:06:00', '18:06:00', '09:08:00', '00:00:00', '00:00:00', '01:06:00', '1', 'W', '5029', 'Absen 1', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(216, 'S000047.64548a474eb3c', -480000, '2023-01-10', '09:00-17:00', 'WEEKDAY', '18:02:00', '18:02:00', '09:11:00', '00:00:00', '00:00:00', '01:02:00', '1', 'W', '5037', 'Absen 2', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(217, 'S000047.64548a474eb3c', 0, '2023-01-11', '09:00-17:00', 'WEEKDAY', '18:00:00', '18:00:00', '08:59:00', '00:01:00', '00:00:00', '01:00:00', '1', 'W', '5044', NULL, 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(218, 'S000047.64548a474eb3c', 0, '2023-01-12', '09:00-17:00', 'WEEKDAY', '18:16:00', '18:16:00', '09:15:00', '00:01:00', '00:00:00', '01:16:00', '1', 'W', '5051', NULL, 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(219, 'S000047.64548a474eb3c', -480000, '2023-01-13', '09:00-17:00', 'WEEKDAY', '18:07:00', '18:07:00', '09:09:00', '00:00:00', '00:00:00', '01:07:00', '1', 'W', '5059', 'Absen 3', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(220, 'S000047.64548a474eb3c', -100000, '2023-01-14', '09:00-17:00', 'WEEKDAY', '14:59:00', '14:59:00', '05:25:00', '00:34:00', '02:01:00', '00:00:00', '1', 'W', '5066', 'Telat 30-60 menit', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(221, 'S000047.64548a474eb3c', 20000, '2023-01-15', '', 'Holiday', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '0', 'W', '5073', 'Lembur', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(222, 'S000047.64548a474eb3c', -480000, '2023-01-16', '', 'WEEKDAY', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '1', 'W', '5087', 'Absen 4', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(223, 'S000047.64548a474eb3c', -480000, '2023-01-17', '', 'WEEKDAY', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '1', 'W', '5091', 'Absen 5', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(224, 'S000047.64548a474eb3c', -480000, '2023-01-18', '', 'WEEKDAY', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '1', 'W', '5098', 'Absen 6', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(225, 'S000047.64548a474eb3c', -480000, '2023-01-19', '', 'WEEKDAY', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '1', 'W', '5108', 'Absen 7', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(226, 'S000047.64548a474eb3c', -480000, '2023-01-20', '', 'Work', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '1', NULL, NULL, 'Absen 8', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(227, 'S000047.64548a474eb3c', -480000, '2023-01-21', '', 'Work', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '1', NULL, NULL, 'Absen 9', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(228, 'S000047.64548a474eb3c', 20000, '2023-01-22', '', 'Holiday', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '0', NULL, NULL, 'Lembur', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(229, 'S000047.64548a474eb3c', -480000, '2023-01-23', '', 'Work', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '1', NULL, NULL, 'Absen 10', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(230, 'S000047.64548a474eb3c', -480000, '2023-01-24', '', 'Work', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '1', NULL, NULL, 'Absen 11', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0'),
+	(231, 'S000047.64548a474eb3c', -480000, '2023-01-25', '', 'Work', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '1', NULL, NULL, 'Absen 12', 1, 1, '2023-05-05 04:47:03', '0', '2023-05-05 04:47:03', '0');
 
 -- Dumping structure for procedure hris.spTest
 DELIMITER //

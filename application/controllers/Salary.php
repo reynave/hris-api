@@ -245,8 +245,8 @@ class Salary extends CI_Controller
             foreach ($sqlTime as $row) {
                 if ($row['late'] != "00:00:00") {
                     $update = array(
-                        "amount" => -1 * (int) $this->model->select("pinaltyFee", "potongan_keterlambatan", "lateMinute <= '" . $row['late'] . "' ORDER BY lateMinute DESC LIMIT 1"),
-                        "note" => $this->model->select("note", "potongan_keterlambatan", "lateMinute <= '" . $row['late'] . "' ORDER BY lateMinute DESC LIMIT 1")
+                        "amount" => -1 * (int) $this->model->select("pinaltyFee", "potongan_keterlambatan", "presence = 1 and lateMinute <= '" . $row['late'] . "' ORDER BY lateMinute DESC LIMIT 1"),
+                        "note" => $this->model->select("note", "potongan_keterlambatan", "presence = 1 and lateMinute <= '" . $row['late'] . "' ORDER BY lateMinute DESC LIMIT 1")
                     );
 
                 } else {
