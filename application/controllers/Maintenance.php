@@ -238,6 +238,30 @@ class Maintenance extends CI_Controller
 
     }
 
+    function delete()
+    {
+
+        $post = json_decode(file_get_contents('php://input'), true);
+        $data = array(
+            "error" => true,
+        );
+        if ($post) { 
+            $update = array( 
+                "presence" => 0, 
+                "updateDate" => date("Y-m-d H:i:s"),
+                "updateBy" => $this->model->userId(),
+            );
+            $this->db->update("maintenance", $update, "id='" . $post['id'] . "'");
+
+            $data = array(
+                "error" => false,
+            );
+            echo json_encode($data);
+        }
+
+    }
+
+
     function fnDeleteTrans()
     {
 
