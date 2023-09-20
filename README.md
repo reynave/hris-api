@@ -6,6 +6,8 @@ Requriement
 - LAMP Ubuntu 20.04
 - php7
 - mysql database
+- Framework Codeigniter 3.x ( already included in this repository)
+- !No need composer
 
 Setting : 
 1. Git clone https://github.com/reynave/hris-api.git
