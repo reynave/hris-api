@@ -6,7 +6,7 @@ class Model extends CI_Model
     function __construct()
     {
         /* Call the Model constructor */
-        $this->prefixDB = '';
+     
         parent::__construct();
     }
 
@@ -48,8 +48,8 @@ class Model extends CI_Model
 
     function token($token = "")
     {
-        if ($this->model->select('id', $this->prefixDB . 'user', 'token= "' . $token . '"  and presence = 1')) {
-            return $this->model->select('id', $this->prefixDB . 'user', 'token= "' . $token . '"  and presence = 1');
+        if ($this->model->select('id',  'user', 'token= "' . $token . '"  and presence = 1')) {
+            return $this->model->select('id',  'user', 'token= "' . $token . '"  and presence = 1');
         } else {
             return false;
         }
@@ -135,9 +135,9 @@ class Model extends CI_Model
             if ($openAPI == true) {
                 return true;
             } else if ($token) {
-                if (self::select('id', $this->prefixDB . 'personal_access', "status = 1 and token= '" . $token . "'")) {
-                    $userId = self::select('personalId', $this->prefixDB . 'personal_access', "status = 1 and token= '" . $token . "'");
-                    if ($this->model->select("id", $this->prefixDB . "personal", "id='$userId'")) {
+                if (self::select('id',  'personal_access', "status = 1 and token= '" . $token . "'")) {
+                    $userId = self::select('personalId',  'personal_access', "status = 1 and token= '" . $token . "'");
+                    if ($this->model->select("id",  "personal", "id='$userId'")) {
                         return true;
                     } else {
                         return false;
@@ -183,8 +183,8 @@ class Model extends CI_Model
         if (isset($headers['token']) || isset($headers['Token'])) {
             $token = isset($headers['token']) ? $headers['token'] : $headers['Token'];
 
-            if ($this->model->select('id', $this->prefixDB . 'personal_access', "token= '$token'")) {
-                return $this->model->select('personalId', $this->prefixDB . 'personal_access', "token= '$token'");
+            if ($this->model->select('id',  'personal_access', "token= '$token'")) {
+                return $this->model->select('personalId',  'personal_access', "token= '$token'");
             } else {
                 return false;
             }
@@ -235,7 +235,7 @@ class Model extends CI_Model
         if ($id == 0) {
             return false;
         } else {
-            return $this->model->select('concat(first_name," ",last_name)', $this->prefixDB . 'user', 'id="' . $id . '"');
+            return $this->model->select('concat(first_name," ",last_name)',  'user', 'id="' . $id . '"');
         }
     }
 
