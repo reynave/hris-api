@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
-class TimeManagementHoliday extends CI_Controller
+class RequestHoliday extends CI_Controller
 {
 
     public function __construct()
@@ -27,6 +27,25 @@ class TimeManagementHoliday extends CI_Controller
                 WHERE h.personalId = '$id' 
                 AND h.presence = 1 
             "),
+        );
+        echo json_encode($data);
+    }
+
+    function waitingApproved(){
+
+        $data = $this->model->sql("SELECT personalId, COUNT(id) AS 'totalDays' 
+        FROM request_holiday 
+        WHERE approved = 0 and presence = 1
+        GROUP BY personalId 
+        ");
+        $i = 0;
+        foreach($data as $row){
+            $data[$i]['name'] = $this->model->select("name","personal", " id = '".$row['personalId']."'");
+            $i++;
+        }
+
+        $data = array(
+            "data" => $data,
         );
         echo json_encode($data);
     }

@@ -6,9 +6,14 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => '128.199.94.89',
-	'username' => 'user88',
-	'password' => '.}4x}9J*s*7nhQ-w',
+	//'hostname' => '128.199.94.89',
+	//'username' => 'user88',
+	//'password' => '.}4x}9J*s*7nhQ-w',
+
+	'hostname' => 'localhost',
+	'username' => 'root',
+	'password' => '',
+
 	'database' => 'hris',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
