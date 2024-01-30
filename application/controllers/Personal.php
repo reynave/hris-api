@@ -64,6 +64,7 @@ class Personal extends CI_Controller
                 "expDate" =>  $post['model']['expDate']['year'] . "-" . $post['model']['expDate']['month'] . "-" . $post['model']['expDate']['day'],
                 "postalCode" => $post['model']['postalCode'],
                 "address" => $post['model']['address'],
+                "note" => $post['model']['note'],
 
                 "inputDate"     => date("Y-m-d H:i:s"),
                 "updateDate"    => date("Y-m-d H:i:s"),

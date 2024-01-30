@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
-class TimeManagement extends CI_Controller
+class TimeManagementHoliday extends CI_Controller
 {
 
     public function __construct()
@@ -11,7 +11,7 @@ class TimeManagement extends CI_Controller
         header('Access-Control-Allow-Methods: GET, POST, PUT');
         header('Content-Type: application/json');
         if (!$this->model->header($this->db->openAPI)) {
-            //  echo $this->model->error("Error auth");
+            // echo $this->model->error("Error auth");
             // exit;
         }
     }
@@ -19,22 +19,14 @@ class TimeManagement extends CI_Controller
 
     function index()
     {
+        $id = $this->model->userId();
         $data = array(
-            "data" => $this->model->sql("SELECT p.id , p.name , t2.*
-            FROM personal AS p
-            LEFT JOIN  (
-                SELECT tm.personalId, tm.`date`, s.name AS 'shift',
-                s.scheduleIn, s.scheduleOut,
-                 tm.checkIn, tm.checkOut, tm.overTime, tm.id as 'idx'
-                
-                FROM time_management AS tm 
-                LEFT JOIN time_management_shift AS s ON tm.shiftId = s.id
-                
-                WHERE  tm.`date` = CURDATE() and tm.presence = 1
-             ) AS  t2 ON p.id = t2.personalId
-            
-            WHERE p.presence = 1;
-             "),
+            "data" => $this->model->sql("SELECT h.* , p.name 
+                FROM time_management_request_holiday AS h
+                LEFT JOIN personal AS p ON  p.id = h.approvedBy
+                WHERE h.personalId = '$id' 
+                AND h.presence = 1 
+            "), 
         );
         echo json_encode($data);
     }
