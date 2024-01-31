@@ -109,3 +109,10 @@ ALTER TABLE `time_management`
 ALTER TABLE `salary_time`
 	ADD COLUMN `pinaltyFee` DOUBLE NOT NULL DEFAULT '0' AFTER `amount`,
 	ADD COLUMN `overtimeFee` DOUBLE NOT NULL DEFAULT '0' AFTER `pinaltyFee`;
+
+ALTER TABLE `employment`
+	ADD COLUMN `totalHoliday` INT(3) NOT NULL DEFAULT 0 AFTER `personalId`;
+
+
+DELETE FROM `global_setting` WHERE `id`=12;
+INSERT INTO `global_setting` (`id`, `name`, `value`) VALUES (12, 'TotalHoliday per Year', '14');
