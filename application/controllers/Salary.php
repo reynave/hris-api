@@ -143,11 +143,7 @@ class Salary extends CI_Controller
                 "byJabatan" => $byJabatan,
                 "salary" => $jabatanPercent,
                 "jabatanMaxAmount" => $jabatanMaxAmount,
-
             );
-
-
-
 
 
             foreach ($post['timeManagement'] as $row) {
@@ -156,7 +152,7 @@ class Salary extends CI_Controller
                     "date" => $row['date'],
                     "hour" => $row['hour'],
                     "job" => $row['job'],
-                    "checkIn" => $row['checkIn'] ? $row['checkOut'] : "00:00:00",
+                    "checkIn" => $row['checkIn'] ? $row['checkIn'] : "00:00:00",
                     "checkOut" => $row['checkOut'] ? $row['checkOut'] : "00:00:00",
                     "workingHour" => $row['workingHour'] ? str_replace(["h", "m"], ":", $row['workingHour']) : "00:00:00",
                     "late" => $row['late'] ? str_replace(["h", "m"], ":", $row['late']) : "00:00:00",
@@ -187,7 +183,7 @@ class Salary extends CI_Controller
                 "endDate" => $insertSalary['periodEndDate'],
             );
 
-            self::copyTunjangan(  $id,  $post['personalId']);
+            self::copyTunjangan($id, $post['personalId']);
 
         } else {
             $data = array(
@@ -204,7 +200,7 @@ class Salary extends CI_Controller
         join personal as p on p.id = s.personalId
         where s.presence = 1 and s.id = '$id' ")[0];
 
-  
+
         $data = array(
             "item" => $item,
             "items1" => $this->model->sql("SELECT * from salary_detail where presence = 1 and (sorting < 200) and salaryId = '$id' "),
@@ -236,37 +232,96 @@ class Salary extends CI_Controller
             "error" => true,
         );
         if ($post) {
-            $workingDays = $this->model->select("value","global_setting","id=10");
+            $workingDays = $this->model->select("value", "global_setting", "id=10");
+            $overtimeFeePerHour = $this->model->select("value", "global_setting", "id=300");
+
             $salaryBruto = $this->model->select("value", "payroll_tunjangan", "personalId = '" . $post['personalId'] . "' and sorting = 100 ");
 
             $absen = $salaryBruto / $workingDays;
             $sqlTime = $this->model->sql("SELECT * FROM salary_time  WHERE  salaryId = '" . $post['salaryId'] . "' ORDER BY date ASC ");
             $n = 1;
             foreach ($sqlTime as $row) {
+                $pinaltyFee = 0;
+                $overtimeFee = 0;
+
+                $update = array(
+                    "note" => ''
+                );
+                $this->db->update("salary_time", $update, "id = " . $row['id']);
+
+               
+
                 if ($row['late'] != "00:00:00") {
+                    $pinaltyFee = -1 * (int) $this->model->select("pinaltyFee", "potongan_keterlambatan", "presence = 1 and lateMinute <= '" . $row['late'] . "' ORDER BY lateMinute DESC LIMIT 1");
                     $update = array(
-                        "amount" => -1 * (int) $this->model->select("pinaltyFee", "potongan_keterlambatan", "presence = 1 and lateMinute <= '" . $row['late'] . "' ORDER BY lateMinute DESC LIMIT 1"),
+                        "pinaltyFee" => $pinaltyFee,
                         "note" => $this->model->select("note", "potongan_keterlambatan", "presence = 1 and lateMinute <= '" . $row['late'] . "' ORDER BY lateMinute DESC LIMIT 1")
                     );
-
-                } else {
-                    if($row['job'] != 'Holiday'){
-                        $update = array(
-                            "amount" => (int) $absen * -1,
-                            "note" => "Absen ".$n++,
-                        );
-                    }else{
-                        $update = array(
-                            "amount" => 0,
-                            "note" => "",
-                        );
-                    }
-                   
+                    $this->db->update("salary_time", $update, "id = " . $row['id']);
                 }
-                $this->db->update("salary_time", $update, "id = " . $row['id']);
+                if ($row['overtime'] != "00:00:00") {
+                    $t = explode(":", $row['overtime']);
+                    $overtimeFee = (int) $t[0] * $overtimeFeePerHour;
+                    $update = array(
+                        "overtimeFee" => $overtimeFee,
+                        "note" => 'Overtime Fee'
+                    );
+                    $this->db->update("salary_time", $update, "id = " . $row['id']); 
+                }
+
+
+                if ($row['checkIn'] == "00:00:00" && $row['checkOut'] == "00:00:00" && $row['hour'] == "" && $row['hour'] == "" && $row['job'] == "WEEKDAY") {
+                    $update = array(
+                        "pinaltyFee" => (int) $absen * -1,
+                        "amount" => (int) $absen * -1,
+                        "note" => "Absen " . $n++,
+                    );
+                    $this->db->update("salary_time", $update, "id = " . $row['id']);
+                } else {
+                    $update = array(
+                        "amount" => $pinaltyFee + $overtimeFee,
+                    );
+                    $this->db->update("salary_time", $update, "id = " . $row['id']);
+                }
+
+                // } 
+                // if ($row['overtime'] != "00:00:00") {
+                //     $t = explode(":",$row['overtime']);
+                //     $overtimeFee = (int)$t[0] * $overtimeFeePerHour;
+                //     $update = array(
+                //         "overtimeFee" => $overtimeFee  ,
+                //         "note" => 'Overtime Fee'
+                //     ); 
+                //     $this->db->update("salary_time", $update, "id = " . $row['id']);
+                // }
+                // if ($row['late'] != "00:00:00") {
+                //     $pinaltyFee =  -1 * (int) $this->model->select("pinaltyFee", "potongan_keterlambatan", "presence = 1 and lateMinute <= '" . $row['late'] . "' ORDER BY lateMinute DESC LIMIT 1");
+
+                //     $update = array(
+                //         "pinaltyFee" =>  $pinaltyFee,
+                //         "note" => $this->model->select("note", "potongan_keterlambatan", "presence = 1 and lateMinute <= '" . $row['late'] . "' ORDER BY lateMinute DESC LIMIT 1")
+                //     );
+
+                // } 
+                // else {
+                //     if($row['job'] != 'Holiday'){
+                //         $update = array(
+                //             "pinaltyFee" => (int) $absen * -1,
+                //             "amount" => (int) $absen * -1,
+                //             "note" => "Absen ".$n++,
+                //         );
+                //     }else{
+                //         $update = array(
+                //             "amount" => $pinaltyFee + $overtimeFee,
+                //             "note" => "",
+                //         );
+                //     }
+
+                // } 
+                // $this->db->update("salary_time", $update, "id = " . $row['id']);
             }
 
- 
+
             foreach ($post['items1'] as $row) {
                 $update = array(
                     "value" => $row['value'],
@@ -313,7 +368,7 @@ class Salary extends CI_Controller
 
 
             // BYJABATAN
-            
+
             $jabatanPercent = (double) $this->model->select("value", "global_setting", " id = 100");
             $jabatanMaxAmount = (double) $this->model->select("value", "global_setting", " id = 101");
             $byJabatan = ($salaryBruto * $jabatanPercent) > $jabatanMaxAmount ? $jabatanMaxAmount : ($salaryBruto * $jabatanPercent);
@@ -347,8 +402,7 @@ class Salary extends CI_Controller
 
             $this->db->update("salary", $update, "id= '" . $post['salaryId'] . "' ");
 
-       
-        
+
             $ress = array(
                 "note" => $note
             );
@@ -362,20 +416,17 @@ class Salary extends CI_Controller
         $data = array(
             "error" => true,
         );
-        if ($post) { 
+        if ($post) {
             $salaryBruto = $this->model->select("salary", "payroll", "personalId = '" . $post['personalId'] . "' ");
-
-           
             foreach ($post['salary_time'] as $row) {
                 $update = array(
                     "amount" => $row['amount'],
-                    "note" => $row['note'], 
+                    "note" => $row['note'],
                 );
-
-                $this->db->update("salary_time",$update,"id=".$row['id']);
+                $this->db->update("salary_time", $update, "id=" . $row['id']);
             }
 
- 
+
             foreach ($post['items1'] as $row) {
                 $update = array(
                     "value" => $row['value'],
@@ -422,7 +473,7 @@ class Salary extends CI_Controller
 
 
             // BYJABATAN
-            
+
             $jabatanPercent = (double) $this->model->select("value", "global_setting", " id = 100");
             $jabatanMaxAmount = (double) $this->model->select("value", "global_setting", " id = 101");
             $byJabatan = ($salaryBruto * $jabatanPercent) > $jabatanMaxAmount ? $jabatanMaxAmount : ($salaryBruto * $jabatanPercent);
@@ -456,8 +507,8 @@ class Salary extends CI_Controller
 
             $this->db->update("salary", $update, "id= '" . $post['salaryId'] . "' ");
 
-       
-        
+
+
             $ress = array(
                 "note" => $note
             );
@@ -465,7 +516,8 @@ class Salary extends CI_Controller
         }
     }
 
-    function fnPublish(){
+    function fnPublish()
+    {
         $id = 0;
         $post = json_decode(file_get_contents('php://input'), true);
         $data = array(

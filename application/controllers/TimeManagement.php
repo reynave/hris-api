@@ -47,7 +47,9 @@ class TimeManagement extends CI_Controller
             JOIN personal AS p ON p.id = e.personalId 
             WHERE e.presence = 1 
              "),
-            "potongan_keterlambatan" => $this->model->sql("SELECT * from potongan_keterlambatan where presence = 1 order by pinaltyFee ASC")
+            "potongan_keterlambatan" => $this->model->sql("SELECT * from potongan_keterlambatan where presence = 1 order by pinaltyFee ASC"),
+            "overtimeFee" => (int)$this->model->select('value','global_setting','id=300'),
+            
         );
         echo json_encode($data);
     }
@@ -59,6 +61,11 @@ class TimeManagement extends CI_Controller
         $error = true;
         if ($post) {
             $error = true;
+            $update = array(
+                "value" =>  $post['overtimeFee'], 
+            );
+            $this->db->update('global_setting', $update, "id = 300 ");
+
             foreach ($post['item'] as $row) { 
                 $update = array(
                     "note" =>  $row['note'],
@@ -338,7 +345,7 @@ class TimeManagement extends CI_Controller
                 "day" => $dt->format("D"),
                 "date" => $dt->format("Y-m-d"),
                 "hour" => '',
-                "job" => $workDay == 1 ? "Work" : 'Holiday',
+                "job" => $workDay == 1 ? "Work" : ' - ',
                 "checkIn" => '',
                 "checkOut" => '',
                 "late" => '',

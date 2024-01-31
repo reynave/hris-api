@@ -101,3 +101,11 @@ AUTO_INCREMENT=3
 
 ALTER TABLE `personal`
 	ADD COLUMN `note` TEXT NOT NULL DEFAULT '' AFTER `status`;
+
+ALTER TABLE `time_management`
+	ADD COLUMN `requestHolidayId` INT(11) NOT NULL DEFAULT '0' AFTER `id`;
+
+
+ALTER TABLE `salary_time`
+	ADD COLUMN `pinaltyFee` DOUBLE NOT NULL DEFAULT '0' AFTER `amount`,
+	ADD COLUMN `overtimeFee` DOUBLE NOT NULL DEFAULT '0' AFTER `pinaltyFee`;

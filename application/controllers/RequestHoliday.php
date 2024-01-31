@@ -31,7 +31,8 @@ class RequestHoliday extends CI_Controller
         echo json_encode($data);
     }
 
-    function waitingApproved(){
+    function waitingApproved()
+    {
 
         $data = $this->model->sql("SELECT personalId, COUNT(id) AS 'totalDays' 
         FROM request_holiday 
@@ -39,13 +40,29 @@ class RequestHoliday extends CI_Controller
         GROUP BY personalId 
         ");
         $i = 0;
-        foreach($data as $row){
-            $data[$i]['name'] = $this->model->select("name","personal", " id = '".$row['personalId']."'");
+        foreach ($data as $row) {
+            $data[$i]['name'] = $this->model->select("name", "personal", " id = '" . $row['personalId'] . "'");
+            $data[$i]['inputDate'] = $this->model->select("inputDate", "personal", " id = '" . $row['personalId'] . "'");
+
             $i++;
         }
 
         $data = array(
             "data" => $data,
+        );
+        echo json_encode($data);
+    }
+
+    function detailRequest()
+    {
+        $id = $this->input->get('id');
+        $data = array(
+            "items" => $this->model->sql("SELECT h.*, s.name AS 'shiftName', '' AS 'check'
+            FROM request_holiday AS h
+            LEFT JOIN time_management_shift AS s ON s.id = h.shiftId
+            WHERE h.approved = 0 and h.presence = 1  and  h.personalId = '$id'
+            ORDER BY h.date ASC
+            ")
         );
         echo json_encode($data);
     }
@@ -92,7 +109,7 @@ class RequestHoliday extends CI_Controller
 
             // Tanggal start dan end
             $startDate = $post['startDate']['year'] . "-" . $post['startDate']['month'] . "-" . $post['startDate']['day'];
-                
+
             $endDate = $post['endDate']['year'] . "-" . $post['endDate']['month'] . "-" . $post['endDate']['day'];
 
             // Konversi string tanggal menjadi objek DateTime
@@ -110,13 +127,13 @@ class RequestHoliday extends CI_Controller
             }
 
             // Tampilkan hasil
-            if(count( $dateRange) < 14) {
-                foreach( $dateRange as $row){
+            if (count($dateRange) < 14) {
+                foreach ($dateRange as $row) {
                     $insert = array(
-                        "personalId" => $post['personalId'], 
-                        "shiftId" => $post['shiftId'], 
-                        "note" => $post['note'], 
-                        "approved" => 0,  
+                        "personalId" => $post['personalId'],
+                        "shiftId" => $post['shiftId'],
+                        "note" => $post['note'],
+                        "approved" => 0,
                         "date" => $row,
                         "presence" => 1,
                         "inputDate" => date("Y-m-d H:i:s"),
@@ -127,9 +144,62 @@ class RequestHoliday extends CI_Controller
             }
             $data = array(
                 "error" => false,
-                "dateRange" => $dateRange ,
+                "dateRange" => $dateRange,
             );
         }
+        echo json_encode($data);
+    }
+
+
+    function fnApprove()
+    {
+        $post = json_decode(file_get_contents('php://input'), true);
+        $error = true;
+        if ($post) {
+            $error = true;
+            foreach ($post['items'] as $row) {
+                $update = array(
+                    "approved" => $post['approved'],
+                    "updateDate" => date("Y-m-d H:i:s"),
+                );
+                if ($row['check'] == true) {
+                    $this->db->update('request_holiday', $update, "id='" . $row['id'] . "' ");
+
+
+                    if ($post['approved'] == '1') { 
+                        $insert = array(
+                            'personalId' => $row['personalId'],
+                            'date' => $row['date'],
+                            'shiftId' => $row['shiftId'],
+                            'presence' => 1,
+                            'inputDate' => date('Y-m-d H:i:s'),
+                            'updateDate' => date('Y-m-d H:i:s'),
+                            'requestHolidayId' => $row['id'], 
+                        ); 
+                        $this->db->insert('time_management', $insert);
+                    }
+                }
+
+            }
+
+            $data = array(
+                "error" => false,
+            );
+        }
+        echo json_encode($data);
+    }
+
+    function historyRequestHoliday()
+    {
+        $id = $this->input->get('id');
+        $data = array(
+            "data" => $this->model->sql("SELECT h.*, s.name AS 'shiftName', p.name AS 'personal'
+            FROM request_holiday AS h
+            LEFT JOIN time_management_shift AS s ON s.id = h.shiftId
+            LEFT JOIN personal AS p ON p.id = h.personalId
+            WHERE h.approved != 0 and h.presence = 1  
+            ")
+        );
         echo json_encode($data);
     }
 }
