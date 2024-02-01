@@ -247,9 +247,7 @@ class Salary extends CI_Controller
                 $update = array(
                     "note" => ''
                 );
-                $this->db->update("salary_time", $update, "id = " . $row['id']);
-
-               
+                $this->db->update("salary_time", $update, "id = " . $row['id']); 
 
                 if ($row['late'] != "00:00:00") {
                     $pinaltyFee = -1 * (int) $this->model->select("pinaltyFee", "potongan_keterlambatan", "presence = 1 and lateMinute <= '" . $row['late'] . "' ORDER BY lateMinute DESC LIMIT 1");
@@ -283,6 +281,20 @@ class Salary extends CI_Controller
                     );
                     $this->db->update("salary_time", $update, "id = " . $row['id']);
                 }
+
+
+                //IJIN APPROVED
+                $idC = $this->model->select("id","request_holiday"," date = '".$row['date'] ."' AND personalId  = '".$post['personalId']."' ");
+                if( $this->model->select("approved","request_holiday"," id = '$idC' ") == 1 ){
+                    $shiftId =  $this->model->select("shiftId","request_holiday"," id = '$idC' ");
+                    $update = array(
+                        "amount"  => (int) $absen,
+                        "shiftId" =>  $this->model->select("shiftId","request_holiday"," id = '$idC' "),
+                        "job" => $this->model->select("name","time_management_shift"," id = '$shiftId' "),
+                    );
+                    $this->db->update("salary_time", $update, " date = '".$row['date'] ."' AND   salaryId = '".$row['salaryId']."' ");
+                }
+
 
                 // } 
                 // if ($row['overtime'] != "00:00:00") {

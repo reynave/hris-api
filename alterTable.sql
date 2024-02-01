@@ -116,3 +116,7 @@ ALTER TABLE `employment`
 
 DELETE FROM `global_setting` WHERE `id`=12;
 INSERT INTO `global_setting` (`id`, `name`, `value`) VALUES (12, 'TotalHoliday per Year', '14');
+
+
+DELETE FROM `employment_status` WHERE `id`=199;
+INSERT INTO `employment_status` (`id`, `name`) VALUES (199, 'Resign');

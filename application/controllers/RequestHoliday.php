@@ -157,27 +157,24 @@ class RequestHoliday extends CI_Controller
         $error = true;
         if ($post) {
             $error = true;
+            $id = $this->model->userId();
             foreach ($post['items'] as $row) {
                 $update = array(
                     "approved" => $post['approved'],
+                    "approvedBy" => $post['approved'],
+                    "approvedDate" => date("Y-m-d H:i:s"),
+                    
                     "updateDate" => date("Y-m-d H:i:s"),
                 );
                 if ($row['check'] == true) {
                     $this->db->update('request_holiday', $update, "id='" . $row['id'] . "' ");
 
 
-                    if ($post['approved'] == '1') { 
-                        $insert = array(
-                            'personalId' => $row['personalId'],
-                            'date' => $row['date'],
-                            'shiftId' => $row['shiftId'],
-                            'presence' => 1,
-                            'inputDate' => date('Y-m-d H:i:s'),
-                            'updateDate' => date('Y-m-d H:i:s'),
-                            'requestHolidayId' => $row['id'], 
-                        ); 
-                        $this->db->insert('time_management', $insert);
-                    }
+                    $totalHoliday = (int) $this->model->select("totalHoliday","employment","personalId = '" .$row['personalId']. "' ") + 1;
+                    $update = array(
+                        'totalHoliday' => $totalHoliday 
+                    ); 
+                    $this->db->update('employment', $update, "personalId = '" .$row['personalId']. "' ");
                 }
 
             }

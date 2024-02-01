@@ -22,7 +22,7 @@ class Employee extends CI_Controller
             "data" => $this->model->sql("SELECT p.id, p.idx,  p.name,
             jl.name AS 'jobLevel', jp.name AS 'jobPosition',
             s.name AS 'empyStatus', o.name AS 'organization', a.name AS 'approvedLine', b.name as 'branch',
-            e.dateJoinStart
+            e.dateJoinStart,   e.totalHoliday
             FROM personal AS p
             LEFT JOIN employment AS e ON e.personalId = p.id 
             LEFT JOIN employment_joblevel AS jl ON jl.id = e.jobLevelId
