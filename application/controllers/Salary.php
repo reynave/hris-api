@@ -293,44 +293,42 @@ class Salary extends CI_Controller
                         "job" => $this->model->select("name","time_management_shift"," id = '$shiftId' "),
                     );
                     $this->db->update("salary_time", $update, " date = '".$row['date'] ."' AND   salaryId = '".$row['salaryId']."' ");
+                } 
+
+                // dateJoinStart
+                $dateJoinStart = $this->model->select("dateJoinStart","employment","personalId = '".$post['personalId']."' ");
+                $dateJoinStartInt = strtotime($dateJoinStart);
+                $dateInt = strtotime($row['date']);
+                if($dateInt < $dateJoinStartInt){
+                    $update = array(
+                        "amount"  => 0,
+                        "overtimeFee" => 0,
+                        "pinaltyFee" => 0,
+                        "shiftId" =>  '',
+                        "job" => '',
+                        "note" => "",
+                    );
+                    $this->db->update("salary_time", $update, " date = '".$row['date'] ."' AND   salaryId = '".$row['salaryId']."' ");
+              
                 }
 
 
-                // } 
-                // if ($row['overtime'] != "00:00:00") {
-                //     $t = explode(":",$row['overtime']);
-                //     $overtimeFee = (int)$t[0] * $overtimeFeePerHour;
-                //     $update = array(
-                //         "overtimeFee" => $overtimeFee  ,
-                //         "note" => 'Overtime Fee'
-                //     ); 
-                //     $this->db->update("salary_time", $update, "id = " . $row['id']);
-                // }
-                // if ($row['late'] != "00:00:00") {
-                //     $pinaltyFee =  -1 * (int) $this->model->select("pinaltyFee", "potongan_keterlambatan", "presence = 1 and lateMinute <= '" . $row['late'] . "' ORDER BY lateMinute DESC LIMIT 1");
+                // RESIGN 
+                $dateJoinEnd = $this->model->select("dateJoinEnd","employment","personalId = '".$post['personalId']."' ");
+                
+                $dateJoinEndInt = strtotime($dateJoinEnd);
+                $dateInt = strtotime($row['date']);
 
-                //     $update = array(
-                //         "pinaltyFee" =>  $pinaltyFee,
-                //         "note" => $this->model->select("note", "potongan_keterlambatan", "presence = 1 and lateMinute <= '" . $row['late'] . "' ORDER BY lateMinute DESC LIMIT 1")
-                //     );
-
-                // } 
-                // else {
-                //     if($row['job'] != 'Holiday'){
-                //         $update = array(
-                //             "pinaltyFee" => (int) $absen * -1,
-                //             "amount" => (int) $absen * -1,
-                //             "note" => "Absen ".$n++,
-                //         );
-                //     }else{
-                //         $update = array(
-                //             "amount" => $pinaltyFee + $overtimeFee,
-                //             "note" => "",
-                //         );
-                //     }
-
-                // } 
-                // $this->db->update("salary_time", $update, "id = " . $row['id']);
+                if($dateInt >= $dateJoinEndInt){
+                    $update = array(
+                        "amount"  => 0,
+                        "shiftId" =>  'Z',
+                        "job" => 'RESIGN',
+                        "note" => "",
+                    );
+                    $this->db->update("salary_time", $update, " date = '".$row['date'] ."' AND   salaryId = '".$row['salaryId']."' ");
+              
+                }
             }
 
 
