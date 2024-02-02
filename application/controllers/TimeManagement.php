@@ -303,7 +303,6 @@ class TimeManagement extends CI_Controller
             "name" => $this->model->select("name", "personal", "id = '" . $this->input->get('id') . "'"),
             "jobPositionId" => $this->model->select("name", "employment_jobposition", "id = '" . $jobPosId . "'"),
             "dateJoinStart" => $this->model->select("dateJoinStart", "employment", "personalId = '" . $this->input->get('id') . "'"),
-
         );
 
         $summary = array(
@@ -328,8 +327,7 @@ class TimeManagement extends CI_Controller
             $isLate = false;
             $isQuickly = false;
             $isOvertime = false;
-            $where = "personalId = '" . $this->input->get('id') . "' AND 
-            `date` = '" . $dt->format("Y-m-d") . "' ORDER BY id DESC limit 1";
+            $where = "personalId = '" . $this->input->get('id') . "' AND   `date` = '" . $dt->format("Y-m-d") . "' ORDER BY id DESC limit 1";
             $shiftId = $this->model->select("shiftId", "time_management", $where);
             $scheduleIn = $this->model->select("scheduleIn", "time_management_shift", "id='$shiftId'");
             $scheduleOut = $this->model->select("scheduleOut", "time_management_shift", "id='$shiftId'");

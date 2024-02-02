@@ -109,6 +109,7 @@ class Payroll extends CI_Controller
                 "bankAccountNumber" => $post['model']['bankAccountNumber'],
                 "bankAccountHolderName" => $post['model']['bankAccountHolderName'],
                 "hourlyRate" => $post['model']['hourlyRate'],
+                "overtimeRate" => $post['model']['overtimeRate'], 
                 "tunjangan" => $post['model']['tunjangan'],
 
 

@@ -233,9 +233,10 @@ class Salary extends CI_Controller
         );
         if ($post) {
             $workingDays = $this->model->select("value", "global_setting", "id=10");
-            $overtimeFeePerHour = $this->model->select("value", "global_setting", "id=300");
-
-            $salaryBruto = $this->model->select("value", "payroll_tunjangan", "personalId = '" . $post['personalId'] . "' and sorting = 100 ");
+           $overtimeFeePerHour = $this->model->select("overtimeRate", "payroll", "personalId = '".$post['personalId']."' ");
+        //       $overtimeFeePerHour = 12;
+       
+       $salaryBruto = $this->model->select("value", "payroll_tunjangan", "personalId = '" . $post['personalId'] . "' and sorting = 100 ");
 
             $absen = $salaryBruto / $workingDays;
             $sqlTime = $this->model->sql("SELECT * FROM salary_time  WHERE  salaryId = '" . $post['salaryId'] . "' ORDER BY date ASC ");

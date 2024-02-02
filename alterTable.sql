@@ -120,3 +120,6 @@ INSERT INTO `global_setting` (`id`, `name`, `value`) VALUES (12, 'TotalHoliday p
 
 DELETE FROM `employment_status` WHERE `id`=199;
 INSERT INTO `employment_status` (`id`, `name`) VALUES (199, 'Resign');
+
+ALTER TABLE `payroll`
+	ADD COLUMN `overtimeRate` DOUBLE NOT NULL DEFAULT '0' AFTER `hourlyRate`;
