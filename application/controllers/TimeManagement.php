@@ -282,29 +282,32 @@ class TimeManagement extends CI_Controller
 
     function reports()
     {
-        $beginMinusOneDay = $this->input->get('startDate');
+        $salaryType = $this->model->select("salaryType", "payroll", "personalId = '" . $this->input->get('id') . "'");
 
+        $beginMinusOneDay = $this->input->get('startDate');
         $endAddOneDay = date('Y-m-d H:i:s', strtotime($this->input->get('endDate') . ' +1 day'));
 
 
-        // $begin = new DateTime($beginMinusOneDay);
-        // $end = new DateTime($endAddOneDay);
-
-        // $interval = DateInterval::createFromDateString('1 day');
-        // $period = new DatePeriod($begin, $interval, $end);
 
 
-        $begin = $beginMinusOneDay;
-        $end = date('Y-m-d', strtotime($this->input->get('endDate')));
+        if ($salaryType == 'H') {
+            $begin = $beginMinusOneDay;
+            $end = date('Y-m-d', strtotime($this->input->get('endDate')));
 
-        $period = [];
-        $a = "SELECT * FROM time_management 
-        WHERE personalId = 'P000003'
-        AND  date between '2023-01-01' and '2023-01-31'
-        ORDER BY DATE ASC";
-     
-        $period = $this->model->sql($a);
-        
+            $period = [];
+            $a = "SELECT * FROM time_management 
+            WHERE personalId = 'P000003'
+            AND  date between '2023-01-01' and '2023-01-31'
+            ORDER BY DATE ASC";
+
+            $period = $this->model->sql($a);
+        } else {
+            $begin = new DateTime($beginMinusOneDay);
+            $end = new DateTime($endAddOneDay);
+
+            $interval = DateInterval::createFromDateString('1 day');
+            $period = new DatePeriod($begin, $interval, $end);
+        }
 
 
 
@@ -339,16 +342,15 @@ class TimeManagement extends CI_Controller
                 "hours" => 0,
             ),
         );
-        $salaryType = $this->model->select("salaryType", "payroll", "personalId = '" . $this->input->get('id') . "'");
-       
+
         foreach ($period as $dt) {
             $isLate = false;
             $isQuickly = false;
             $isOvertime = false;
-       
-            if ($salaryType == 'H') { 
-                $where = "personalId = '" . $this->input->get('id') . "' AND   `date` = '" .  $dt['date'] . "' ORDER BY id DESC limit 1";
-              
+
+            if ($salaryType == 'H') {
+                $where = "personalId = '" . $this->input->get('id') . "' AND   `date` = '" . $dt['date'] . "' ORDER BY id DESC limit 1";
+
                 $shiftId = $dt['shiftId'];
                 $scheduleIn = $this->model->select("scheduleIn", "time_management_shift", "id='$shiftId'");
                 $scheduleOut = $this->model->select("scheduleOut", "time_management_shift", "id='$shiftId'");
@@ -359,7 +361,7 @@ class TimeManagement extends CI_Controller
                 $workDay = $this->model->select(date('D', strtotime($dt['date'])), "time_management_shift", "id='$shiftId'");
                 $day = date('D', strtotime($dt['date']));
                 $date = $dt['date'];
-            }else{
+            } else {
                 $where = "personalId = '" . $this->input->get('id') . "' AND   `date` = '" . $dt->format("Y-m-d") . "' ORDER BY id DESC limit 1";
                 $shiftId = $this->model->select("shiftId", "time_management", $where);
                 $scheduleIn = $this->model->select("scheduleIn", "time_management_shift", "id='$shiftId'");
@@ -375,7 +377,7 @@ class TimeManagement extends CI_Controller
 
 
             $temp = array(
-                "day" => $day ,
+                "day" => $day,
                 "date" => $date,
                 "hour" => '',
                 "job" => $workDay == 1 ? "Work" : ' - ',
@@ -457,7 +459,7 @@ class TimeManagement extends CI_Controller
 
                 $summary['working']['hours'] += $workingHours->h;
                 $summary['working']['minutes'] += $workingHours->i;
-                
+
 
             }
             array_push($items, $temp);
@@ -489,7 +491,7 @@ class TimeManagement extends CI_Controller
                  
             from time_management_shift where presence = 1"),
             "offtime" => $this->model->sql("SELECT id, name FROM  offtime  where presence = 1  order by name asc "),
-            "salaryType" => $salaryType ,
+            "salaryType" => $salaryType,
         );
 
         echo json_encode($data);
