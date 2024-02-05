@@ -123,3 +123,7 @@ INSERT INTO `employment_status` (`id`, `name`) VALUES (199, 'Resign');
 
 ALTER TABLE `payroll`
 	ADD COLUMN `overtimeRate` DOUBLE NOT NULL DEFAULT '0' AFTER `hourlyRate`;
+
+
+ALTER TABLE `salary`
+	ADD COLUMN `salaryType` VARCHAR(3) NOT NULL DEFAULT '' AFTER `asLock`;

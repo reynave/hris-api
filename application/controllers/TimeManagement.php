@@ -48,8 +48,8 @@ class TimeManagement extends CI_Controller
             WHERE e.presence = 1 
              "),
             "potongan_keterlambatan" => $this->model->sql("SELECT * from potongan_keterlambatan where presence = 1 order by pinaltyFee ASC"),
-            "overtimeFee" => (int)$this->model->select('value','global_setting','id=300'),
-            
+            "overtimeFee" => (int) $this->model->select('value', 'global_setting', 'id=300'),
+
         );
         echo json_encode($data);
     }
@@ -62,20 +62,20 @@ class TimeManagement extends CI_Controller
         if ($post) {
             $error = true;
             $update = array(
-                "value" =>  $post['overtimeFee'], 
+                "value" => $post['overtimeFee'],
             );
             $this->db->update('global_setting', $update, "id = 300 ");
 
-            foreach ($post['item'] as $row) { 
+            foreach ($post['item'] as $row) {
                 $update = array(
-                    "note" =>  $row['note'],
-                    "lateMinute" =>  $row['lateMinute'],
-                    "pinaltyFee" => (int)$row['pinaltyFee'],
+                    "note" => $row['note'],
+                    "lateMinute" => $row['lateMinute'],
+                    "pinaltyFee" => (int) $row['pinaltyFee'],
                 );
-                $this->db->update('potongan_keterlambatan', $update, "id = '" .  $row['id'] . "'");
+                $this->db->update('potongan_keterlambatan', $update, "id = '" . $row['id'] . "'");
             }
             $data = array(
-                "error" => false, 
+                "error" => false,
                 "post" => $post,
             );
         }
@@ -164,7 +164,7 @@ class TimeManagement extends CI_Controller
             $error = true;
             $id = $post['id'];
             $update = array(
-                "presence" => 0, 
+                "presence" => 0,
             );
             $this->db->update('potongan_keterlambatan', $update, "id='$id'");
             $data = array(
@@ -178,9 +178,9 @@ class TimeManagement extends CI_Controller
         $post = json_decode(file_get_contents('php://input'), true);
         $error = true;
         if ($post) {
-            $error = true; 
-            $insert = array( 
-                "presence" => 1, 
+            $error = true;
+            $insert = array(
+                "presence" => 1,
             );
             $this->db->insert('potongan_keterlambatan', $insert);
             $data = array(
@@ -205,13 +205,13 @@ class TimeManagement extends CI_Controller
                 "updateDate" => date("Y-m-d H:i:s"),
             );
 
-            $jobPositionId = $this->model->select("jobPositionId","employment","personalId = '".$this->model->userId()."' ");
-            if($this->model->select("_timeManagement","employment_jobposition","id= $jobPositionId ") == 1){
+            $jobPositionId = $this->model->select("jobPositionId", "employment", "personalId = '" . $this->model->userId() . "' ");
+            if ($this->model->select("_timeManagement", "employment_jobposition", "id= $jobPositionId ") == 1) {
                 $this->db->update('time_management', $update, "id='$id'");
                 $error = false;
-            } 
+            }
             $data = array(
-                "error" => $error ,
+                "error" => $error,
                 "userId" => $this->model->userId(),
             );
         }
@@ -287,11 +287,27 @@ class TimeManagement extends CI_Controller
         $endAddOneDay = date('Y-m-d H:i:s', strtotime($this->input->get('endDate') . ' +1 day'));
 
 
-        $begin = new DateTime($beginMinusOneDay);
-        $end = new DateTime($endAddOneDay);
+        // $begin = new DateTime($beginMinusOneDay);
+        // $end = new DateTime($endAddOneDay);
 
-        $interval = DateInterval::createFromDateString('1 day');
-        $period = new DatePeriod($begin, $interval, $end);
+        // $interval = DateInterval::createFromDateString('1 day');
+        // $period = new DatePeriod($begin, $interval, $end);
+
+
+        $begin = $beginMinusOneDay;
+        $end = date('Y-m-d', strtotime($this->input->get('endDate')));
+
+        $period = [];
+        $a = "SELECT * FROM time_management 
+        WHERE personalId = 'P000003'
+        AND  date between '2023-01-01' and '2023-01-31'
+        ORDER BY DATE ASC";
+     
+        $period = $this->model->sql($a);
+        
+
+
+
         $personalId = $this->input->get('id');
         $shiftId = $this->model->select("shiftId", "time_management", "personalId = '$personalId'");
         $items = [];
@@ -323,25 +339,44 @@ class TimeManagement extends CI_Controller
                 "hours" => 0,
             ),
         );
+        $salaryType = $this->model->select("salaryType", "payroll", "personalId = '" . $this->input->get('id') . "'");
+       
         foreach ($period as $dt) {
             $isLate = false;
             $isQuickly = false;
             $isOvertime = false;
-            $where = "personalId = '" . $this->input->get('id') . "' AND   `date` = '" . $dt->format("Y-m-d") . "' ORDER BY id DESC limit 1";
-            $shiftId = $this->model->select("shiftId", "time_management", $where);
-            $scheduleIn = $this->model->select("scheduleIn", "time_management_shift", "id='$shiftId'");
-            $scheduleOut = $this->model->select("scheduleOut", "time_management_shift", "id='$shiftId'");
+       
+            if ($salaryType == 'H') { 
+                $where = "personalId = '" . $this->input->get('id') . "' AND   `date` = '" .  $dt['date'] . "' ORDER BY id DESC limit 1";
+              
+                $shiftId = $dt['shiftId'];
+                $scheduleIn = $this->model->select("scheduleIn", "time_management_shift", "id='$shiftId'");
+                $scheduleOut = $this->model->select("scheduleOut", "time_management_shift", "id='$shiftId'");
 
-            $checkIn = $this->model->select("checkIn", "time_management", $where);
-            $checkOut = $this->model->select("checkOut", "time_management", $where);
+                $checkIn = $dt['checkIn'];
+                $checkOut = $dt['checkOut'];
 
-            $workDay = $this->model->select($dt->format("D"), "time_management_shift", "id='$shiftId'");
+                $workDay = $this->model->select(date('D', strtotime($dt['date'])), "time_management_shift", "id='$shiftId'");
+                $day = date('D', strtotime($dt['date']));
+                $date = $dt['date'];
+            }else{
+                $where = "personalId = '" . $this->input->get('id') . "' AND   `date` = '" . $dt->format("Y-m-d") . "' ORDER BY id DESC limit 1";
+                $shiftId = $this->model->select("shiftId", "time_management", $where);
+                $scheduleIn = $this->model->select("scheduleIn", "time_management_shift", "id='$shiftId'");
+                $scheduleOut = $this->model->select("scheduleOut", "time_management_shift", "id='$shiftId'");
 
+                $checkIn = $this->model->select("checkIn", "time_management", $where);
+                $checkOut = $this->model->select("checkOut", "time_management", $where);
+
+                $workDay = $this->model->select($dt->format("D"), "time_management_shift", "id='$shiftId'");
+                $day = $dt->format("D");
+                $date = $dt->format("Y-m-d");
+            }
 
 
             $temp = array(
-                "day" => $dt->format("D"),
-                "date" => $dt->format("Y-m-d"),
+                "day" => $day ,
+                "date" => $date,
                 "hour" => '',
                 "job" => $workDay == 1 ? "Work" : ' - ',
                 "checkIn" => '',
@@ -420,6 +455,10 @@ class TimeManagement extends CI_Controller
                     }
                 }
 
+                $summary['working']['hours'] += $workingHours->h;
+                $summary['working']['minutes'] += $workingHours->i;
+                
+
             }
             array_push($items, $temp);
         }
@@ -438,7 +477,7 @@ class TimeManagement extends CI_Controller
                 "overtime" => ((int) ($summary['overtime']['hours'] + (int) date('H', mktime(0, $summary['overtime']['minutes'])))) . 'h' . date('i', mktime(0, $summary['overtime']['minutes'])) . 'm',
 
                 "working" => ((int) ($summary['working']['hours'] + (int) date('H', mktime(0, $summary['working']['minutes'])))) . 'h' . date('i', mktime(0, $summary['working']['minutes'])) . 'm',
-                //   "h" => (int) date('H', mktime(0,$summary['working']['minutes'])),
+                //"h" => (int) date('H', mktime(0,$summary['working']['minutes'])),
             ),
 
             "employee" => $employee,
@@ -450,6 +489,7 @@ class TimeManagement extends CI_Controller
                  
             from time_management_shift where presence = 1"),
             "offtime" => $this->model->sql("SELECT id, name FROM  offtime  where presence = 1  order by name asc "),
+            "salaryType" => $salaryType ,
         );
 
         echo json_encode($data);
