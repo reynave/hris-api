@@ -233,18 +233,33 @@ class Salary extends CI_Controller
         );
         if ($post) {
             $parTimeFee = 0;
-            $workingDays = $this->model->select("value", "global_setting", "id=10");
+            $workingDays = 0;
+
+ 
+
+
             $overtimeFeePerHour = $this->model->select("overtimeRate", "payroll", "personalId = '" . $post['personalId'] . "' ");
             $salaryType = $this->model->select("salaryType", "payroll", "personalId = '" . $post['personalId'] . "' ");
             $hourlyRate = $this->model->select("hourlyRate", "payroll", "personalId = '" . $post['personalId'] . "' ");
 
             //$overtimeFeePerHour = 12;
-
+ 
             $salaryBruto = $this->model->select("value", "payroll_tunjangan", "personalId = '" . $post['personalId'] . "' and sorting = 100 ");
 
-            $absen = $salaryBruto / $workingDays;
+         
             $sqlTime = $this->model->sql("SELECT *,HOUR(workingHour) as 'partTimeHours' FROM salary_time  WHERE  salaryId = '" . $post['salaryId'] . "' ORDER BY date ASC ");
             $n = 1;
+
+        
+ 
+            foreach ($sqlTime as $row) {  
+                if(date('D', strtotime($row['date'])) != 'Sun'){
+                    $workingDays++;
+                } 
+            }
+
+            $absen = $salaryBruto / $workingDays;
+
 
             foreach ($sqlTime as $row) {
                 $pinaltyFee = 0;
@@ -294,7 +309,7 @@ class Salary extends CI_Controller
                 if ($this->model->select("approved", "request_holiday", " id = '$idC' ") == 1) {
                     $shiftId = $this->model->select("shiftId", "request_holiday", " id = '$idC' ");
                     $update = array(
-                        "amount" => (int) $absen,
+                        "amount" => 0,
                         "shiftId" => $this->model->select("shiftId", "request_holiday", " id = '$idC' "),
                         "job" => $this->model->select("name", "time_management_shift", " id = '$shiftId' "),
                     );
@@ -375,17 +390,19 @@ class Salary extends CI_Controller
                 $this->db->update("salary_detail", $update, "id= '" . $row['id'] . "' ");
             }
 
- 
 
 
-           //  if ($salaryType == 'H') {
+
+            if ($salaryType == 'H') {
                 $update = array(
-                    "value" => $this->model->select("sum(amount)","salary_time"," salaryId = '" . $post['salaryId'] . "'   "),
+                    "value" => $this->model->select("sum(amount)", "salary_time", " salaryId = '" . $post['salaryId'] . "'   "),
                     "updateDate" => date("Y-m-d H:i:s"),
                     "updateBy" => $this->model->userId(),
                 );
                 $this->db->update("salary_detail", $update, " sorting = 100 AND  salaryId = '" . $post['salaryId'] . "' ");
-            // }
+            }
+
+
             /**
              * CUSTOM FEE 
              *  */
@@ -444,6 +461,7 @@ class Salary extends CI_Controller
         }
     }
 
+
     function saleryDetailUpdate()
     {
         $post = json_decode(file_get_contents('php://input'), true);
@@ -453,6 +471,11 @@ class Salary extends CI_Controller
         if ($post) {
             $parTimeFee = 0;
             $salaryBruto = $this->model->select("salary", "payroll", "personalId = '" . $post['personalId'] . "' ");
+            $salaryType = $this->model->select("salaryType", "payroll", "personalId = '" . $post['personalId'] . "' ");
+            $basicSalary = $this->model->select("value", "payroll_tunjangan", "personalId = '" . $post['personalId'] . "' and sorting = 100 ");
+            $workDay  = 0;
+            $totalDay = 0;
+            
             foreach ($post['salary_time'] as $row) {
                 $update = array(
                     "overtimeFee" => $row['overtimeFee'],
@@ -461,7 +484,13 @@ class Salary extends CI_Controller
                     "note" => $row['note'],
                 );
                 $this->db->update("salary_time", $update, "id=" . $row['id']);
+                if($row['workDay'] == '1'){
+                    $workDay++;
+                }
 
+                if(date('D', strtotime($row['date'])) != 'Sun'){
+                    $totalDay++;
+                }
                 $parTimeFee += $row['amount'];
             }
 
@@ -512,15 +541,26 @@ class Salary extends CI_Controller
 
 
 
-         //   TUNJANGAN TETAP
-         //   Gaji Pokok
-            $update = array(
-                "value" => $parTimeFee,
-                "updateDate" => date("Y-m-d H:i:s"),
-                "updateBy" => $this->model->userId(),
-            );
-            $this->db->update("salary_detail", $update, " sorting = 100 AND  salaryId = '" . $post['salaryId'] . "' ");
- 
+            //   TUNJANGAN TETAP
+            //   Gaji Pokok
+            if ($salaryType == 'H') {
+                $update = array(
+                    "value" => $parTimeFee,
+                    "updateDate" => date("Y-m-d H:i:s"),
+                    "updateBy" => $this->model->userId(),
+                );
+                $this->db->update("salary_detail", $update, " sorting = 100 AND  salaryId = '" . $post['salaryId'] . "' ");
+            } else {
+
+                $update = array( 
+                    "value" =>  (($basicSalary / $totalDay) *  $workDay) + $parTimeFee,
+                   
+                    "updateDate" => date("Y-m-d H:i:s"),
+                    "updateBy" => $this->model->userId(),
+                );
+                $this->db->update("salary_detail", $update, " sorting = 100 AND  salaryId = '" . $post['salaryId'] . "' ");
+            }
+
 
             // BYJABATAN
 
@@ -558,7 +598,7 @@ class Salary extends CI_Controller
             $this->db->update("salary", $update, "id= '" . $post['salaryId'] . "' ");
 
 
-          
+
 
 
             $ress = array(
