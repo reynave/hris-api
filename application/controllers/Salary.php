@@ -484,7 +484,7 @@ class Salary extends CI_Controller
                     "note" => $row['note'],
                 );
                 $this->db->update("salary_time", $update, "id=" . $row['id']);
-                if($row['workDay'] == '1'){
+                if($row['workDay'] == '1' &&  $row['workingHour'] != "00:00:00"){
                     $workDay++;
                 }
 
@@ -553,7 +553,8 @@ class Salary extends CI_Controller
             } else {
 
                 $update = array( 
-                    "value" =>  (($basicSalary / $totalDay) *  $workDay) + $parTimeFee,
+                  "value" =>  (($basicSalary / $totalDay) *  $workDay) + $parTimeFee,
+                ///    "value" =>  $workDay,
                    
                     "updateDate" => date("Y-m-d H:i:s"),
                     "updateBy" => $this->model->userId(),
