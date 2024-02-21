@@ -1,0 +1,1 @@
+var api = 'http://localhost/app/hris/hris-api/';

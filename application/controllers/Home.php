@@ -79,7 +79,7 @@ class Home extends CI_Controller
         $year0 = "SELECT SUM(qty) AS qty FROM ( 
         SELECT  YEAR(NOW()) - YEAR(dateJoinStart) AS totalYears, COUNT(YEAR(NOW()) - YEAR(dateJoinStart) ) AS 'qty'
         FROM employment
-        WHERE  dateJoinStart != '0000-00-00'  AND presence = 1 AND STATUS = 1
+        WHERE  ( YEAR(NOW()) - YEAR(dateJoinStart)) < 100  AND presence = 1 AND STATUS = 1
         GROUP BY YEAR(NOW()) - YEAR(dateJoinStart)
         ) AS t
         WHERE  totalYears < 1";
@@ -87,7 +87,7 @@ class Home extends CI_Controller
         $year1to5 = "SELECT SUM(qty) AS qty FROM ( 
         SELECT  YEAR(NOW()) - YEAR(dateJoinStart) AS totalYears, COUNT(YEAR(NOW()) - YEAR(dateJoinStart) ) AS 'qty'
         FROM employment
-        WHERE  dateJoinStart != '0000-00-00'  AND presence = 1 AND STATUS = 1
+        WHERE  ( YEAR(NOW()) - YEAR(dateJoinStart)) < 100  AND presence = 1 AND STATUS = 1
         GROUP BY YEAR(NOW()) - YEAR(dateJoinStart)
         ) AS t
         WHERE  totalYears >= 1 or  totalYears < 5";
@@ -95,7 +95,7 @@ class Home extends CI_Controller
         $year5to10 = "SELECT SUM(qty) AS qty FROM ( 
         SELECT  YEAR(NOW()) - YEAR(dateJoinStart) AS totalYears, COUNT(YEAR(NOW()) - YEAR(dateJoinStart) ) AS 'qty'
         FROM employment
-        WHERE  dateJoinStart != '0000-00-00'  AND presence = 1 AND STATUS = 1
+        WHERE  ( YEAR(NOW()) - YEAR(dateJoinStart)) < 100  AND presence = 1 AND STATUS = 1
         GROUP BY YEAR(NOW()) - YEAR(dateJoinStart)
         ) AS t
         WHERE  totalYears >= 5 or  totalYears < 10";
@@ -103,7 +103,7 @@ class Home extends CI_Controller
         $year10 = "SELECT SUM(qty) AS qty FROM ( 
         SELECT  YEAR(NOW()) - YEAR(dateJoinStart) AS totalYears, COUNT(YEAR(NOW()) - YEAR(dateJoinStart) ) AS 'qty'
         FROM employment
-        WHERE  dateJoinStart != '0000-00-00'  AND presence = 1 AND STATUS = 1
+        WHERE  ( YEAR(NOW()) - YEAR(dateJoinStart)) < 100  AND presence = 1 AND STATUS = 1
         GROUP BY YEAR(NOW()) - YEAR(dateJoinStart)
         ) AS t
         WHERE  totalYears >= 10  ";
