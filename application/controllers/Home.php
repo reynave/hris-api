@@ -21,28 +21,116 @@ class Home extends CI_Controller
 
     public function index()
     {
+
+        $employmentStatus = $this->model->sql("SELECT e.employmentStatusId , s.name, SUM(e.employmentStatusId)  AS 'qty'
+        FROM employment AS e
+        JOIN employment_status AS s ON s.id = e.employmentStatusId
+        WHERE e.presence = 1
+        GROUP BY e.employmentStatusId");
+        $total= 0;
+        for($i = 0; $i < count($employmentStatus); $i++){
+            $total += $employmentStatus[$i]['qty'];
+        }
+        for($i = 0; $i < count($employmentStatus); $i++){
+            $percent = (float)($employmentStatus[$i]['qty'] / $total  * 100 );  
+            $employmentStatus[$i]['percent'] = (float)number_format((float) $percent, 2, '.', '');
+        }
+
+        $employmentPosition =  $this->model->sql("SELECT e.jobPositionId, COUNT(e.jobPositionId)  AS 'qty', p.name
+        FROM employment AS e 
+        JOIN employment_jobposition AS p ON p.id = e.jobPositionId
+        WHERE e.presence = 1
+        GROUP BY e.jobPositionId");
+        $total= 0;
+        for($i = 0; $i < count($employmentPosition); $i++){
+            $total += $employmentPosition[$i]['qty'];
+        }
+        for($i = 0; $i < count($employmentPosition); $i++){
+            $percent = (float)($employmentPosition[$i]['qty'] / $total  * 100 );  
+            $employmentPosition[$i]['percent'] = (float)number_format((float) $percent, 2, '.', '');
+        }
+
+
+
+        $gender = $this->model->sql("SELECT gender, COUNT(gender) AS 'qty' from personal
+        GROUP BY gender");
+        $total= 0;
+        for($i = 0; $i < count($gender); $i++){
+            if( $gender[$i]['gender'] == 'F' ){
+                $gender[$i]['gender'] =  "Female";
+            }
+
+           else  if( $gender[$i]['gender'] == 'M' ){
+                $gender[$i]['gender'] =  "Male";
+            }   
+            else {
+                $gender[$i]['gender'] =  "Undefine";
+            }
+
+            $total += $gender[$i]['qty'];
+        }
+        for($i = 0; $i < count($gender); $i++){
+            $percent = (float)($gender[$i]['qty'] / $total  * 100 );  
+            $gender[$i]['percent'] = (float)number_format((float) $percent, 2, '.', '');
+        }
+
+
+        $year0 = "SELECT SUM(qty) AS qty FROM ( 
+            SELECT  YEAR(NOW()) - YEAR(dateJoinStart) AS totalYears, COUNT(YEAR(NOW()) - YEAR(dateJoinStart) ) AS 'qty'
+            FROM employment
+            WHERE  dateJoinStart != '0000-00-00'  AND presence = 1 AND STATUS = 1
+            GROUP BY YEAR(NOW()) - YEAR(dateJoinStart)
+            ) AS t
+            WHERE  totalYears < 1";
+
+$year1to5 = "SELECT SUM(qty) AS qty FROM ( 
+    SELECT  YEAR(NOW()) - YEAR(dateJoinStart) AS totalYears, COUNT(YEAR(NOW()) - YEAR(dateJoinStart) ) AS 'qty'
+    FROM employment
+    WHERE  dateJoinStart != '0000-00-00'  AND presence = 1 AND STATUS = 1
+    GROUP BY YEAR(NOW()) - YEAR(dateJoinStart)
+    ) AS t
+    WHERE  totalYears >= 1 or  totalYears < 5";
+
+$year5to10 = "SELECT SUM(qty) AS qty FROM ( 
+    SELECT  YEAR(NOW()) - YEAR(dateJoinStart) AS totalYears, COUNT(YEAR(NOW()) - YEAR(dateJoinStart) ) AS 'qty'
+    FROM employment
+    WHERE  dateJoinStart != '0000-00-00'  AND presence = 1 AND STATUS = 1
+    GROUP BY YEAR(NOW()) - YEAR(dateJoinStart)
+    ) AS t
+    WHERE  totalYears >= 5 or  totalYears < 10";
+
+$year10 = "SELECT SUM(qty) AS qty FROM ( 
+    SELECT  YEAR(NOW()) - YEAR(dateJoinStart) AS totalYears, COUNT(YEAR(NOW()) - YEAR(dateJoinStart) ) AS 'qty'
+    FROM employment
+    WHERE  dateJoinStart != '0000-00-00'  AND presence = 1 AND STATUS = 1
+    GROUP BY YEAR(NOW()) - YEAR(dateJoinStart)
+    ) AS t
+    WHERE  totalYears >= 10  ";
+
+        $lenghtOfServiceData = [
+            (int)$this->model->sql($year0)[0]['qty'], 
+            (int)$this->model->sql($year1to5)[0]['qty'], 
+            (int)$this->model->sql($year5to10)[0]['qty'], 
+            (int)$this->model->sql($year10)[0]['qty'], 
+        ];
+
         $data = array(
             "error" => false,
-            "ServerTime" => date("Y-m-d H:i:s"),
-
-            "employmentStatus" => $this->model->sql("SELECT e.employmentStatusId , s.name, SUM(e.employmentStatusId)  AS 'qty'
-            FROM employment AS e
-            JOIN employment_status AS s ON s.id = e.employmentStatusId
-            WHERE e.presence = 1
-            GROUP BY e.employmentStatusId"),
-
-            "employmentPosition" => $this->model->sql("SELECT e.jobPositionId, COUNT(e.jobPositionId)  AS 'qty', p.name
-              FROM employment AS e 
-              JOIN employment_jobposition AS p ON p.id = e.jobPositionId
-              WHERE e.presence = 1
-              GROUP BY e.jobPositionId"),
-
-            "gender" => $this->model->sql("SELECT gender, COUNT(gender) AS 'qty' from personal
-            GROUP BY gender"),
+            "ServerTime" => date("Y-m-d H:i:s"), 
+            "employmentStatus" => $employmentStatus, 
+            "employmentPosition" =>  $employmentPosition, 
+            "gender" =>  $gender,
 
             "lenghtOfService" => array(
-                    "note" => "< 1 yr",
-                    "qty" => "",
+                "labels" => [
+                    "< 1yr","1-5yr","5-10yr","<10yr"
+                ],
+                "datasets" =>[
+                    "label" => "My First dataset",
+                    "data"  => $lenghtOfServiceData,
+                    "borderColor"  => '#36A2EB',
+                    "backgroundColor"  => '#9BD0F5',
+                ],
             ),
 
 
