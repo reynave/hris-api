@@ -45,7 +45,7 @@ class Employee extends CI_Controller
             FROM  employment AS e
             JOIN employment_status AS es ON es.id = e.employmentStatusId
             JOIN personal AS p ON p.id = e.personalId
-            WHERE e.presence = 1 AND e.STATUS = 1 and DATEDIFF(e.dateJoinEnd,NOW()) < $n"),
+            WHERE e.presence = 1 AND e.STATUS = 1 and DATEDIFF(e.dateJoinEnd,NOW()) < $n AND employmentStatusId < 100"),
         );
         echo json_encode($data);
     }

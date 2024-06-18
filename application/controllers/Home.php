@@ -67,7 +67,7 @@ class Home extends CI_Controller
             }
 
             $total += $gender[$i]['qty'];
-            $genderDataLabel[] =  $gender[$i]['gender'];
+            $genderDataLabel[] = $gender[$i]['gender'];
         }
         for ($i = 0; $i < count($gender); $i++) {
             $percent = (float) ($gender[$i]['qty'] / $total * 100);
@@ -117,13 +117,13 @@ class Home extends CI_Controller
 
 
         $genderData = array(
-            "label" =>  $genderDataLabel,
-            "datasets" =>  $genderDataDataset,
+            "label" => $genderDataLabel,
+            "datasets" => $genderDataDataset,
         );
-    
+       
         $data = array(
             "error" => false,
-            "colors" => ["#FF407D","#0B60B0","#2D9596","#7F27FF","#9B4444","#AC7D88","#37B5B6"],
+            "colors" => ["#FF407D", "#0B60B0", "#2D9596", "#7F27FF", "#9B4444", "#AC7D88", "#37B5B6"],
             "ServerTime" => date("Y-m-d H:i:s"),
             "employmentStatus" => $employmentStatus,
             "employmentPosition" => $employmentPosition,
@@ -131,16 +131,20 @@ class Home extends CI_Controller
             "gender" => $gender,
 
             "lenghtOfService" => array(
-                    "labels" => [
-                        "< 1yr",
-                        "1-5yr",
-                        "5-10yr",
-                        "> 10yr"
-                    ],
-                    "datasets" => $lenghtOfServiceData,
-                ),
-
-
+                "labels" => [
+                    "< 1yr",
+                    "1-5yr",
+                    "5-10yr",
+                    "> 10yr"
+                ],
+                "datasets" => $lenghtOfServiceData,
+            ),
+            "announcement" => $this->model->sql("SELECT * 
+                FROM announcement 
+                WHERE presence = 1 AND status = 1 AND 
+                ( NOW() <= endDate AND createDate <= NOW())
+                ORDER BY endDate "),
+            
         );
 
         echo json_encode($data, JSON_PRETTY_PRINT);
