@@ -137,6 +137,8 @@ class Reimbursement extends CI_Controller
         if ($post) {
             $error = true;
             $item = $post['item'];
+            $upload_data = $post['upload_data'];
+            
             $id = $this->model->number('reimbursement');
             $insert = array(
                 "id" => $id, 
@@ -144,7 +146,9 @@ class Reimbursement extends CI_Controller
                 "reimbursementNameId" => $item['reimbursementNameId'],
                 "requestAmount" => $item['requestAmount'],
                 "description" => $item['description'],
-                "personalId" => $item['personalId'], 
+                "personalId" => $item['personalId'],  
+                "uploadFile" => $upload_data['file_name'],  
+                
                 "inputDate"     => date("Y-m-d H:i:s"), 
             );
             $this->db->insert('reimbursement', $insert);

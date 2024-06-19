@@ -72,4 +72,41 @@ class Upload extends CI_Controller
         echo json_encode($data);
     }
  
+
+    function uploadReimbursement()
+    { 
+        $data = array(
+            "error" => true,
+        );
+
+        // mysql harus : SET GLOBAL local_infile=1; 
+        if ($this->input->post('token') == '2661ef6c07b945d4&') {
+            $this->load->helper('url', 'form');
+            $config['upload_path']          = './uploads/reimbursement';
+            $config['allowed_types']        = 'jpg|jpeg|png|pdf';
+            $config['max_size']             = 10000;
+            $new_name = time() . $_FILES["item"]['name'];
+            $config['file_name'] = $new_name;
+            $data = array(
+                "error" => false,
+                "upload_data" => [],
+                "token" => apache_request_headers(),
+                "post" => $this->input->post(),
+            );
+            $this->load->library('upload', $config);
+
+            if (!$this->upload->do_upload('item')) {
+                $data['error'] =  $this->upload->display_errors();
+            } else {
+                $data['upload_data'] =  $this->upload->data();  
+                $error = false;
+                $data = array(
+                    "error"     => $error, 
+                    "data"    => $data,
+                );
+            }
+        }
+
+        echo json_encode($data);
+    }
 }
