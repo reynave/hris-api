@@ -1,3 +1,18 @@
+CREATE TABLE `announcement` (
+	`id` INT(10) NOT NULL AUTO_INCREMENT,
+	`createDate` DATE NOT NULL DEFAULT '2022-01-01',
+	`endDate` DATE NOT NULL DEFAULT '2022-01-01',
+	`note` VARCHAR(250) NOT NULL DEFAULT '' COLLATE 'utf16_bin',
+	`status` TINYINT(3) NOT NULL DEFAULT '1',
+	`presence` TINYINT(3) NOT NULL DEFAULT '1',
+	PRIMARY KEY (`id`) USING BTREE
+)
+COLLATE='utf16_bin'
+ENGINE=InnoDB
+AUTO_INCREMENT=5
+;
+
+
 ALTER TABLE `employment_jobposition`
 	CHANGE COLUMN `_masterData` `_masterData` TINYINT(3) NOT NULL DEFAULT 0 AFTER `name`,
 	CHANGE COLUMN `_timeManagement` `_timeManagement` TINYINT(3) NOT NULL DEFAULT 0 AFTER `_masterData`,
@@ -50,3 +65,18 @@ ALTER TABLE `employment_jobposition`
 
 ALTER TABLE `reimbursement`
 	ADD COLUMN `uploadFile` VARCHAR(250) NOT NULL DEFAULT '' AFTER `description`;
+
+
+CREATE TABLE `personal_sp` (
+	`id` INT(10) NOT NULL AUTO_INCREMENT,
+	`personalId` VARCHAR(50) NOT NULL DEFAULT '' COLLATE 'utf16_bin',
+	`uploadFile` VARCHAR(250) NOT NULL DEFAULT '' COLLATE 'utf16_bin',
+	`note` TEXT(32767) NOT NULL COLLATE 'utf16_bin',
+	`status` TINYINT(3) NOT NULL DEFAULT '1',
+	`presence` TINYINT(3) NOT NULL DEFAULT '1',
+	PRIMARY KEY (`id`) USING BTREE
+)
+COLLATE='utf16_bin'
+ENGINE=InnoDB
+AUTO_INCREMENT=8
+;

@@ -135,6 +135,11 @@ class GlobalSetting extends CI_Controller
                     "_reimbursement" => $row['_reimbursement'],
                     "_loan" => $row['_loan'],
                     "_payroll" => $row['_payroll'],
+                    "_sp" => $row['_sp'],
+                    "_invetory" => $row['_invetory'],
+                     "_announcement" => $row['_announcement'],
+                    
+                    
                 );
                 $this->db->update("employment_jobposition", $update, " id='" . $row['id'] . "' ");
             }

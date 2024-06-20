@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
-class Inventory extends CI_Controller
+class Sp extends CI_Controller
 {
 
     public function __construct()
@@ -19,14 +19,11 @@ class Inventory extends CI_Controller
 
     function index()
     {
-        $items = $this->model->sql("SELECT *  FROM inventory WHERE  presence = 1 ");
+        $items = $this->model->sql("SELECT id, name  FROM personal WHERE  presence = 1 order by name asc ");
         $i = 0;
-        foreach($items as $row){
-            $items[$i]['loaned'] = 0;
-            if($this->model->select("count(id)", "inventory_personal"," inventoryId =  '". $row['id']."' and presence = 1 " )){
-                $items[$i]['loaned'] =  (int)$this->model->select("count(id)", "inventory_personal"," inventoryId =  '". $row['id']."' and presence = 1 " );
-            } 
-            $items[$i]['avaiable'] =  $row['qty'] - $items[$i]['loaned'] ;
+        foreach ($items as $row) {
+            $items[$i]['qty'] = (int) $this->model->select("count(id)", "personal_sp", " personalId =  '" . $row['id'] . "' and presence = 1 ");
+
             $i++;
         }
 
@@ -40,18 +37,11 @@ class Inventory extends CI_Controller
     function detail()
     {
         $id = $this->input->get('id');
-        $item = $this->model->sql("SELECT *  FROM inventory WHERE  presence = 1 and id =  '$id'  ");
-        $personal = $this->model->sql("SELECT id, name  FROM personal WHERE  presence = 1 order by name ASC");
+        $items = $this->model->sql("SELECT *  FROM personal_sp WHERE  presence = 1 and personalId =  '$id'  ");
 
         $data = array(
-            "header" => $item[0],
-            "personal" => $personal,
-            "items" => $this->model->sql("SELECT 
-            i.id, i.personalId , p.`name` , i.note, i.returnDate, i.loanDate, i.rent
-            FROM inventory_personal AS i
-            left join personal as p on P.id = i.personalId
-            WHERE i.presence = 1 and i.inventoryId =  '$id' 
-        "),
+            "personal" => $this->model->sql("SELECT *  FROM personal WHERE  presence = 1 and id =  '$id'  ")[0],
+            "items" => $items
         );
         echo json_encode($data);
     }
@@ -67,11 +57,8 @@ class Inventory extends CI_Controller
             foreach ($post['items'] as $row) {
                 $update = array(
                     "note" => $row['note'],
-                    "endDate" => $row['endDate'],
-                    "createDate" => $row['createDate'],
-                    "status" => $row['status'],
                 );
-                $this->db->update('announcement', $update, "id='" . $row['id'] . "'");
+                $this->db->update('personal_sp', $update, "id='" . $row['id'] . "'");
             }
             $data = array(
                 "error" => false,
@@ -79,50 +66,48 @@ class Inventory extends CI_Controller
         }
         echo json_encode($data);
     }
-
-    function newItem(){
-        $post = json_decode(file_get_contents('php://input'), true);
-        $data = array(
-            "error" => true,
-        );
-        if ($post) {
-             
-            $insert = array(
-                "name" => $post['name'],
-                "qty" => $post['qty'], 
-                "presence" => 1,
-                "inputDate" => date("Y-m-d H:i:s"),
-                "updateDate" => date("Y-m-d H:i:s"), 
-            );
-            $this->db->insert('inventory', $insert);
-            
-            $data = array(
-                "error" => false,
-            );
-        }
-        echo json_encode($data);
-    }
-
-    function updateHeader(){
+    function onUpdateUploadSp()
+    {
         $post = json_decode(file_get_contents('php://input'), true);
         $data = array(
             "error" => true,
         );
         if ($post) { 
-            $id = $post['inventoryId'];
-            $update = array( 
-                "qty" => $post['header']['qty'],  
-                "updateDate" => date("Y-m-d H:i:s"), 
+           
+            $update = array(
+                "uploadFile" => $post['uploadFile']['file_name'],
             );
-            $this->db->update('inventory', $update," id = '$id' ");  
+            $this->db->update('personal_sp', $update, "id='" . $post['id'] . "'");
+        
             $data = array(
                 "error" => false,
-                "update" => $update ,
-                "post" => $post,
             );
         }
         echo json_encode($data);
     }
+
+    function onAddRow()
+    {
+        $post = json_decode(file_get_contents('php://input'), true);
+        $data = array(
+            "error" => true,
+        );
+        if ($post) {
+
+            $insert = array(
+                "personalId" => $post['personalId'],
+                "presence" => 1, 
+            );
+            $this->db->insert('personal_sp', $insert);
+
+            $data = array(
+                "error" => false,
+            );
+        }
+        echo json_encode($data);
+    }
+
+     
 
     function onSubmit()
     {
@@ -131,7 +116,7 @@ class Inventory extends CI_Controller
             "error" => true,
         );
         if ($post) {
-            for ($i = 0; $i < (int) $post['item']['qty']; $i++) { 
+            for ($i = 0; $i < (int) $post['item']['qty']; $i++) {
                 $insert = array(
                     "inventoryId" => $post['inventoryId'],
                     "personalId" => $post['item']['personalId'],
@@ -141,7 +126,7 @@ class Inventory extends CI_Controller
                     "rent" => 1,
                     "presence" => 1,
                     "inputDate" => date("Y-m-d H:i:s"),
-                    "updateDate" => date("Y-m-d H:i:s"), 
+                    "updateDate" => date("Y-m-d H:i:s"),
                 );
                 $this->db->insert('inventory_personal', $insert);
             }
@@ -159,11 +144,10 @@ class Inventory extends CI_Controller
             "error" => true,
         );
         if ($post) {
-            $update = array(
-                "rent" => 0,
+            $update = array( 
                 "presence" => 0,
             );
-            $this->db->update('inventory_personal', $update, "id = '" . $post['item']['id'] . "'");
+            $this->db->update('personal_sp', $update, "id = '" . $post['item']['id'] . "'");
             $data = array(
                 "error" => false,
             );

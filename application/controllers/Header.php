@@ -22,7 +22,7 @@ class Header extends CI_Controller
     function index()
     {
         $header = apache_request_headers();
-        $token = $header['Token'];
+        $token = isset($header['Token']) ? $header['Token'] : $header['token'];
 
         $id = $this->model->select("personalId", "personal_access", "token = '$token'");
         $jobPositionId = $this->model->select("jobPositionId", "employment", "personalId = '$id'");

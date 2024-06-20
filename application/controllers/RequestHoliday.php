@@ -100,6 +100,25 @@ class RequestHoliday extends CI_Controller
         echo json_encode($data);
     }
 
+
+    function fnResetAll()
+    {
+        $post = json_decode(file_get_contents('php://input'), true);
+        $error = true;
+        if ($post) { 
+            $update = array(
+                "presence" => 0,
+                "updateDate" => date("Y-m-d H:i:s"),
+            );
+            $this->db->update('request_holiday', $update );
+            $data = array(
+                "error" => false,
+            );
+        }
+        echo json_encode($data);
+    }
+
+
     function onSubmitModel()
     {
         $post = json_decode(file_get_contents('php://input'), true);

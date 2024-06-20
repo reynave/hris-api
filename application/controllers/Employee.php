@@ -11,18 +11,19 @@ class Employee extends CI_Controller
         header('Access-Control-Allow-Methods: GET, POST, PUT');
         header('Content-Type: application/json');
         if (!$this->model->header($this->db->openAPI)) {
-            echo $this->model->error("Error auth");
-            exit;
+         //   echo $this->model->error("Error auth");
+         //   exit;
         }
     }
 
     function index()
     {
+        $jatahCuti =(int)$this->model->select("value", "global_setting", "id = 12");
         $data = array(
             "data" => $this->model->sql("SELECT p.id, p.idx,  p.name,
             jl.name AS 'jobLevel', jp.name AS 'jobPosition',
             s.name AS 'empyStatus', o.name AS 'organization', a.name AS 'approvedLine', b.name as 'branch',
-            e.dateJoinStart,   e.totalHoliday
+            e.dateJoinStart,    0 AS 'sisaCuti'
             FROM personal AS p
             LEFT JOIN employment AS e ON e.personalId = p.id 
             LEFT JOIN employment_joblevel AS jl ON jl.id = e.jobLevelId
@@ -31,8 +32,17 @@ class Employee extends CI_Controller
             LEFT JOIN organization AS o ON o.id = e.organizationId
             LEFT JOIN personal AS a ON a.id = e.approvalLineId
             LEFT JOIN branch AS b ON b.id = e.branchId
-            WHERE p.presence = 1 "),
+            WHERE p.presence = 1  "),
         );
+        $i = 0;
+        foreach($data['data'] as $row){
+           $data['data'][$i]['sisaCuti'] = $jatahCuti - (int)$this->model->select("count(id)", "request_holiday", "presence = 1 and approved = 1 and personalId = '".$row['id']."' ");
+           
+          
+          $i++;
+        }
+
+
         echo json_encode($data);
     }
 
