@@ -49,7 +49,7 @@ class Inventory extends CI_Controller
             "items" => $this->model->sql("SELECT 
             i.id, i.personalId , p.`name` , i.note, i.returnDate, i.loanDate, i.rent
             FROM inventory_personal AS i
-            left join personal as p on P.id = i.personalId
+            left join personal as p on p.id = i.personalId
             WHERE i.presence = 1 and i.inventoryId =  '$id' 
         "),
         );
