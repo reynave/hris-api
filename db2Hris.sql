@@ -1,1 +1,24 @@
-UPDATE SET 
+CREATE TABLE `salary_fix` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`branchId` VARCHAR(50) NOT NULL DEFAULT '' COLLATE 'latin1_swedish_ci',
+	`personalId` VARCHAR(50) NOT NULL DEFAULT '' COLLATE 'latin1_swedish_ci',
+	`position` VARCHAR(50) NOT NULL DEFAULT '' COLLATE 'latin1_swedish_ci',
+	`ratePerHours` INT(11) NOT NULL DEFAULT '0',
+	`qty` INT(11) NOT NULL DEFAULT '0',
+	`total` INT(11) NOT NULL DEFAULT '0',
+	`tax` INT(11) NOT NULL DEFAULT '0',
+	`loan` INT(11) NOT NULL DEFAULT '0',
+	`bpjs` INT(11) NOT NULL DEFAULT '0',
+	`startDate` DATE NOT NULL DEFAULT '2000-01-01',
+	`endDate` DATE NOT NULL DEFAULT '2000-01-01',
+	`presence` TINYINT(1) NOT NULL DEFAULT '1',
+	`inputDate` DATETIME NULL DEFAULT '2023-01-01 00:00:00',
+	`updateDate` DATETIME NULL DEFAULT '2023-01-01 00:00:00',
+	`inputBy` VARCHAR(50) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`updateBy` VARCHAR(50) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	PRIMARY KEY (`id`) USING BTREE
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=358
+;
