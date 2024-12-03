@@ -39,12 +39,12 @@ class SalaryFix extends CI_Controller
             $this->db->trans_start();
 
             $uploadId = uniqid();
-            $branchId = $post['items'][0][0];
-            $startDate = $post['items'][0][2];
-            $endDate = $post['items'][0][3];
+            $branchId = $post['headerSalery'][0][0];
+            $startDate = $post['headerSalery'][0][2];
+            $endDate = $post['headerSalery'][0][3];
 
 
-            for ($i = 2; $i < count($post['items']); $i++) {
+            for ($i = 0; $i < count($post['items']); $i++) {
                 $row = $post['items'][$i];
 
                 if (count($row) > 4) {
@@ -60,6 +60,22 @@ class SalaryFix extends CI_Controller
                         );
                         $this->db->insert("personal", $insertSalary);
                     }
+
+                    if (!$this->model->select("id", "employment", "personalId = '$personalId' ")) {
+                        $idEmployment = $this->model->number('employment');
+                        $insertSalary = array(
+                            "id" =>  $idEmployment,
+                            "personalId" => $personalId,
+                            "branchId" => $branchId, 
+                            
+                            "presence" => 1,
+                            "status" => 1,
+                            "inputDate" => date("Y-m-d H:i:s"),
+                        );
+                        $this->db->insert("employment", $insertSalary);
+                    }
+
+
 
                     $insertSalary = array(
                         "uploadId" => $uploadId,
@@ -104,17 +120,20 @@ class SalaryFix extends CI_Controller
         echo json_encode($data);
     }
 
-    function datatables($id)
+    function datatables()
     {
-        $data = array(
-            "data" => $this->model->sql("SELECT uploadId, personalId,
+        $id = $_GET['id'];
+        $q = "SELECT uploadId, personalId,
                     branchId, startDate, endDate,
                     SUM(total - tax - loan - bpjs) AS 'grandTotal'
                 FROM salary_fix 
                 WHERE presence = 1 AND personalId =  '$id' 
                 GROUP BY branchId, startDate, endDate, personalId, uploadId
                 ORDER BY startDate DESC 
-            "),
+            ";
+        $data = array(
+            "q" => $q,
+            "data" => $this->model->sql($q),
         );
         echo json_encode($data);
     }

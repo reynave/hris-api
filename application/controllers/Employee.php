@@ -22,7 +22,7 @@ class Employee extends CI_Controller
         $data = array(
             "data" => $this->model->sql("SELECT p.id, p.idx,  p.name,
             jl.name AS 'jobLevel', jp.name AS 'jobPosition',
-            s.name AS 'empyStatus', o.name AS 'organization', a.name AS 'approvedLine', b.name as 'branch',
+            s.name AS 'empyStatus', o.name AS 'organization', a.name AS 'approvedLine', b.name as 'branch', e.branchId,
             e.dateJoinStart,    0 AS 'sisaCuti'
             FROM personal AS p
             LEFT JOIN employment AS e ON e.personalId = p.id 
