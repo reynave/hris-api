@@ -91,6 +91,11 @@ class SalaryFix extends CI_Controller
                         "tax" => (int) $row[6],
                         "loan" => (int) $row[7],
                         "bpjs" => (int) $row[8],
+
+                        "treatmentDate" =>  $row[10],
+                        "treatmentTime" =>  $row[11],
+                        "patientName" => $row[12],
+                        
                         "presence" => 1,
 
                         "inputDate" => date("Y-m-d H:i:s"),
@@ -123,13 +128,12 @@ class SalaryFix extends CI_Controller
     function datatables()
     {
         $id = $_GET['id'];
-        $q = "SELECT uploadId, personalId,
-                    branchId, startDate, endDate,
-                    SUM(total - tax - loan - bpjs) AS 'grandTotal'
+        $q = "SELECT   branchId, personalId, concat(YEAR(treatmentDate) , '-', MONTH(treatmentDate) )AS 'period',
+                SUM(total - tax - loan - bpjs) AS 'grandTotal', YEAR(treatmentDate) as 'year',MONTH(treatmentDate) as 'month'
                 FROM salary_fix 
                 WHERE presence = 1 AND personalId =  '$id' 
-                GROUP BY branchId, startDate, endDate, personalId, uploadId
-                ORDER BY startDate DESC 
+                GROUP BY MONTH(treatmentDate), YEAR(treatmentDate), branchId
+                ORDER BY treatmentDate DESC 
             ";
         $data = array(
             "q" => $q,
@@ -144,8 +148,9 @@ class SalaryFix extends CI_Controller
         $data = array(
             "data" => $this->model->sql("SELECT * , (total - tax - loan - bpjs) AS 'grandTotal'
                 FROM salary_fix WHERE presence = 1 
-                AND personalId = '" . $get['id'] . "' AND uploadId = '" . $get['uploadId'] . "'
-                ORDER BY startDate DESC
+                AND branchId = '" . $get['branchId'] . "' and  personalId = '" . $get['id'] . "' AND MONTH(treatmentDate) = '" . $get['month'] . "' 
+                AND  YEAR(treatmentDate) = '" . $get['year'] . "'
+                ORDER BY treatmentDate ASC
             "),
         );
         echo json_encode($data);
