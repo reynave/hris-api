@@ -10,8 +10,8 @@ class SalaryFix extends CI_Controller
         header('Access-Control-Allow-Methods: GET, POST, PUT');
         header('Content-Type: application/json');
         if (!$this->model->header($this->db->openAPI)) {
-            //  echo $this->model->error("Error auth");
-            //   exit;
+              echo $this->model->error("Error auth");
+               exit;
         }
     }
     function index()
@@ -48,7 +48,7 @@ class SalaryFix extends CI_Controller
                 $row = $post['items'][$i];
 
                 if (count($row) > 4) {
-                    $personalId = strtolower(url_title($row[0]));
+                    $personalId =  strtolower($branchId.'.'.url_title($row[0]));
 
                     if (!$this->model->select("id", "personal", "id = '$personalId' ")) {
                         $insertSalary = array(
@@ -67,6 +67,7 @@ class SalaryFix extends CI_Controller
                             "id" =>  $idEmployment,
                             "personalId" => $personalId,
                             "branchId" => $branchId, 
+                            "jobPositionId" => $row[2], 
                             
                             "presence" => 1,
                             "status" => 1,
@@ -75,8 +76,14 @@ class SalaryFix extends CI_Controller
                         $this->db->insert("employment", $insertSalary);
                     }
 
-
-
+                    if (!$this->model->select("id", "employment_jobposition", "id = '".$row[2]."' ")) {
+                        $insertSalary = array(
+                            "id" =>  $row[2],
+                            "name" => $row[2], 
+                            "presence" => 1, 
+                        );
+                        $this->db->insert("employment_jobposition", $insertSalary);
+                    }
                     $insertSalary = array(
                         "uploadId" => $uploadId,
                         "branchId" => $branchId,
@@ -128,12 +135,16 @@ class SalaryFix extends CI_Controller
     function datatables()
     {
         $id = $_GET['id'];
-        $q = "SELECT   branchId, personalId, concat(YEAR(treatmentDate) , '-', MONTH(treatmentDate) )AS 'period',
-                SUM(total - tax - loan - bpjs) AS 'grandTotal', YEAR(treatmentDate) as 'year',MONTH(treatmentDate) as 'month'
-                FROM salary_fix 
-                WHERE presence = 1 AND personalId =  '$id' 
-                GROUP BY MONTH(treatmentDate), YEAR(treatmentDate), branchId
-                ORDER BY treatmentDate DESC 
+        $q = "SELECT  branchId, personalId, CONCAT( YEAR , '-',LPAD(MONTH, 2, '0')) AS 'period',  
+            YEAR , MONTH, sum(grandTotal) AS 'grandTotal' , COUNT(grandTotal) AS 'qty'
+        FROM (
+            SELECT   branchId, personalId, YEAR(treatmentDate) as 'year', MONTH(treatmentDate) as 'month',
+            (total - tax - loan - bpjs) AS 'grandTotal'
+            FROM salary_fix 
+            WHERE   personalId =  '$id'  
+        ) AS a 
+        GROUP BY branchId, personalId, YEAR , MONTH
+        ORDER BY YEAR, MONTH DESC 
             ";
         $data = array(
             "q" => $q,
@@ -145,13 +156,19 @@ class SalaryFix extends CI_Controller
     function datatablesDetail()
     {
         $get = $this->input->get();
+        $items = $this->model->sql("SELECT * , (total - tax - loan - bpjs) AS 'grandTotal'
+        FROM salary_fix WHERE presence = 1 
+        AND branchId = '" . $get['branchId'] . "' and  personalId = '" . $get['id'] . "' AND MONTH(treatmentDate) = '" . $get['month'] . "' 
+        AND  YEAR(treatmentDate) = '" . $get['year'] . "'
+        ORDER BY treatmentDate ASC
+    ");
+    $i = 0;
+    foreach($items as $row){
+        $items[$i]['checkbox'] = 0;
+        $i++;
+    }
         $data = array(
-            "data" => $this->model->sql("SELECT * , (total - tax - loan - bpjs) AS 'grandTotal'
-                FROM salary_fix WHERE presence = 1 
-                AND branchId = '" . $get['branchId'] . "' and  personalId = '" . $get['id'] . "' AND MONTH(treatmentDate) = '" . $get['month'] . "' 
-                AND  YEAR(treatmentDate) = '" . $get['year'] . "'
-                ORDER BY treatmentDate ASC
-            "),
+            "data" => $items,
         );
         echo json_encode($data);
     }
@@ -206,6 +223,32 @@ class SalaryFix extends CI_Controller
                 order by p.name ASC
             "),
         );
+        echo json_encode($data);
+    }
+
+    function deleteAll(){
+        $post = json_decode(file_get_contents('php://input'), true);
+        $data = array(
+            "error" => true,
+        );
+
+        if ($post) {
+            foreach($post['items'] as $row){
+               
+                $update = array(
+                    "presence" => 0,
+                    "updateDate" => date("Y-m-d H:i:s")
+                ); 
+                if($row['checkbox'] == 1 ){ 
+                    $this->db->update('salary_fix', $update, "id='" . $row['id'] . "'");
+                }
+             
+            }
+           
+            $data = array(
+                "error" => false,
+            );
+        }
         echo json_encode($data);
     }
 }

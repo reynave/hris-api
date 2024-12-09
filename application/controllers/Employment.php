@@ -11,8 +11,8 @@ class Employment extends CI_Controller
         header('Access-Control-Allow-Methods: GET, POST, PUT');
         header('Content-Type: application/json');
         if (!$this->model->header($this->db->openAPI)) {
-            echo $this->model->error("Error auth");
-            exit;
+             echo $this->model->error("Error auth");
+             exit;
         }
     }
 
